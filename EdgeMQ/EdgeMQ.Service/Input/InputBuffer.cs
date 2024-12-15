@@ -26,7 +26,7 @@ public sealed class InputBuffer
             return;
         }
 
-        await _semaphore.WaitAsync();
+        await _semaphore.WaitAsync(cancellationToken);
 
         Interlocked.Add(ref _currentSize, payload.Length);
         Interlocked.Increment(ref _currentCount);
@@ -38,7 +38,7 @@ public sealed class InputBuffer
 
         try
         {
-            await _inputChanel.Writer.WriteAsync(message);
+            await _inputChanel.Writer.WriteAsync(message, cancellationToken);
         }
         finally
         {
@@ -54,7 +54,7 @@ public sealed class InputBuffer
 
         try
         {
-            await foreach (var message in _inputChanel.Reader.ReadAllAsync(cancellationToken))
+            while (_inputChanel.Reader.TryRead(out var message))
             {
                 Interlocked.Add(ref _currentSize, -1 * message.Payload.Length);
                 Interlocked.Decrement(ref _currentCount);
@@ -73,8 +73,8 @@ public sealed class InputBuffer
     private bool CheckConstraints(ref byte[] payload)
     {
         var valid = !(payload.Length > _configuration.MaxMessageSizeBytes
-                     || _currentSize + payload.Length >= (long) _configuration.MaxBufferSizeBytes
-                     || _currentCount + 1 >= _configuration.MaxMessageCount);
+                     || _currentSize + payload.Length > (long) _configuration.MaxBufferSizeBytes
+                     || _currentCount + 1 > _configuration.MaxMessageCount);
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
         {
