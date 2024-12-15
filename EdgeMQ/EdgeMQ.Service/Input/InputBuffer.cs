@@ -15,7 +15,7 @@ public sealed class InputBuffer
 
     public InputBuffer(InputBufferConfiguration configuration)
     {
-        _inputChanel = Channel.CreateBounded<BufferMessage>((int) configuration.MaxMessageCount);
+        _inputChanel = Channel.CreateBounded<BufferMessage>(configuration.MaxMessageCount);
         _configuration = configuration;
     }
 
@@ -73,7 +73,7 @@ public sealed class InputBuffer
     private bool CheckConstraints(ref byte[] payload)
     {
         var valid = !(payload.Length > _configuration.MaxMessageSizeBytes
-                     || _currentSize + payload.Length > (long) _configuration.MaxBufferSizeBytes
+                     || _currentSize + payload.Length > _configuration.MaxBufferSizeBytes
                      || _currentCount + 1 > _configuration.MaxMessageCount);
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
@@ -84,7 +84,11 @@ public sealed class InputBuffer
         return valid;
     }
 
-    public long MessagesCount => _currentCount;
+    public long MessageCount => _currentCount;
 
-    public long PayloadSize => _currentSize;
+    public long MessageSizeBytes => _currentSize;
+
+    public long MaxMessageCount => _configuration.MaxMessageCount;
+
+    public long MaxMessageSizeBytes => _configuration.MaxBufferSizeBytes;
 }

@@ -7,7 +7,7 @@ namespace EdgeMQ.Service.UnitTests;
 public sealed class InputBufferTests
 {
     [Fact]
-    public async Task AddAndRead_MessagesAdded_Removed()
+    public async Task Add_MessagesAdded()
     {
         var config = new InputBufferConfiguration();
         var buffer = new InputBuffer(config);
@@ -18,14 +18,14 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessagesCount.ShouldBe(3);
-        buffer.PayloadSize.ShouldBe(15);
+        buffer.MessageCount.ShouldBe(3);
+        buffer.MessageSizeBytes.ShouldBe(15);
 
         var messages = await buffer.ReadAllAsync(token);
 
         messages.Count.ShouldBe(3);
-        buffer.MessagesCount.ShouldBe(0);
-        buffer.PayloadSize.ShouldBe(0);
+        buffer.MessageCount.ShouldBe(0);
+        buffer.MessageSizeBytes.ShouldBe(0);
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessagesCount.ShouldBe(2);
-        buffer.PayloadSize.ShouldBe(10);
+        buffer.MessageCount.ShouldBe(2);
+        buffer.MessageSizeBytes.ShouldBe(10);
     }
 
     [Fact]
@@ -64,8 +64,8 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessagesCount.ShouldBe(2);
-        buffer.PayloadSize.ShouldBe(10);
+        buffer.MessageCount.ShouldBe(2);
+        buffer.MessageSizeBytes.ShouldBe(10);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessagesCount.ShouldBe(0);
-        buffer.PayloadSize.ShouldBe(0);
+        buffer.MessageCount.ShouldBe(0);
+        buffer.MessageSizeBytes.ShouldBe(0);
     }
 }
