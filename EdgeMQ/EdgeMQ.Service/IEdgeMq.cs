@@ -11,6 +11,8 @@ public interface IEdgeMq
 
     Task DeQueueAsync(uint batchSize, Func<Task, IReadOnlyCollection<Message>> process, TimeSpan timeOut, CancellationToken cancellationToken);
 
+    Task<IReadOnlyCollection<Message>> DeQueueAsync(uint batchSize, CancellationToken cancellationToken);
+
     Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken);
 
     Task AcknowledgeAsync(Guid batchId, CancellationToken cancellationToken);

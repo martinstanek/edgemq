@@ -32,6 +32,50 @@ public sealed class EdgeMqTests
         queue.Stop();
     }
 
+    [Fact]
+    public async Task Acknowledge_MessagesAcknowledged_QueueAltered()
+    {
+        var queue = new EdgeMqTestsContext().GetQueue();
+        var token = CancellationToken.None;
+        var payload = "test"u8.ToArray();
+
+        queue.Start(CancellationToken.None);
+
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+
+        var messages = await queue.PeekAsync(batchSize: 10, token);
+        var batchId = messages.First().BatchId;
+
+        await queue.AcknowledgeAsync(batchId, token);
+
+        queue.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Stop();
+    }
+
+    [Fact]
+    public async Task DirectDeque_MessagesAcknowledged_QueueAltered()
+    {
+        var queue = new EdgeMqTestsContext().GetQueue();
+        var token = CancellationToken.None;
+        var payload = "test"u8.ToArray();
+
+        queue.Start(CancellationToken.None);
+
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+
+        var messages = await queue.DeQueueAsync(10, token);
+
+        messages.Count.ShouldBe(3);
+        queue.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Stop();
+    }
+
     private sealed class EdgeMqTestsContext
     {
         internal IEdgeMq GetQueue()
