@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,8 +12,10 @@ namespace EdgeMQ.Service;
 public sealed class EdgeMq : IEdgeMq
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly ConcurrentBag<Message> _peekedMessages = new();
     private readonly InputBuffer _inputBuffer;
     private readonly IMessageStore _messageStore;
+    private Guid _currentBatchId = Guid.Empty;
 
     private bool _isStopped;
 
@@ -32,9 +35,28 @@ public sealed class EdgeMq : IEdgeMq
         throw new NotImplementedException();
     }
 
-    public Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _semaphore.WaitAsync(cancellationToken);
+
+        try
+        {
+            _peekedMessages.Clear();
+            _currentBatchId = Guid.NewGuid();
+
+            var peekedMessages = await _messageStore.ReadMessagesAsync(batchSize);
+
+            foreach (var message in peekedMessages)
+            {
+                _peekedMessages.Add(message with { BatchId = _currentBatchId });
+            }
+
+            return _peekedMessages;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public Task AckAsync(Guid batchId)
@@ -58,7 +80,7 @@ public sealed class EdgeMq : IEdgeMq
 
     public void Start(CancellationToken cancellationToken)
     {
-        _ = ProcessQueueAsync(cancellationToken);
+        Task.Factory.StartNew(() => ProcessQueueAsync(cancellationToken), TaskCreationOptions.LongRunning);
     }
 
     public void Stop()
@@ -107,11 +129,11 @@ public sealed class EdgeMq : IEdgeMq
 
     public ulong BufferMessageCount => _inputBuffer.MessageCount;
 
-    public ulong BufferMessageSizeBytes { get; }
+    public ulong BufferMessageSizeBytes => _inputBuffer.MaxMessageSizeBytes;
 
-    public ulong MaxMessageCount { get; }
+    public ulong MaxMessageCount => _messageStore.MaxMessageCount;
 
-    public ulong MaxMessageSizeBytes { get; }
+    public ulong MaxMessageSizeBytes => _messageStore.MessageSizeBytes;
 
-    public ulong CurrentCurrentId { get; }
+    public ulong CurrentCurrentId => _messageStore.CurrentCurrentId;
 }

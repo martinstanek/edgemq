@@ -18,6 +18,8 @@ public sealed class EdgeMqTests
         var store = new InMemoryMessageStore(storeConfig);
         var queue = new EdgeMq(buffer, store);
 
+        queue.Start(CancellationToken.None);
+
         await queue.QueueAsync(payload, token);
         await queue.QueueAsync(payload, token);
         await queue.QueueAsync(payload, token);
@@ -25,8 +27,8 @@ public sealed class EdgeMqTests
         var messages = await queue.PeekAsync(batchSize: 10, token);
 
         messages.Count.ShouldBe(3);
+        messages.All(a => a.BatchId == messages.First().BatchId).ShouldBeTrue();
 
-
-
+        queue.Stop();
     }
 }
