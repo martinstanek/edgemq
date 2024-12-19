@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using EdgeMQ.Service.Exceptions;
 using EdgeMQ.Service.Input;
 using EdgeMQ.Service.Store;
 
@@ -59,9 +60,25 @@ public sealed class EdgeMq : IEdgeMq
         }
     }
 
-    public Task AckAsync(Guid batchId)
+    public async Task AcknowledgeAsync(Guid batchId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _semaphore.WaitAsync(cancellationToken);
+
+        try
+        {
+            if (!batchId.Equals(_currentBatchId))
+            {
+                throw new EdgeQueueAcknowledgeException("The batch id is obsolete");
+            }
+
+            var idsToDelete = _peekedMessages.Select(s => s.Id).ToList();
+
+            await _messageStore.DeleteMessagesAsync(idsToDelete);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public async Task DeQueueAsync(uint batchSize, Func<Task, IReadOnlyCollection<Message>> process, CancellationToken cancellationToken)
@@ -129,7 +146,7 @@ public sealed class EdgeMq : IEdgeMq
 
     public ulong BufferMessageCount => _inputBuffer.MessageCount;
 
-    public ulong BufferMessageSizeBytes => _inputBuffer.MaxMessageSizeBytes;
+    public ulong BufferMessageSizeBytes => _inputBuffer.MessageSizeBytes;
 
     public ulong MaxMessageCount => _messageStore.MaxMessageCount;
 

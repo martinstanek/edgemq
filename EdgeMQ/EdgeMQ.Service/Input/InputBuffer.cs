@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using EdgeMQ.Service.Exceptions;
 
 namespace EdgeMQ.Service.Input;
 
@@ -78,7 +79,7 @@ public sealed class InputBuffer
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
         {
-            throw new EdgeQueueInputException();
+            throw new EdgeQueueInputException("Input buffer constraints violated");
         }
 
         return valid;

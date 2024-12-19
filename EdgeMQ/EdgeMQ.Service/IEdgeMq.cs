@@ -13,7 +13,7 @@ public interface IEdgeMq
 
     Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken);
 
-    Task AckAsync(Guid batchId);
+    Task AcknowledgeAsync(Guid batchId, CancellationToken cancellationToken);
 
     void Start(CancellationToken cancellationToken);
 
