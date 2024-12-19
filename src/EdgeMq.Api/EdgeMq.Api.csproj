@@ -9,4 +9,8 @@
         <PublishAot>true</PublishAot>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\EdgeMq.Model\EdgeMq.Model.csproj" />
+    </ItemGroup>
+
 </Project>
