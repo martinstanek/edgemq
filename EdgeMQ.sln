@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3451FB53-2ABA-430A-901B-82700DF0E2E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{53533156-2EDF-4A5C-A9D8-A176D77E6B7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ", "src\EdgeMQ\EdgeMQ.csproj", "{ABD60FA4-7886-44EF-A3B7-8594FCF2A882}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ.Service", "src\EdgeMQ.Service\EdgeMQ.Service.csproj", "{94339474-9A88-488F-A814-1046F5838CC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ.Service.UnitTests", "tests\EdgeMQ.Service.UnitTests\EdgeMQ.Service.UnitTests.csproj", "{8527CE50-8C54-4BA5-9593-C39B46809D71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ABD60FA4-7886-44EF-A3B7-8594FCF2A882}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABD60FA4-7886-44EF-A3B7-8594FCF2A882}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABD60FA4-7886-44EF-A3B7-8594FCF2A882}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABD60FA4-7886-44EF-A3B7-8594FCF2A882}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94339474-9A88-488F-A814-1046F5838CC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94339474-9A88-488F-A814-1046F5838CC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94339474-9A88-488F-A814-1046F5838CC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94339474-9A88-488F-A814-1046F5838CC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8527CE50-8C54-4BA5-9593-C39B46809D71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8527CE50-8C54-4BA5-9593-C39B46809D71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8527CE50-8C54-4BA5-9593-C39B46809D71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8527CE50-8C54-4BA5-9593-C39B46809D71}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ABD60FA4-7886-44EF-A3B7-8594FCF2A882} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
+		{94339474-9A88-488F-A814-1046F5838CC4} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
+		{8527CE50-8C54-4BA5-9593-C39B46809D71} = {53533156-2EDF-4A5C-A9D8-A176D77E6B7C}
+	EndGlobalSection
+EndGlobal

@@ -1,5 +1,5 @@
-﻿using EdgeMQ.Extensions;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
+using EdgeMQ.Extensions;
 using EdgeMQ.Service.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);

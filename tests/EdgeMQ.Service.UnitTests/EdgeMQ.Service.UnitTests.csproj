@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EdgeMQ.Service\EdgeMQ.Service.csproj" />
+      <ProjectReference Include="..\..\src\EdgeMQ.Service\EdgeMQ.Service.csproj" />
     </ItemGroup>
 
 </Project>
