@@ -10,12 +10,12 @@ public sealed class InputBuffer
     private readonly InputBufferConfiguration _configuration;
     private readonly Channel<BufferMessage> _inputChanel;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private long _currentCount;
-    private long _currentSize;
+    private ulong _currentCount;
+    private ulong _currentSize;
 
     public InputBuffer(InputBufferConfiguration configuration)
     {
-        _inputChanel = Channel.CreateBounded<BufferMessage>(configuration.MaxMessageCount);
+        _inputChanel = Channel.CreateBounded<BufferMessage>((int) configuration.MaxMessageCount);
         _configuration = configuration;
     }
 
@@ -28,8 +28,8 @@ public sealed class InputBuffer
 
         await _semaphore.WaitAsync(cancellationToken);
 
-        Interlocked.Add(ref _currentSize, payload.Length);
-        Interlocked.Increment(ref _currentCount);
+        _currentSize += (uint) payload.Length;
+        _currentCount++;
 
         var message = new BufferMessage
         {
@@ -56,8 +56,8 @@ public sealed class InputBuffer
         {
             while (_inputChanel.Reader.TryRead(out var message))
             {
-                Interlocked.Add(ref _currentSize, -1 * message.Payload.Length);
-                Interlocked.Decrement(ref _currentCount);
+                _currentSize -= (uint) message.Payload.Length;
+                _currentCount--;
 
                 messages.Add(message);
             }
@@ -73,7 +73,7 @@ public sealed class InputBuffer
     private bool CheckConstraints(ref byte[] payload)
     {
         var valid = !(payload.Length > _configuration.MaxMessageSizeBytes
-                     || _currentSize + payload.Length > _configuration.MaxBufferSizeBytes
+                     || _currentSize + (uint) payload.Length > _configuration.MaxBufferSizeBytes
                      || _currentCount + 1 > _configuration.MaxMessageCount);
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
@@ -84,11 +84,11 @@ public sealed class InputBuffer
         return valid;
     }
 
-    public long MessageCount => _currentCount;
+    public ulong MessageCount => _currentCount;
 
-    public long MessageSizeBytes => _currentSize;
+    public ulong MessageSizeBytes => _currentSize;
 
-    public long MaxMessageCount => _configuration.MaxMessageCount;
+    public ulong MaxMessageCount => _configuration.MaxMessageCount;
 
-    public long MaxMessageSizeBytes => _configuration.MaxBufferSizeBytes;
+    public ulong MaxMessageSizeBytes => _configuration.MaxBufferSizeBytes;
 }

@@ -100,4 +100,18 @@ public sealed class EdgeMq : IEdgeMq
 
         await _messageStore.AddMessagesAsync(messagePayloadsToStore);
     }
+
+    public ulong MessageCount => _messageStore.MessageCount;
+
+    public ulong MessageSizeBytes => _messageStore.MessageSizeBytes;
+
+    public ulong BufferMessageCount => _inputBuffer.MessageCount;
+
+    public ulong BufferMessageSizeBytes { get; }
+
+    public ulong MaxMessageCount { get; }
+
+    public ulong MaxMessageSizeBytes { get; }
+
+    public ulong CurrentCurrentId { get; }
 }

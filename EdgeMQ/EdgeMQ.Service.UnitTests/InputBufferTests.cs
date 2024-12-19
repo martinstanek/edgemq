@@ -18,14 +18,14 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessageCount.ShouldBe(3);
-        buffer.MessageSizeBytes.ShouldBe(15);
+        buffer.MessageCount.ShouldBe((ulong) 3);
+        buffer.MessageSizeBytes.ShouldBe((ulong) 15);
 
         var messages = await buffer.ReadAllAsync(token);
 
         messages.Count.ShouldBe(3);
-        buffer.MessageCount.ShouldBe(0);
-        buffer.MessageSizeBytes.ShouldBe(0);
+        buffer.MessageCount.ShouldBe((ulong) 0);
+        buffer.MessageSizeBytes.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessageCount.ShouldBe(2);
-        buffer.MessageSizeBytes.ShouldBe(10);
+        buffer.MessageCount.ShouldBe((ulong) 2);
+        buffer.MessageSizeBytes.ShouldBe((ulong) 10);
     }
 
     [Fact]
@@ -64,8 +64,8 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessageCount.ShouldBe(2);
-        buffer.MessageSizeBytes.ShouldBe(10);
+        buffer.MessageCount.ShouldBe((ulong) 2);
+        buffer.MessageSizeBytes.ShouldBe((ulong) 10);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public sealed class InputBufferTests
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
 
-        buffer.MessageCount.ShouldBe(0);
-        buffer.MessageSizeBytes.ShouldBe(0);
+        buffer.MessageCount.ShouldBe((ulong) 0);
+        buffer.MessageSizeBytes.ShouldBe((ulong) 0);
     }
 }
