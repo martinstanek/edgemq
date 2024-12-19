@@ -37,7 +37,7 @@ public sealed class EdgeMq : IEdgeMq
         throw new NotImplementedException();
     }
 
-    public Task AckAsync(string batchId)
+    public Task AckAsync(Guid batchId)
     {
         throw new NotImplementedException();
     }

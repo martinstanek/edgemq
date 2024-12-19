@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,53 +9,81 @@ namespace EdgeMQ.Service.Store;
 public sealed class InMemoryMessageStore : IMessageStore
 {
     private readonly ConcurrentDictionary<ulong, Message> _messages = new();
-    private long _currentCount;
-    private long _currentSize;
+    private readonly MessageStoreConfiguration _config;
+    private readonly Lock _lock = new();
+    private ulong _currentCount;
+    private ulong _currentSize;
     private ulong _currentId;
+
+    public InMemoryMessageStore(MessageStoreConfiguration config)
+    {
+        _config = config;
+    }
 
     public Task InitAsync()
     {
-        _currentCount = 0;
-        _currentSize = 0;
-        _currentId = 0;
+        lock (_lock)
+        {
+            _currentCount = 0;
+            _currentSize = 0;
+            _currentId = 0;
+        }
 
         return Task.CompletedTask;
     }
 
     public Task AddMessagesAsync(IReadOnlyCollection<byte[]> messagePayloads)
     {
-        foreach (var payload in messagePayloads)
+        lock (_lock)
         {
-            var message = new Message
+            foreach (var payload in messagePayloads)
             {
-                Id = GetNextId(),
-                Payload = payload
-            };
+                var message = new Message
+                {
+                    Id = GetNextId(),
+                    Payload = payload
+                };
 
-            _messages[message.Id] = message;
-
-            Interlocked.Increment(ref _currentCount);
-            Interlocked.Add(ref _currentSize, message.Payload.Length);
+                _messages[message.Id] = message;
+                _currentCount++;
+                _currentSize += (ulong)message.Payload.Length;
+            }
         }
 
         return Task.CompletedTask;
     }
 
+    public Task<IReadOnlyCollection<Message>> ReadMessagesAsync()
+    {
+        return ReadMessagesAsync(_config.DefaultBatchSize);
+    }
+
     public Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize)
     {
-        throw new System.NotImplementedException();
+        var result = _messages
+            .OrderBy(m => m.Key)
+            .Select(s => s.Value)
+            .Take((int)batchSize)
+            .ToList();
+
+        return Task.FromResult<IReadOnlyCollection<Message>>(result);
     }
 
     public Task DeleteMessagesAsync(IReadOnlyCollection<ulong> messageIds)
     {
-        foreach (var messageId in messageIds)
+        lock (_lock)
         {
-            _messages.Remove(messageId, out var deletedMessage);
-
-            if (deletedMessage is not null)
+            foreach (var messageId in messageIds)
             {
-                Interlocked.Decrement(ref _currentCount);
-                Interlocked.Add(ref _currentSize, -1 * deletedMessage.Payload.Length);
+                _messages.Remove(messageId, out var deletedMessage);
+
+                if (deletedMessage is null)
+                {
+                    continue;
+                }
+
+                _currentCount--;
+                _currentSize -= (uint)deletedMessage.Payload.Length;
             }
         }
 
@@ -66,13 +95,13 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Interlocked.Increment(ref _currentId);
     }
 
-    public long MessageCount => _currentCount;
+    public ulong MessageCount => _currentCount;
 
-    public long MessageSizeBytes => _currentSize;
+    public ulong MessageSizeBytes => _currentSize;
 
     public ulong CurrentCurrentId => _currentId;
 
-    public long MaxMessageCount { get; }
+    public ulong MaxMessageCount => _config.MaxMessageCount;
 
-    public long MaxMessageSizeBytes { get; }
+    public ulong MaxMessageSizeBytes => _config.MaxMessageSizeBytes;
 }

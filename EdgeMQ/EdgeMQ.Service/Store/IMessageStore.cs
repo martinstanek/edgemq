@@ -9,17 +9,19 @@ public interface IMessageStore
 
     Task AddMessagesAsync(IReadOnlyCollection<byte[]> messagePayloads);
 
+    Task<IReadOnlyCollection<Message>> ReadMessagesAsync();
+
     Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize);
 
     Task DeleteMessagesAsync(IReadOnlyCollection<ulong> messageIds);
 
-    public long MessageCount { get; }
+    public ulong MessageCount { get; }
 
-    public long MessageSizeBytes { get; }
+    public ulong MessageSizeBytes { get; }
 
-    public long MaxMessageCount { get; }
+    public ulong MaxMessageCount { get; }
 
-    public long MaxMessageSizeBytes { get; }
+    public ulong MaxMessageSizeBytes { get; }
 
     public ulong CurrentCurrentId { get; }
 }

@@ -9,36 +9,37 @@ public sealed class MessageStoreTests
     [Fact]
     public async Task AddMessages_MessagesAdded()
     {
-        var store = new InMemoryMessageStore();
-        var message1 = new Message { Id = 1, Payload = "hello"u8.ToArray() };
-        var message2 = new Message { Id = 2, Payload = "hello"u8.ToArray() };
+        var config = new MessageStoreConfiguration();
+        var store = new InMemoryMessageStore(config);
+        var payload = "hello"u8.ToArray();
 
-        await store.AddMessagesAsync([message1, message2]);
+        await store.AddMessagesAsync([payload, payload]);
 
-        store.MessageCount.ShouldBe(2);
-        store.MessageSizeBytes.ShouldBe(10);
+        store.MessageCount.ShouldBe((ulong) 2);
+        store.MessageSizeBytes.ShouldBe((ulong) 10);
     }
 
     [Fact]
     public async Task DeleteMessages_MessagesDeleted()
     {
-        var store = new InMemoryMessageStore();
-        var message1 = new Message { Id = 1, Payload = "hello"u8.ToArray() };
-        var message2 = new Message { Id = 2, Payload = "hello"u8.ToArray() };
+        var config = new MessageStoreConfiguration();
+        var store = new InMemoryMessageStore(config);
+        var payload = "hello"u8.ToArray();
 
-        await store.AddMessagesAsync([message1, message2]);
+        await store.AddMessagesAsync([payload, payload]);
 
-        store.MessageCount.ShouldBe(2);
-        store.MessageSizeBytes.ShouldBe(10);
+        var messages = await store.ReadMessagesAsync();
 
-        await store.DeleteMessagesAsync([message1.Id]);
+        messages.Count.ShouldBe(2);
 
-        store.MessageCount.ShouldBe(1);
-        store.MessageSizeBytes.ShouldBe(5);
+        await store.DeleteMessagesAsync([messages.First().Id]);
 
-        await store.DeleteMessagesAsync([message2.Id]);
+        store.MessageCount.ShouldBe((ulong) 1);
+        store.MessageSizeBytes.ShouldBe((ulong) 5);
 
-        store.MessageCount.ShouldBe(0);
-        store.MessageSizeBytes.ShouldBe(0);
+        await store.DeleteMessagesAsync([messages.Last().Id]);
+
+        store.MessageCount.ShouldBe((ulong) 0);
+        store.MessageSizeBytes.ShouldBe((ulong) 0);
     }
 }
