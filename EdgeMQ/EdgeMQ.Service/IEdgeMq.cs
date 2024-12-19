@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace EdgeMQ.Service;
 
-public interface IEdgeMq
+public interface IEdgeMq : IDisposable
 {
     Task QueueAsync(byte[] payload, CancellationToken cancellationToken);
 
-    Task DeQueueAsync(uint batchSize, Func<Task, IReadOnlyCollection<Message>> process, TimeSpan timeOut, CancellationToken cancellationToken);
+    Task DeQueueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<Message>> DeQueueAsync(uint batchSize, CancellationToken cancellationToken);
 

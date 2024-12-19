@@ -10,7 +10,7 @@ public sealed class EdgeMqTests
     [Fact]
     public async Task Peek_MessagesPeeked_QueueNotAltered()
     {
-        var queue = new EdgeMqTestsContext().GetQueue();
+        using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
         var payload = "test"u8.ToArray();
 
@@ -29,13 +29,12 @@ public sealed class EdgeMqTests
         queue.CurrentCurrentId.ShouldBe((ulong) 3);
         queue.MessageSizeBytes.ShouldBe((ulong) 12);
         queue.MessageCount.ShouldBe((ulong) 3);
-        queue.Stop();
     }
 
     [Fact]
     public async Task Acknowledge_MessagesAcknowledged_QueueAltered()
     {
-        var queue = new EdgeMqTestsContext().GetQueue();
+        using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
         var payload = "test"u8.ToArray();
 
@@ -58,7 +57,7 @@ public sealed class EdgeMqTests
     [Fact]
     public async Task DirectDeque_MessagesAcknowledged_QueueAltered()
     {
-        var queue = new EdgeMqTestsContext().GetQueue();
+        using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
         var payload = "test"u8.ToArray();
 
@@ -71,6 +70,34 @@ public sealed class EdgeMqTests
         var messages = await queue.DeQueueAsync(10, token);
 
         messages.Count.ShouldBe(3);
+        queue.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Stop();
+    }
+
+    [Fact]
+    public async Task Deque_MessagesAcknowledged_QueueAltered()
+    {
+        using var queue = new EdgeMqTestsContext().GetQueue();
+        var token = CancellationToken.None;
+        var payload = "test"u8.ToArray();
+        var messages = Array.Empty<Message>();
+
+        queue.Start(CancellationToken.None);
+
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+
+        await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
+        {
+            messages = m.ToArray();
+
+            return Task.CompletedTask;
+
+        }, token);
+
+        messages.Length.ShouldBe(3);
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.MessageCount.ShouldBe((ulong) 0);
         queue.Stop();

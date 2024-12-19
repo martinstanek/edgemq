@@ -17,7 +17,6 @@ public sealed class EdgeMq : IEdgeMq
     private readonly InputBuffer _inputBuffer;
     private readonly IMessageStore _messageStore;
     private Guid _currentBatchId = Guid.Empty;
-
     private bool _isStopped;
 
     public EdgeMq(InputBuffer inputBuffer, IMessageStore messageStore)
@@ -31,13 +30,18 @@ public sealed class EdgeMq : IEdgeMq
         return _inputBuffer.AddAsync(payload, cancellationToken);
     }
 
-    public async Task DeQueueAsync(uint batchSize, Func<Task, IReadOnlyCollection<Message>> process, TimeSpan timeOut, CancellationToken cancellationToken)
+    public async Task DeQueueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
 
+        var timeOutSource = new CancellationTokenSource(timeOut);
+        var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(timeOutSource.Token, cancellationToken);
+
         try
         {
-
+            await NonBlockingPeekAsync(batchSize);
+            await Task.Run(() => process(_peekedMessages), linkedSource.Token);
+            await NonBlockingAcknowledgeAsync(_currentBatchId);
         }
         finally
         {
@@ -100,6 +104,11 @@ public sealed class EdgeMq : IEdgeMq
         _isStopped = true;
     }
 
+    public void Dispose()
+    {
+        Stop();
+    }
+
     private async Task<IReadOnlyCollection<Message>> NonBlockingPeekAsync(uint batchSize)
     {
         _peekedMessages.Clear();
@@ -120,6 +129,11 @@ public sealed class EdgeMq : IEdgeMq
         if (!batchId.Equals(_currentBatchId))
         {
             throw new EdgeQueueAcknowledgeException("The batch id is obsolete");
+        }
+
+        if (!_peekedMessages.Any(p => p.BatchId.Equals(batchId)))
+        {
+            throw new EdgeQueueAcknowledgeException("The batch id is invalid");
         }
 
         var idsToDelete = _peekedMessages.Select(s => s.Id).ToList();
