@@ -3,5 +3,5 @@ using EdgeMq.Model;
 
 namespace EdgeMq.Api.Serialization;
 
-[JsonSerializable(typeof(Todo[]))]
+[JsonSerializable(typeof(QueueMetrics))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext { }

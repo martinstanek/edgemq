@@ -11,6 +11,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\EdgeMq.Model\EdgeMq.Model.csproj" />
+      <ProjectReference Include="..\EdgeMQ.Service\EdgeMQ.Service.csproj" />
     </ItemGroup>
 
 </Project>
