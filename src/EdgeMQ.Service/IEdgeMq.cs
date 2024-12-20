@@ -21,6 +21,8 @@ public interface IEdgeMq : IDisposable
 
     void Stop();
 
+    public string Name { get; }
+
     public ulong MessageCount { get; }
 
     public ulong MessageSizeBytes { get; }

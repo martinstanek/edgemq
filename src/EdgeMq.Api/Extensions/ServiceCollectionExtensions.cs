@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQueue(this IServiceCollection services)
     {
         return services
-            .AddEdgeMq()
+            .AddEdgeMq("test-queue")
             .AddHostedService<QueueService>();
     }
 }

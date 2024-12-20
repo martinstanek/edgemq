@@ -14,15 +14,17 @@ public sealed class EdgeMq : IEdgeMq
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly ConcurrentBag<Message> _peekedMessages = new();
+    private readonly EdgeQueueConfiguration _configuration;
     private readonly InputBuffer _inputBuffer;
     private readonly IMessageStore _messageStore;
     private Guid _currentBatchId = Guid.Empty;
     private bool _isStopped;
 
-    public EdgeMq(InputBuffer inputBuffer, IMessageStore messageStore)
+    public EdgeMq(InputBuffer inputBuffer, IMessageStore messageStore, EdgeQueueConfiguration configuration)
     {
         _inputBuffer = inputBuffer;
         _messageStore = messageStore;
+        _configuration = configuration;
     }
 
     public Task QueueAsync(byte[] payload, CancellationToken cancellationToken)
@@ -175,6 +177,8 @@ public sealed class EdgeMq : IEdgeMq
 
         await _messageStore.AddMessagesAsync(messagePayloadsToStore);
     }
+
+    public string Name => _configuration.Name;
 
     public ulong MessageCount => _messageStore.MessageCount;
 

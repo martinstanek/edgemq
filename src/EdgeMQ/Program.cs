@@ -5,5 +5,5 @@ using EdgeMQ.Service.Extensions;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Logging.SetDefaultLevels();
-builder.Services.AddEdgeMq();
+builder.Services.AddEdgeMq("test-queue");
 builder.Build().Run();

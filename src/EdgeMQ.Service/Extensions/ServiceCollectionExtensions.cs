@@ -6,8 +6,9 @@ namespace EdgeMQ.Service.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddEdgeMq(this IServiceCollection services)
+    public static IServiceCollection AddEdgeMq(this IServiceCollection services, string name)
     {
+        var queueConfig = new EdgeQueueConfiguration { Name = name };
         var storeConfig = new MessageStoreConfiguration();
         var bufferConfig = new InputBufferConfiguration();
         var buffer = new InputBuffer(bufferConfig);
@@ -15,6 +16,7 @@ public static class ServiceCollectionExtensions
 
         return services
             .AddSingleton(buffer)
+            .AddSingleton(queueConfig)
             .AddSingleton<IMessageStore>(_ => store)
             .AddSingleton<IEdgeMq, EdgeMq>();
     }
