@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using EdgeMq.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Shouldly;
 using Xunit;
 

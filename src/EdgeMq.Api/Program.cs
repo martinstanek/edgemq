@@ -10,3 +10,5 @@ var app = builder.Build();
 
 app.ConfigureEndpoints();
 app.Run();
+
+public partial class Program { }
