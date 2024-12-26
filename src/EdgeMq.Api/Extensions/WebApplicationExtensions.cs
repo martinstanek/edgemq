@@ -14,7 +14,7 @@ public static class WebApplicationExtensions
 {
     public static WebApplication ConfigureEndpoints(this WebApplication webApplication)
     {
-            var todosApi = webApplication.MapGroup("/queue");
+        var todosApi = webApplication.MapGroup("/queue");
 
         todosApi.MapGet("/", (IEdgeMq queue) =>
         {
@@ -56,7 +56,7 @@ public static class WebApplicationExtensions
                 MessageCount = queue.MessageCount
             });
         });
-   
+
         return webApplication;
     }
 }
