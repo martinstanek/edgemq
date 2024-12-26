@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace EdgeMq.Api.Handlers;
 
-public sealed class EdgeQueueHandler
+public sealed class EdgeQueueHandler : IEdgeQueueHandler
 {
     private readonly IEdgeMq _edgeMq;
 
@@ -43,6 +43,19 @@ public sealed class EdgeQueueHandler
         var bytes = Convert.FromBase64String(rawContent);
 
         await _edgeMq.QueueAsync(bytes, CancellationToken.None);
+
+        return new QueueMetrics
+        {
+            Name = _edgeMq.Name,
+            MessageCount = _edgeMq.MessageCount
+        };
+    }
+
+    public async Task<QueueMetrics> AcknowledgeAsync(string queueName, Guid batchId)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+
+        await _edgeMq.AcknowledgeAsync(batchId, CancellationToken.None);
 
         return new QueueMetrics
         {

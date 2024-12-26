@@ -1,3 +1,4 @@
+using System;
 using EdgeMq.Api.Handlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -11,17 +12,20 @@ public static class WebApplicationExtensions
     {
         var todosApi = webApplication.MapGroup("/queue");
 
+        todosApi.MapGet("/{name}", async (string name, [FromQuery] int batchSize,  EdgeQueueHandler handler)
+            => Results.Ok((object?)await handler.DequeueAsync(name, batchSize)));
+
         todosApi.MapGet("/{name}/stats", async (string name, EdgeQueueHandler handler)
             => Results.Ok((object?)await handler.GetMetricsAsync(name)));
 
         todosApi.MapGet("/{name}/peek", async (string name, [FromQuery] int batchSize,  EdgeQueueHandler handler)
             => Results.Ok((object?)await handler.PeekAsync(name, batchSize)));
 
-        todosApi.MapGet("/{name}", async (string name, [FromQuery] int batchSize,  EdgeQueueHandler handler)
-            => Results.Ok((object?)await handler.DequeueAsync(name, batchSize)));
-
         todosApi.MapPut("/{name}", async (string name, HttpRequest request, EdgeQueueHandler handler)
             => Results.Ok(await handler.EnqueueAsync(request, name)));
+
+        todosApi.MapPatch("/{name}", async (string name, [FromQuery] Guid batchId, EdgeQueueHandler handler)
+            => Results.Ok(await handler.AcknowledgeAsync(name, batchId)));
 
         return webApplication;
     }
