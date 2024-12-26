@@ -7,7 +7,7 @@ using EdgeMQ.Service.Store;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.Service.UnitTests;
+namespace EdgeMQ.Service.UnitTests.Service;
 
 public sealed class EdgeMqTests
 {
