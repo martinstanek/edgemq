@@ -1,12 +1,7 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using EdgeMq.Model;
-using EdgeMQ.Service;
+using EdgeMq.Api.Handlers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EdgeMq.Api.Extensions;
 
@@ -16,46 +11,17 @@ public static class WebApplicationExtensions
     {
         var todosApi = webApplication.MapGroup("/queue");
 
-        todosApi.MapGet("/", (IEdgeMq queue) =>
-        {
-            return Results.Ok(new QueueMetrics
-            {
-                Name = queue.Name,
-                MessageCount = queue.MessageCount
-            });
-        });
+        todosApi.MapGet("/{name}/stats", async (string name, EdgeQueueHandler handler)
+            => Results.Ok((object?)await handler.GetMetricsAsync(name)));
 
-        todosApi.MapGet("/{name}", async (string name, IEdgeMq queue) =>
-        {
-            var messages = await queue.DeQueueAsync(batchSize: 100, CancellationToken.None);
+        todosApi.MapGet("/{name}/peek", async (string name, [FromQuery] int batchSize,  EdgeQueueHandler handler)
+            => Results.Ok((object?)await handler.PeekAsync(name, batchSize)));
 
-            var result = messages.Select(s => new QueueRawMessage
-            {
-                Id = s.Id,
-                BatchId = s.BatchId,
-                PayloadBase64 = Convert.ToBase64String(s.Payload)
-            });
+        todosApi.MapGet("/{name}", async (string name, [FromQuery] int batchSize,  EdgeQueueHandler handler)
+            => Results.Ok((object?)await handler.DequeueAsync(name, batchSize)));
 
-            return Results.Ok(result.ToArray());
-        });
-
-        todosApi.MapPut("/{name}", async (HttpRequest request, IEdgeMq queue) =>
-        {
-            using var reader = new StreamReader(
-                request.Body,
-                encoding: Encoding.UTF8,
-                detectEncodingFromByteOrderMarks: false);
-
-            var rawContent = await reader.ReadToEndAsync();
-            var bytes = Convert.FromBase64String(rawContent);
-            await queue.QueueAsync(bytes, CancellationToken.None);
-
-            return Results.Ok(new QueueMetrics
-            {
-                Name = queue.Name,
-                MessageCount = queue.MessageCount
-            });
-        });
+        todosApi.MapPut("/{name}", async (string name, HttpRequest request, EdgeQueueHandler handler)
+            => Results.Ok(await handler.EnqueueAsync(request, name)));
 
         return webApplication;
     }
