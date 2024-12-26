@@ -1,3 +1,4 @@
+using EdgeMq.Api.Handlers;
 using EdgeMq.Api.Serialization;
 using EdgeMq.Api.Services;
 using EdgeMQ.Service.Extensions;
@@ -18,6 +19,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQueue(this IServiceCollection services)
     {
         return services
+            .AddSingleton<IEdgeQueueHandler, EdgeQueueHandler>()
             .AddEdgeMq("test-queue")
             .AddHostedService<QueueService>();
     }
