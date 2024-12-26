@@ -16,7 +16,7 @@ public sealed class EdgeMqTests
     {
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test"u8.ToArray();
+        var payload = "test";
 
         queue.Start(CancellationToken.None);
 
@@ -40,7 +40,7 @@ public sealed class EdgeMqTests
     {
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test"u8.ToArray();
+        var payload = "test";
 
         queue.Start(CancellationToken.None);
 
@@ -53,6 +53,8 @@ public sealed class EdgeMqTests
 
         await queue.AcknowledgeAsync(batchId, token);
 
+        await Task.Delay(500, token);
+
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.MessageCount.ShouldBe((ulong) 0);
         queue.Stop();
@@ -63,7 +65,7 @@ public sealed class EdgeMqTests
     {
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test"u8.ToArray();
+        var payload = "test";
 
         queue.Start(CancellationToken.None);
 
@@ -84,7 +86,7 @@ public sealed class EdgeMqTests
     {
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test"u8.ToArray();
+        var payload = "test";
         var messages = Array.Empty<Message>();
 
         queue.Start(CancellationToken.None);

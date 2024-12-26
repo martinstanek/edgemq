@@ -20,9 +20,9 @@ public sealed class InputBuffer
         _configuration = configuration;
     }
 
-    public async Task AddAsync(byte[] payload, CancellationToken cancellationToken)
+    public async Task AddAsync(string payload, CancellationToken cancellationToken)
     {
-        if (!CheckConstraints(ref payload))
+        if (!CheckConstraints(payload))
         {
             return;
         }
@@ -71,7 +71,7 @@ public sealed class InputBuffer
         return messages;
     }
 
-    private bool CheckConstraints(ref byte[] payload)
+    private bool CheckConstraints(string payload)
     {
         var valid = !(payload.Length > _configuration.MaxMessageSizeBytes
                      || _currentSize + (uint) payload.Length > _configuration.MaxBufferSizeBytes

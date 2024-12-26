@@ -32,7 +32,7 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Task.CompletedTask;
     }
 
-    public Task AddMessagesAsync(IReadOnlyCollection<byte[]> messagePayloads)
+    public Task AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
     {
         lock (_lock)
         {

@@ -27,7 +27,7 @@ public sealed class EdgeMq : IEdgeMq
         _configuration = configuration;
     }
 
-    public Task QueueAsync(byte[] payload, CancellationToken cancellationToken)
+    public Task QueueAsync(string payload, CancellationToken cancellationToken)
     {
         return _inputBuffer.AddAsync(payload, cancellationToken);
     }

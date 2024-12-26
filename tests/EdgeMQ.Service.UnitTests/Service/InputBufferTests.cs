@@ -14,7 +14,7 @@ public sealed class InputBufferTests
         var config = new InputBufferConfiguration();
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
-        var message = "hello"u8.ToArray();
+        var message = "hello";
 
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
@@ -40,7 +40,7 @@ public sealed class InputBufferTests
 
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
-        var message = "hello"u8.ToArray();
+        var message = "hello";
 
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
@@ -60,7 +60,7 @@ public sealed class InputBufferTests
 
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
-        var message = "hello"u8.ToArray();
+        var message = "hello";
 
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);
@@ -80,7 +80,7 @@ public sealed class InputBufferTests
 
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
-        var message = "hello"u8.ToArray();
+        var message = "hello";
 
         await buffer.AddAsync(message, token);
         await buffer.AddAsync(message, token);

@@ -40,9 +40,8 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 
         using var reader = new StreamReader(request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false);
         var rawContent = await reader.ReadToEndAsync();
-        var bytes = Convert.FromBase64String(rawContent);
 
-        await _edgeMq.QueueAsync(bytes, CancellationToken.None);
+        await _edgeMq.QueueAsync(rawContent, CancellationToken.None);
 
         return new QueueMetrics
         {
@@ -75,7 +74,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         {
             Id = s.Id,
             BatchId = s.BatchId,
-            PayloadBase64 = Convert.ToBase64String(s.Payload)
+            Payload = s.Payload
         });
 
         return result.ToArray();
@@ -92,7 +91,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         {
             Id = s.Id,
             BatchId = s.BatchId,
-            PayloadBase64 = Convert.ToBase64String(s.Payload)
+            Payload = s.Payload
         });
 
         return result.ToArray();

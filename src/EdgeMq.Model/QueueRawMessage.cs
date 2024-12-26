@@ -8,5 +8,5 @@ public sealed record QueueRawMessage
 
     public required Guid BatchId { get; init; }
 
-    public required string PayloadBase64 { get; init; }
+    public required string Payload { get; init; }
 }

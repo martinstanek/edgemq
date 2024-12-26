@@ -7,7 +7,7 @@ public interface IMessageStore
 {
     Task InitAsync();
 
-    Task AddMessagesAsync(IReadOnlyCollection<byte[]> messagePayloads);
+    Task AddMessagesAsync(IReadOnlyCollection<string> messagePayloads);
 
     Task<IReadOnlyCollection<Message>> ReadMessagesAsync();
 

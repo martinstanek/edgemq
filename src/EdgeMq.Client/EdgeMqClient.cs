@@ -23,18 +23,12 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return _api.Value.GetMetricsAsync(queueName);
     }
 
-    public Task<QueueMetrics> EnqueueAsync(byte[] payload, string queueName)
+    public Task<QueueMetrics> EnqueueAsync(string queueName, string payload)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
+        Guard.Against.NullOrWhiteSpace(payload);
 
-        if (payload.Length == 0)
-        {
-            throw new ArgumentException(nameof(payload));
-        }
-
-        var base64 = Convert.ToBase64String(payload);
-
-        return _api.Value.EnqueueAsync(payload: base64, name: queueName);
+        return _api.Value.EnqueueAsync(queueName, payload);
     }
 
     public Task<QueueMetrics> AcknowledgeAsync(string queueName, Guid batchId)

@@ -13,7 +13,7 @@ public sealed class MessageStoreTests
     {
         var config = new MessageStoreConfiguration();
         var store = new InMemoryMessageStore(config);
-        var payload = "hello"u8.ToArray();
+        var payload = "hello";
 
         await store.AddMessagesAsync([payload, payload]);
 
@@ -26,7 +26,7 @@ public sealed class MessageStoreTests
     {
         var config = new MessageStoreConfiguration();
         var store = new InMemoryMessageStore(config);
-        var payload = "hello"u8.ToArray();
+        var payload = "hello";
 
         await store.AddMessagesAsync([payload, payload]);
 
