@@ -7,6 +7,7 @@ using EdgeMQ.Service.Input;
 using EdgeMQ.Service.Store;
 using Shouldly;
 using Xunit;
+using Xunit.Sdk;
 
 namespace EdgeMQ.Service.UnitTests.Service;
 
@@ -15,9 +16,10 @@ public sealed class EdgeMqTests
     [Fact]
     public async Task Peek_MessagesPeeked_QueueNotAltered()
     {
+        const string payload = "test";
+
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test";
 
         queue.Start(CancellationToken.None);
 
@@ -39,9 +41,10 @@ public sealed class EdgeMqTests
     [Fact]
     public async Task Acknowledge_MessagesAcknowledged_QueueAltered()
     {
+        const string payload = "test";
+
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test";
 
         queue.Start(CancellationToken.None);
 
@@ -57,15 +60,15 @@ public sealed class EdgeMqTests
 
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.MessageCount.ShouldBe((ulong) 0);
-        queue.Stop();
     }
 
     [Fact]
     public async Task DirectDeque_MessagesAcknowledged_QueueAltered()
     {
+        const string payload = "test";
+
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test";
 
         queue.Start(CancellationToken.None);
 
@@ -78,15 +81,15 @@ public sealed class EdgeMqTests
         messages.Count.ShouldBe(3);
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.MessageCount.ShouldBe((ulong) 0);
-        queue.Stop();
     }
 
     [Fact]
     public async Task Deque_MessagesAcknowledged_QueueAltered()
     {
+        const string payload = "test";
+
         using var queue = new EdgeMqTestsContext().GetQueue();
         var token = CancellationToken.None;
-        var payload = "test";
         var messages = Array.Empty<Message>();
 
         queue.Start(CancellationToken.None);
@@ -97,6 +100,7 @@ public sealed class EdgeMqTests
 
         await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
+            m.Count.ShouldBe(3);
             messages = m.ToArray();
 
             return Task.CompletedTask;
@@ -106,7 +110,62 @@ public sealed class EdgeMqTests
         messages.Length.ShouldBe(3);
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.MessageCount.ShouldBe((ulong) 0);
-        queue.Stop();
+    }
+
+    [Fact]
+    public async Task Deque_Twice_OnlyFirstReturnsMessages()
+    {
+        const string payload = "test";
+
+        using var queue = new EdgeMqTestsContext().GetQueue();
+        var token = CancellationToken.None;
+
+        queue.Start(CancellationToken.None);
+
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+
+        await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
+        {
+            m.Count.ShouldBe(3);
+            return Task.CompletedTask;
+
+        }, token);
+
+        await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
+        {
+            m.Count.ShouldBe(0);
+            return Task.CompletedTask;
+
+        }, token);
+
+        queue.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.MessageCount.ShouldBe((ulong) 0);
+    }
+
+    [Fact]
+    public async Task Deque_Parallel_DoesNotThrow()
+    {
+        const string payload = "test";
+
+        using var queue = new EdgeMqTestsContext().GetQueue();
+        var token = CancellationToken.None;
+
+        queue.Start(CancellationToken.None);
+
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+        await queue.QueueAsync(payload, token);
+
+        var t1 = queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
+        var t2 = queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
+        var t3 = queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
+
+        await Task.WhenAll(t1, t2, t3);
+
+        queue.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.MessageCount.ShouldBe((ulong) 0);
     }
 
     private sealed class EdgeMqTestsContext

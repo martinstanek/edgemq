@@ -43,7 +43,11 @@ public sealed class EdgeMq : IEdgeMq
         {
             await NonBlockingPeekAsync(batchSize);
             await Task.Run(() => process(_peekedMessages), linkedSource.Token);
-            await NonBlockingAcknowledgeAsync(_currentBatchId);
+
+            if (_peekedMessages.Count != 0)
+            {
+                await NonBlockingAcknowledgeAsync(_currentBatchId);
+            }
         }
         finally
         {

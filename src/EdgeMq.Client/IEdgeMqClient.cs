@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Model;
 
@@ -13,7 +14,14 @@ public interface IEdgeMqClient
 
     Task<QueueMetrics> AcknowledgeAsync(string queueName, Guid batchId);
 
+    Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize);
+
     Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize);
 
-    Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize);
+    Task DequeueAsync(
+        string queueName,
+        int batchSize,
+        TimeSpan timeOut,
+        Func<IReadOnlyCollection<QueueRawMessage>, Task> process,
+        CancellationToken cancellationToken);
 }

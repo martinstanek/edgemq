@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -42,6 +44,41 @@ public sealed class EdgeMqApiTests
         messages.First().Payload.ShouldBe(payload);
         stats.Name.ShouldBe(queueName);
         stats.MessageCount.ShouldBe((uint)0);
+    }
+
+    [Fact]
+    public async Task DequeueByProcessing_MessagesAdded_QueueIsEmpty()
+    {
+        const string queueName = "test-queue";
+        const string payload = "hallo";
+
+        var context = new EdgeMqApiTestsContext();
+        var client = context.GetClient();
+        var timeOut = TimeSpan.FromSeconds(5);
+        var token = CancellationToken.None;
+
+        await client.EnqueueAsync(queueName, payload);
+        await client.EnqueueAsync(queueName, payload);
+        await client.EnqueueAsync(queueName, payload);
+        await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
+        {
+            messages.Count.ShouldBe(3);
+
+            return Task.CompletedTask;
+
+        }, token);
+
+        var stats = await client.GetMetricsAsync(queueName);
+
+        stats.MessageCount.ShouldBe((uint) 0);
+
+        await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
+        {
+            messages.Count.ShouldBe(0);
+
+            return Task.CompletedTask;
+
+        }, token);
     }
 
     [Fact]
