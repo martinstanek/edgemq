@@ -5,7 +5,5 @@ ENV ASPNETCORE_URLS=http://*:2323
 WORKDIR /app
 COPY . .
 
-#ENTRYPOINT ["./EdgeMq.Api"]
-
-ENTRYPOINT ["/bin/sh"]
+ENTRYPOINT ["./EdgeMq.Api"]
 
