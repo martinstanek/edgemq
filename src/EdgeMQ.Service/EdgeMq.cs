@@ -158,6 +158,7 @@ public sealed class EdgeMq : IEdgeMq
             try
             {
                 await PersistIncomingMessagesAsync(cancellationToken);
+                await Task.Delay(100, cancellationToken);
             }
             finally
             {
