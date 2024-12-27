@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+FROM ubuntu:22.04
 EXPOSE 2323
 ENV ASPNETCORE_URLS=http://*:2323
 
