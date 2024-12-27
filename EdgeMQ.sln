@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ", "src\EdgeMQ\EdgeMQ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ.Service", "src\EdgeMQ.Service\EdgeMQ.Service.csproj", "{94339474-9A88-488F-A814-1046F5838CC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ.Service.UnitTests", "tests\EdgeMQ.Service.UnitTests\EdgeMQ.Service.UnitTests.csproj", "{8527CE50-8C54-4BA5-9593-C39B46809D71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ.UnitTests", "tests\EdgeMQ.UnitTests\EdgeMQ.UnitTests.csproj", "{8527CE50-8C54-4BA5-9593-C39B46809D71}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Api", "src\EdgeMq.Api\EdgeMq.Api.csproj", "{A082CD51-2C0B-487D-AC61-520888027FF4}"
 EndProject
@@ -21,11 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{C545537C-9
 		misc\Dockerfile = misc\Dockerfile
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{A8A1A9E8-232E-47EF-9166-9C9C78F8C3F9}"
-	ProjectSection(SolutionItems) = preProject
-		misc\scripts\publish-docker.sh = misc\scripts\publish-docker.sh
-		misc\scripts\publish-nuget.sh = misc\scripts\publish-nuget.sh
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Producer", "tests\EdgeMq.Producer\EdgeMq.Producer.csproj", "{CEDB7B42-550A-4F26-AE6C-786A131811B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +53,10 @@ Global
 		{1493377C-AF2F-40AF-9D3A-DD09425501FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1493377C-AF2F-40AF-9D3A-DD09425501FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1493377C-AF2F-40AF-9D3A-DD09425501FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEDB7B42-550A-4F26-AE6C-786A131811B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEDB7B42-550A-4F26-AE6C-786A131811B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEDB7B42-550A-4F26-AE6C-786A131811B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEDB7B42-550A-4F26-AE6C-786A131811B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ABD60FA4-7886-44EF-A3B7-8594FCF2A882} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
@@ -65,6 +65,6 @@ Global
 		{A082CD51-2C0B-487D-AC61-520888027FF4} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
 		{2E9495F6-1897-4866-8A9E-63BDD83D5A6D} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
 		{1493377C-AF2F-40AF-9D3A-DD09425501FA} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
-		{A8A1A9E8-232E-47EF-9166-9C9C78F8C3F9} = {C545537C-99D8-425B-8DD7-EF67CC9F3847}
+		{CEDB7B42-550A-4F26-AE6C-786A131811B4} = {53533156-2EDF-4A5C-A9D8-A176D77E6B7C}
 	EndGlobalSection
 EndGlobal

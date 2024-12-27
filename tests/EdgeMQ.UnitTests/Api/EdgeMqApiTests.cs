@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.Service.UnitTests.Api;
+namespace EdgeMQ.UnitTests.Api;
 
 public sealed class EdgeMqApiTests
 {

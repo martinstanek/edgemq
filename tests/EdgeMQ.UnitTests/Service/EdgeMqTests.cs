@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EdgeMQ.Service;
 using EdgeMQ.Service.Input;
 using EdgeMQ.Service.Store;
 using Shouldly;
 using Xunit;
 using Xunit.Sdk;
 
-namespace EdgeMQ.Service.UnitTests.Service;
+namespace EdgeMQ.UnitTests.Service;
 
 public sealed class EdgeMqTests
 {
@@ -177,7 +178,7 @@ public sealed class EdgeMqTests
             var bufferConfig = new InputBufferConfiguration();
             var buffer = new InputBuffer(bufferConfig);
             var store = new InMemoryMessageStore(storeConfig);
-            var queue = new EdgeMq(buffer, store, queueConfig);
+            var queue = new EdgeMQ.Service.EdgeMq(buffer, store, queueConfig);
 
             return queue;
         }

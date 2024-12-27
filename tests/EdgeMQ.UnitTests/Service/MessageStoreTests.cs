@@ -4,7 +4,7 @@ using EdgeMQ.Service.Store;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.Service.UnitTests.Service;
+namespace EdgeMQ.UnitTests.Service;
 
 public sealed class MessageStoreTests
 {
