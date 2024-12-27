@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
+builder.Logging.SetDefaultLevels();
 builder.Services.ConfigureSerialization();
 builder.Services.AddQueue();
 
 var app = builder.Build();
 
+app.ConfigureRoot();
 app.ConfigureEndpoints();
 app.Run();
 

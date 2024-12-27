@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading;
+using System.Threading.Tasks;
 using EdgeMq.Client;
 
 namespace EdgeMq.Producer;
 
 public static class Program
 {
-    public static void Main()
+    public static async Task Main()
     {
         Console.WriteLine("EdgeMQ Producer");
 
@@ -22,11 +22,11 @@ public static class Program
         {
             var payload = DateTime.Now.ToString("s");
 
-            edgeMqClient.EnqueueAsync("test-queue", payload).GetAwaiter().GetResult();
+            await edgeMqClient.EnqueueAsync("test-queue", payload);
 
             Console.WriteLine(payload);
 
-            Thread.Sleep(100);
+            await Task.Delay(100);
         }
     }
 }

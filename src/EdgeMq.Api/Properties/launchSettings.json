@@ -4,8 +4,7 @@
     "EdgeMq.Api": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "queue",
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:2323"
     }
   }

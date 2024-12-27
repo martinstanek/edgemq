@@ -12,8 +12,9 @@ public static class WebApplicationExtensions
     {
         var todosApi = webApplication.MapGroup("/queue");
 
-        todosApi.MapGet("/{name}", async (string name, [FromQuery] int batchSize, [FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.DequeueAsync(name, batchSize)));
+        todosApi
+            .MapGet("/{name}", async (string name, [FromQuery] int batchSize, [FromServices] IEdgeQueueHandler handler)
+                => Results.Ok(await handler.DequeueAsync(name, batchSize)));
 
         todosApi.MapGet("/{name}/stats", async (string name, [FromServices] IEdgeQueueHandler handler)
             => Results.Ok(await handler.GetMetricsAsync(name)));
@@ -26,6 +27,15 @@ public static class WebApplicationExtensions
 
         todosApi.MapPatch("/{name}", async (string name, [FromQuery] Guid batchId, [FromServices] IEdgeQueueHandler handler)
             => Results.Ok(await handler.AcknowledgeAsync(name, batchId)));
+
+        return webApplication;
+    }
+
+    public static WebApplication ConfigureRoot(this WebApplication webApplication)
+    {
+        var todosApi = webApplication.MapGroup("/");
+
+        todosApi.MapGet("", () => Results.Text("EdgeMq OK"));
 
         return webApplication;
     }
