@@ -6,7 +6,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "queue",
-      "applicationUrl": "http://localhost:5001"
+      "applicationUrl": "http://localhost:2323"
     }
   }
 }

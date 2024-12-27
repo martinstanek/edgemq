@@ -16,6 +16,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Model", "src\EdgeMq.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Client", "src\EdgeMq.Client\EdgeMq.Client.csproj", "{1493377C-AF2F-40AF-9D3A-DD09425501FA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{C545537C-99D8-425B-8DD7-EF67CC9F3847}"
+	ProjectSection(SolutionItems) = preProject
+		misc\Dockerfile = misc\Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{A8A1A9E8-232E-47EF-9166-9C9C78F8C3F9}"
+	ProjectSection(SolutionItems) = preProject
+		misc\scripts\publish-docker.sh = misc\scripts\publish-docker.sh
+		misc\scripts\publish-nuget.sh = misc\scripts\publish-nuget.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +65,6 @@ Global
 		{A082CD51-2C0B-487D-AC61-520888027FF4} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
 		{2E9495F6-1897-4866-8A9E-63BDD83D5A6D} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
 		{1493377C-AF2F-40AF-9D3A-DD09425501FA} = {3451FB53-2ABA-430A-901B-82700DF0E2E3}
+		{A8A1A9E8-232E-47EF-9166-9C9C78F8C3F9} = {C545537C-99D8-425B-8DD7-EF67CC9F3847}
 	EndGlobalSection
 EndGlobal
