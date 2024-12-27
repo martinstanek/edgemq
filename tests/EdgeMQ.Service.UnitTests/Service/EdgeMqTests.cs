@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ public sealed class EdgeMqTests
         await queue.QueueAsync(payload, token);
         await queue.QueueAsync(payload, token);
 
-        var messages = await queue.PeekAsync(batchSize: 10, token);
+        var messages = await EdgeMqTestsContext.PeekUntilPeekedAsync(queue, 10, token);
 
         messages.Count.ShouldBe(3);
         messages.All(a => a.BatchId == messages.First().BatchId).ShouldBeTrue();
@@ -48,12 +49,11 @@ public sealed class EdgeMqTests
         await queue.QueueAsync(payload, token);
         await queue.QueueAsync(payload, token);
 
-        var messages = await queue.PeekAsync(batchSize: 10, token);
+        var messages = await EdgeMqTestsContext.PeekUntilPeekedAsync(queue, 10, token);
+
         var batchId = messages.First().BatchId;
 
         await queue.AcknowledgeAsync(batchId, token);
-
-        await Task.Delay(500, token);
 
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.MessageCount.ShouldBe((ulong) 0);
@@ -121,6 +121,21 @@ public sealed class EdgeMqTests
             var queue = new EdgeMq(buffer, store, queueConfig);
 
             return queue;
+        }
+
+        internal static async Task<IReadOnlyCollection<Message>> PeekUntilPeekedAsync(
+            IEdgeMq queue,
+            uint batchSize,
+            CancellationToken token)
+        {
+            var messages = new List<Message>();
+
+            while (messages.Count == 0)
+            {
+                messages = (await queue.PeekAsync(batchSize, token)).ToList();
+            }
+
+            return messages;
         }
     }
 }
