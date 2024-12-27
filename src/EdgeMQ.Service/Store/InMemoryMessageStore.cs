@@ -83,7 +83,7 @@ public sealed class InMemoryMessageStore : IMessageStore
                 }
 
                 _currentCount--;
-                _currentSize -= (uint)deletedMessage.Payload.Length;
+                _currentSize -= (uint)deletedMessage.Payload.Length; // TODO: lenght != bytes
             }
         }
 

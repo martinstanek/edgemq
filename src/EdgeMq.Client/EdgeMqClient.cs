@@ -57,7 +57,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return _api.Value.DequeueAsync(queueName, batchSize);
     }
 
-    public async Task DequeueAsync(
+    public async Task<QueueMetrics> DequeueAsync(
         string queueName,
         int batchSize,
         TimeSpan timeOut,
@@ -68,26 +68,29 @@ public sealed class EdgeMqClient : IEdgeMqClient
         Guard.Against.NegativeOrZero(batchSize);
         Guard.Against.NegativeOrZero(timeOut.Seconds);
 
-        await _semaphore.WaitAsync(cancellationToken);
-
         var timeOutSource = new CancellationTokenSource(timeOut);
         var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(timeOutSource.Token, cancellationToken);
         var linkedToken = linkedSource.Token;
 
+        await _semaphore.WaitAsync(linkedToken);
+
         try
         {
             var messages = await PeekAsync(queueName, batchSize);
+            var metrics = await GetMetricsAsync(queueName);
 
             await Task.Run(() => process(messages), linkedToken);
 
-            if (messages.Count != 0)
+            if (messages.Count == 0)
             {
-                return;
+                return metrics;
             }
 
             var batchId = messages.First().BatchId;
 
             await AcknowledgeAsync(queueName, batchId);
+
+            return metrics;
         }
         finally
         {
