@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMQ.Service;
@@ -17,7 +18,9 @@ public sealed class QueueService : IHostedService
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _queue.Start(cancellationToken);
-        
+
+        Console.WriteLine($"Started: {_queue.Name}");
+
         return Task.CompletedTask;
     }
 
