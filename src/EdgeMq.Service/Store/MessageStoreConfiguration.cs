@@ -7,4 +7,6 @@ public sealed record MessageStoreConfiguration
     public ulong MaxMessageSizeBytes { get; init; } = 536870912;
 
     public uint DefaultBatchSize { get; init; } = 100;
+
+    public string Path { get; init; } = string.Empty;
 }

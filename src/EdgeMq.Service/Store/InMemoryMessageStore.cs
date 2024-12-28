@@ -1,8 +1,9 @@
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace EdgeMq.Service.Store;
 
@@ -60,6 +61,11 @@ public sealed class InMemoryMessageStore : IMessageStore
 
     public Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize)
     {
+        if (batchSize == 0)
+        {
+            return Task.FromResult<IReadOnlyCollection<Message>>(Array.Empty<Message>());
+        }
+
         var result = _messages
             .OrderBy(m => m.Key)
             .Select(s => s.Value)

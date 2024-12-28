@@ -4,9 +4,9 @@ using EdgeMq.Service.Store;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.UnitTests.Service;
+namespace EdgeMQ.UnitTests.Service.Store;
 
-public sealed class MessageStoreTests
+public sealed class InMemoryMessageStoreTests
 {
     [Fact]
     public async Task AddMessages_MessagesAdded()
