@@ -197,5 +197,5 @@ public sealed class EdgeMq : IEdgeMq
 
     public ulong MaxMessageSizeBytes => _messageStore.MessageSizeBytes;
 
-    public ulong CurrentCurrentId => _messageStore.CurrentCurrentId;
+    public ulong CurrentCurrentId => _messageStore.CurrentId;
 }

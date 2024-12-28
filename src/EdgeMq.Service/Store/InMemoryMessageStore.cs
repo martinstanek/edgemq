@@ -105,7 +105,7 @@ public sealed class InMemoryMessageStore : IMessageStore
 
     public ulong MessageSizeBytes => _currentSize;
 
-    public ulong CurrentCurrentId => _currentId;
+    public ulong CurrentId => _currentId;
 
     public ulong MaxMessageCount => _config.MaxMessageCount;
 

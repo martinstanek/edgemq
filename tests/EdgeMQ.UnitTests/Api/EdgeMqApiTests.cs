@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Client;
+using EdgeMq.Model;
 using EdgeMq.Service.Store;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +41,9 @@ public sealed class EdgeMqApiTests
         var client = context.GetClient();
 
         await client.EnqueueAsync(queueName, payload);
+
+        await Task.Delay(1000, CancellationToken.None);
+
         var messages = await client.DequeueAsync(queueName, batchSize: 100);
         var stats = await client.GetMetricsAsync(queueName);
 
@@ -63,6 +68,8 @@ public sealed class EdgeMqApiTests
         await client.EnqueueAsync(queueName, payload);
         await client.EnqueueAsync(queueName, payload);
         await client.EnqueueAsync(queueName, payload);
+
+        await Task.Delay(1000, token);
 
         var stats = await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
         {
@@ -102,6 +109,8 @@ public sealed class EdgeMqApiTests
         await client.EnqueueAsync(queueName, payload);
         await client.EnqueueAsync(queueName, payload);
 
+        await Task.Delay(1000, token);
+
         context.MessageStore.MessageCount.ShouldBe((ulong) 3);
 
         var stats = await client.DequeueAsync(queueName, batchSize: 2, timeOut, messages =>
@@ -139,7 +148,7 @@ public sealed class EdgeMqApiTests
         await client.EnqueueAsync(queueName, payload);
         await client.EnqueueAsync(queueName, payload);
 
-        var messages = await client.PeekAsync(queueName, batchSize: 100);
+        var messages = await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
 
         await client.AcknowledgeAsync(queueName, messages.First().BatchId);
 
@@ -156,16 +165,29 @@ public sealed class EdgeMqApiTests
         internal IEdgeMqClient GetClient()
         {
             var application = new WebApplicationFactory<Program>()
-                .WithWebHostBuilder(builder =>
-                {
-                    builder.ConfigureServices(_ => { });
-                });
+                .WithWebHostBuilder(builder => { builder.ConfigureServices(_ => { }); });
 
             var httpClient = application.CreateClient();
 
             _messageStore = application.Services.GetRequiredService<IMessageStore>();
 
             return new EdgeMqClient(httpClient);
+        }
+
+        internal static async Task<IReadOnlyCollection<QueueRawMessage>> PeekUntilPeekedAsync(
+            IEdgeMqClient queue,
+            string queueName,
+            int batchSize)
+        {
+            var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var messages = new List<QueueRawMessage>();
+
+            while (messages.Count == 0 | !tokenSource.IsCancellationRequested)
+            {
+                messages = (await queue.PeekAsync(queueName, batchSize)).ToList();
+            }
+
+            return messages;
         }
 
         internal IMessageStore MessageStore => _messageStore ?? throw new InvalidOperationException();

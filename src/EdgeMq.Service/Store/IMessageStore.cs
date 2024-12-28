@@ -23,5 +23,5 @@ public interface IMessageStore
 
     public ulong MaxMessageSizeBytes { get; }
 
-    public ulong CurrentCurrentId { get; }
+    public ulong CurrentId { get; }
 }

@@ -49,7 +49,9 @@ public sealed class FileSystemMessageStore : IMessageStore
                 _currentCount++;
             }
 
-            _currentId = _messages.Max(m => m.Key);
+            _currentId = !_messages.IsEmpty
+                ? _messages.Max(m => m.Key)
+                : 0;
         }
         finally
         {
@@ -141,15 +143,21 @@ public sealed class FileSystemMessageStore : IMessageStore
         {
             foreach (var messageId in messageIds)
             {
-                if (_messages.TryGetValue(messageId, out var info))
+                if (!_messages.TryGetValue(messageId, out var info))
                 {
-                    File.Delete(info.FullName);
-                    _currentCount--;
-                    _currentSize -= (ulong) info.Length;
+                    continue;
                 }
+
+                File.Delete(info.FullName);
+
+                _messages.Remove(messageId, out _);
+                _currentCount--;
+                _currentSize -= (ulong) info.Length;
             }
 
-            _currentId = _messages.Max(m => m.Key);
+            _currentId = !_messages.IsEmpty
+                ? _messages.Max(m => m.Key)
+                : 0;
         }
         finally
         {
@@ -161,7 +169,7 @@ public sealed class FileSystemMessageStore : IMessageStore
 
     public ulong MessageSizeBytes => _currentSize;
 
-    public ulong CurrentCurrentId => _currentId;
+    public ulong CurrentId => _currentId;
 
     public ulong MaxMessageCount => _configuration.MaxMessageCount;
 
