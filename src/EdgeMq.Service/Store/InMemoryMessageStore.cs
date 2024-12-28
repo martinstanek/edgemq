@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EdgeMq.Service1.Store;
+namespace EdgeMq.Service.Store;
 
 public sealed class InMemoryMessageStore : IMessageStore
 {

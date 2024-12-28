@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace EdgeMq.Service1;
+namespace EdgeMq.Service;
 
 public interface IEdgeMq : IDisposable
 {

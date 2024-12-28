@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EdgeMq.Service1;
-using EdgeMq.Service1.Input;
-using EdgeMq.Service1.Store;
+using EdgeMq.Service;
+using EdgeMq.Service.Input;
+using EdgeMq.Service.Store;
 using Shouldly;
 using Xunit;
 using Xunit.Sdk;
@@ -178,7 +178,7 @@ public sealed class EdgeMqTests
             var bufferConfig = new InputBufferConfiguration();
             var buffer = new InputBuffer(bufferConfig);
             var store = new InMemoryMessageStore(storeConfig);
-            var queue = new EdgeMq.Service1.EdgeMq(buffer, store, queueConfig);
+            var queue = new EdgeMq.Service.EdgeMq(buffer, store, queueConfig);
 
             return queue;
         }

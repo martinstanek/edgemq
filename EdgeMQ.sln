@@ -4,7 +4,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3451FB53-2AB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{53533156-2EDF-4A5C-A9D8-A176D77E6B7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Service1", "src\EdgeMq.Service1\EdgeMq.Service1.csproj", "{94339474-9A88-488F-A814-1046F5838CC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Service", "src\EdgeMq.Service\EdgeMq.Service.csproj", "{94339474-9A88-488F-A814-1046F5838CC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMQ.UnitTests", "tests\EdgeMQ.UnitTests\EdgeMQ.UnitTests.csproj", "{8527CE50-8C54-4BA5-9593-C39B46809D71}"
 EndProject

@@ -1,4 +1,4 @@
-namespace EdgeMq.Service1;
+namespace EdgeMq.Service;
 
 public sealed record EdgeQueueConfiguration
 {

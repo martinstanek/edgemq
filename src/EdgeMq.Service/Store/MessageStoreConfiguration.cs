@@ -1,4 +1,4 @@
-namespace EdgeMq.Service1.Store;
+namespace EdgeMq.Service.Store;
 
 public sealed record MessageStoreConfiguration
 {
