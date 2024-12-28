@@ -17,4 +17,6 @@ public interface IEdgeQueueHandler
     Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize);
 
     Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize);
+
+    Task<IReadOnlyCollection<Queue>> GetQueuesAsync();
 }

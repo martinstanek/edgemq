@@ -5,7 +5,7 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Logging.SetDefaultLevels();
 builder.Services.ConfigureSerialization();
-builder.Services.AddQueue();
+builder.Services.AddQueue(builder.Configuration);
 
 var app = builder.Build();
 

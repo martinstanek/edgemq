@@ -6,7 +6,7 @@ using Refit;
 
 namespace EdgeMq.Client;
 
-public interface IEdgeMqApi
+internal interface IEdgeMqApi
 {
     [Get("/queue/{name}")]
     Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string name, [Query] int batchSize);

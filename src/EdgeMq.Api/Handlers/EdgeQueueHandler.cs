@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Service;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +15,13 @@ namespace EdgeMq.Api.Handlers;
 
 public sealed class EdgeQueueHandler : IEdgeQueueHandler
 {
+    private readonly EdgeMqServerConfiguration _serverConfiguration;
     private readonly IEdgeMq _edgeMq;
 
-    public EdgeQueueHandler(IEdgeMq edgeMq)
+    public EdgeQueueHandler(IEdgeMq edgeMq, EdgeMqServerConfiguration serverConfiguration)
     {
         _edgeMq = edgeMq;
+        _serverConfiguration = serverConfiguration;
     }
 
     public Task<QueueMetrics> GetMetricsAsync(string queueName)
@@ -95,5 +98,22 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         });
 
         return result.ToArray();
+    }
+
+    public async Task<IReadOnlyCollection<Queue>> GetQueuesAsync()
+    {
+        var result = new List<Queue>();
+
+        foreach (var queue in _serverConfiguration.Queues)
+        {
+            result.Add(new Queue
+            {
+                Name = queue,
+                Mode = _serverConfiguration.Mode.ToString(),
+                Metrics = await GetMetricsAsync(queue)
+            });
+        }
+
+        return result;
     }
 }

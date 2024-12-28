@@ -18,7 +18,7 @@ public sealed class EdgeMqApiTests
     [Fact]
     public async Task Peek_NoMessagesAdded_QueueIsEmpty()
     {
-        const string queueName = "test-queue";
+        const string queueName = "default";
 
         var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
@@ -34,7 +34,7 @@ public sealed class EdgeMqApiTests
     [Fact]
     public async Task Dequeue_MessagesAdded_QueueIsEmpty()
     {
-        const string queueName = "test-queue";
+        const string queueName = "default";
         const string payload = "hallo";
 
         var context = new EdgeMqApiTestsContext();
@@ -57,7 +57,7 @@ public sealed class EdgeMqApiTests
     [Fact]
     public async Task DequeueByProcessing_MessagesAdded_QueueIsEmpty()
     {
-        const string queueName = "test-queue";
+        const string queueName = "default";
         const string payload = "hallo";
 
         var context = new EdgeMqApiTestsContext();
@@ -97,7 +97,7 @@ public sealed class EdgeMqApiTests
     [Fact]
     public async Task DequeueByProcessing_BatchSizeDefined_BatchSizeRespected()
     {
-        const string queueName = "test-queue";
+        const string queueName = "default";
         const string payload = "hallo";
 
         var context = new EdgeMqApiTestsContext();
@@ -139,7 +139,7 @@ public sealed class EdgeMqApiTests
     [Fact]
     public async Task Acknowledge_MessagesAdded_QueueIsEmpty()
     {
-        const string queueName = "test-queue";
+        const string queueName = "default";
         const string payload = "hallo";
 
         var context = new EdgeMqApiTestsContext();
