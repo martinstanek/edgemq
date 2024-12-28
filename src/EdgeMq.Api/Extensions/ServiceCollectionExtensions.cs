@@ -1,7 +1,7 @@
 using EdgeMq.Api.Handlers;
 using EdgeMq.Api.Serialization;
 using EdgeMq.Api.Services;
-using EdgeMQ.Service.Extensions;
+using EdgeMq.Service1.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EdgeMq.Api.Extensions;

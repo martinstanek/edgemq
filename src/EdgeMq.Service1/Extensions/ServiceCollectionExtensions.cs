@@ -1,8 +1,8 @@
-using EdgeMQ.Service.Input;
-using EdgeMQ.Service.Store;
+using EdgeMq.Service1.Input;
+using EdgeMq.Service1.Store;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EdgeMQ.Service.Extensions;
+namespace EdgeMq.Service1.Extensions;
 
 public static class ServiceCollectionExtensions
 {

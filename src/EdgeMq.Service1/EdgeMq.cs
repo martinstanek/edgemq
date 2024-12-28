@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using EdgeMQ.Service.Exceptions;
-using EdgeMQ.Service.Input;
-using EdgeMQ.Service.Store;
+using EdgeMq.Service1.Exceptions;
+using EdgeMq.Service1.Input;
+using EdgeMq.Service1.Store;
 
-namespace EdgeMQ.Service;
+namespace EdgeMq.Service1;
 
 public sealed class EdgeMq : IEdgeMq
 {

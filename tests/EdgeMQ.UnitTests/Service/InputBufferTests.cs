@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using EdgeMQ.Service.Input;
+using EdgeMq.Service1.Input;
 using Shouldly;
 using Xunit;
 

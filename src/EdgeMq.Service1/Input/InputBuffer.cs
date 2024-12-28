@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using EdgeMQ.Service.Exceptions;
+using EdgeMq.Service1.Exceptions;
 
-namespace EdgeMQ.Service.Input;
+namespace EdgeMq.Service1.Input;
 
 public sealed class InputBuffer
 {

@@ -4,6 +4,8 @@ namespace EdgeMq.Consumer;
 
 public static class Program
 {
+    private static ulong _count;
+
     public static async Task Main()
     {
         Console.WriteLine("EdgeMQ Consumer");
@@ -21,7 +23,7 @@ public static class Program
             {
                 foreach (var message in messages)
                 {
-                    Console.WriteLine(message.Payload);
+                    Console.WriteLine($"{++_count} - {message.Payload}");
                 }
 
                 return Task.CompletedTask;

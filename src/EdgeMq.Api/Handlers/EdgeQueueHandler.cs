@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using EdgeMq.Model;
-using EdgeMQ.Service;
+using EdgeMq.Service1;
 using Microsoft.AspNetCore.Http;
 
 namespace EdgeMq.Api.Handlers;

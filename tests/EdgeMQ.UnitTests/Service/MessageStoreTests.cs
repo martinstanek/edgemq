@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using EdgeMQ.Service.Store;
+using EdgeMq.Service1.Store;
 using Shouldly;
 using Xunit;
 

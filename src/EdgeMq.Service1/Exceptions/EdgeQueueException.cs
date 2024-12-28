@@ -1,5 +1,5 @@
 using System;
 
-namespace EdgeMQ.Service.Exceptions;
+namespace EdgeMq.Service1.Exceptions;
 
 public class EdgeQueueException(string message) : Exception(message) { }

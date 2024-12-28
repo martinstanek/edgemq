@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using EdgeMQ.Service;
+using EdgeMq.Service1;
 using Microsoft.Extensions.Hosting;
 
 namespace EdgeMq.Api.Services;

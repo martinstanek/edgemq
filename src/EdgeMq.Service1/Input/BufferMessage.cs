@@ -1,6 +1,6 @@
 using System;
 
-namespace EdgeMQ.Service.Input;
+namespace EdgeMq.Service1.Input;
 
 public sealed record BufferMessage
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace EdgeMQ.Service;
+namespace EdgeMq.Service1;
 
 public sealed record Message
 {

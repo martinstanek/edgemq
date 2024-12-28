@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EdgeMQ.Service.Store;
+namespace EdgeMq.Service1.Store;
 
 public interface IMessageStore
 {

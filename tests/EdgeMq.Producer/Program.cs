@@ -7,6 +7,8 @@ namespace EdgeMq.Producer;
 
 public static class Program
 {
+    private static ulong _count;
+
     public static async Task Main()
     {
         Console.WriteLine("EdgeMQ Producer");
@@ -24,7 +26,7 @@ public static class Program
 
             await edgeMqClient.EnqueueAsync("test-queue", payload);
 
-            Console.WriteLine(payload);
+            Console.WriteLine($"{++_count} - {payload}");
 
             await Task.Delay(100);
         }
