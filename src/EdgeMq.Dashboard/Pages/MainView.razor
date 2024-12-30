@@ -1,39 +1,22 @@
 ﻿@page "/"
 @using EdgeMq.Client
-@using EdgeMq.Model
 @inject IEdgeMqClient EdgeMqClient;
 
 <PageTitle>Dashboard</PageTitle>
 
-<h1>Queues</h1>
+<MudText Typo="Typo.h5">Queues</MudText>
 
-@if (forecasts == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th aria-label="Temperature in Celsius">Mode</th>
-            <th aria-label="Temperature in Farenheit">Messages</th>
-            <th>MaxMessages</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var forecast in forecasts)
-        {
-            <tr>
-                <td>@forecast.Name</td>
-                <td>@forecast.Mode</td>
-                <td>@forecast.Metrics.MessageCount</td>
-                <td>@forecast.Metrics.MaxMessageCount</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
+<MudTable Items="@forecasts" Hover="true" Breakpoint="Breakpoint.Sm" Loading="false" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Mode</MudTh>
+        <MudTh>Messages</MudTh>
+        <MudTh>Threshold</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Mode">@context.Mode</MudTd>
+        <MudTd DataLabel="Messages">@context.Metrics.MessageCount</MudTd>
+        <MudTd DataLabel="Threshold" >@context.Metrics.MaxMessageCount</MudTd>
+    </RowTemplate>
+</MudTable>
