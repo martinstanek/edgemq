@@ -8,6 +8,9 @@ namespace EdgeMq.Client;
 
 internal interface IEdgeMqApi
 {
+    [Get("/")]
+    Task<IReadOnlyCollection<Queue>> GetQueuesAsync();
+
     [Get("/queue/{name}")]
     Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string name, [Query] int batchSize);
 

@@ -19,6 +19,11 @@ public sealed class EdgeMqClient : IEdgeMqClient
         _api = new Lazy<IEdgeMqApi>(() => Refit.RestService.For<IEdgeMqApi>(httpClient));
     }
 
+    public Task<IReadOnlyCollection<Queue>> GetQueuesAsync()
+    {
+        return _api.Value.GetQueuesAsync();
+    }
+
     public Task<QueueMetrics> GetMetricsAsync(string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);

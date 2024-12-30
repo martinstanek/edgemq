@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using EdgeMq.Model;
 
 namespace EdgeMq.Api.Serialization;
 
+[JsonSerializable(typeof(Int32))]
 [JsonSerializable(typeof(Queue))]
 [JsonSerializable(typeof(QueueMetrics))]
 [JsonSerializable(typeof(QueueRawMessage))]

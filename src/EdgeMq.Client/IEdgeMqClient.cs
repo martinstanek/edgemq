@@ -8,6 +8,8 @@ namespace EdgeMq.Client;
 
 public interface IEdgeMqClient
 {
+    Task<IReadOnlyCollection<Queue>> GetQueuesAsync();
+
     Task<QueueMetrics> GetMetricsAsync(string queueName);
 
     Task<QueueMetrics> EnqueueAsync(string queueName, string payload);
