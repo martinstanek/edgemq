@@ -8,7 +8,7 @@ namespace EdgeMq.Api.Extensions;
 
 public static class WebApplicationExtensions
 {
-    public static WebApplication ConfigureEndpoints(this WebApplication webApplication)
+    public static WebApplication UseApiEndpoints(this WebApplication webApplication)
     {
         var api = webApplication.MapGroup("/queue");
 
@@ -29,15 +29,6 @@ public static class WebApplicationExtensions
 
         api.MapPatch("/{name}", async (string name, [FromQuery] Guid batchId, [FromServices] IEdgeQueueHandler handler)
             => Results.Ok(await handler.AcknowledgeAsync(name, batchId)));
-
-        return webApplication;
-    }
-
-    public static WebApplication ConfigureStaticFiles(this WebApplication webApplication)
-    {
-        var api = webApplication.MapGroup("/dashboard");
-
-        api.MapStaticAssets();
 
         return webApplication;
     }

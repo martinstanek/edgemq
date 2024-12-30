@@ -1,7 +1,6 @@
 using EdgeMq.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -15,11 +14,9 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-//app.ConfigureRoot();
-app.ConfigureEndpoints();
-//app.ConfigureStaticFiles();
-app.MapOpenApi();
+app.UseApiEndpoints();
 app.UseCors(p => { p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
+app.MapOpenApi();
 app.Run();
 
 public partial class Program { }
