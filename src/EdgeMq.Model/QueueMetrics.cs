@@ -14,6 +14,10 @@ public sealed record QueueMetrics
 
     public required ulong InputBufferMessageCount { get; init; }
 
+    public required double MessagesInPerSecond { get; init; }
+
+    public required double MessagesOutPerSecond { get; init; }
+
     public static QueueMetrics Empty => new()
     {
         Name = string.Empty,
@@ -21,6 +25,8 @@ public sealed record QueueMetrics
         MaxMessageCount = 0,
         StoreSizeBytes = 0,
         MaxStoreBytes = 0,
-        InputBufferMessageCount = 0
+        InputBufferMessageCount = 0,
+        MessagesInPerSecond = 0d,
+        MessagesOutPerSecond = 0d
     };
 }

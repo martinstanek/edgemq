@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
+using EdgeMq.Service.Metrics;
 using EdgeMq.Service.Store;
 
 namespace EdgeMq.Service;
 
 public sealed class EdgeMq : IEdgeMq
 {
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly ConcurrentBag<Message> _peekedMessages = new();
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly EventsPerInterval _messagesOut = new();
+    private readonly EventsPerInterval _messagesIn = new();
     private readonly EdgeQueueConfiguration _configuration;
     private readonly InputBuffer _inputBuffer;
     private readonly IMessageStore _messageStore;
@@ -145,6 +148,8 @@ public sealed class EdgeMq : IEdgeMq
         var idsToDelete = _peekedMessages.Select(s => s.Id).ToList();
 
         await _messageStore.DeleteMessagesAsync(idsToDelete);
+
+        _messagesOut.AddEvents((uint) idsToDelete.Count);
     }
 
     private async Task ProcessQueueAsync(CancellationToken cancellationToken)
@@ -181,6 +186,8 @@ public sealed class EdgeMq : IEdgeMq
             .ToList();
 
         await _messageStore.AddMessagesAsync(messagePayloadsToStore);
+
+        _messagesIn.AddEvents((uint) messagePayloadsToStore.Count);
     }
 
     public string Name => _configuration.Name;
@@ -198,4 +205,8 @@ public sealed class EdgeMq : IEdgeMq
     public ulong MaxMessageSizeBytes => _messageStore.MessageSizeBytes;
 
     public ulong CurrentCurrentId => _messageStore.CurrentId;
+
+    public double MessagesInPerSecond => _messagesIn.CurrentEventsPerSecond();
+
+    public double MessagesOutPerSecond => _messagesOut.CurrentEventsPerSecond();
 }

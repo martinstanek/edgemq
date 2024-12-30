@@ -36,4 +36,8 @@ public interface IEdgeMq : IDisposable
     public ulong MaxMessageSizeBytes { get; }
 
     public ulong CurrentCurrentId { get; }
+
+    public double MessagesInPerSecond { get; }
+
+    public double MessagesOutPerSecond { get; }
 }
