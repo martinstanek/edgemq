@@ -14,6 +14,20 @@ namespace EdgeMQ.UnitTests.Api;
 public sealed class EdgeMqApiTests
 {
     [Fact]
+    public async Task GetQueues_QueueIsDefined_QueueIsReported()
+    {
+        const string queueName = "default";
+
+        var context = new EdgeMqApiTestsContext();
+        var client = context.GetClient();
+
+        var queues = await client.GetQueuesAsync();
+
+        queues.Count.ShouldBe(1);
+        queues.First().Name.ShouldBe(queueName);
+    }
+
+    [Fact]
     public async Task Peek_NoMessagesAdded_QueueIsEmpty()
     {
         const string queueName = "default";

@@ -8,7 +8,7 @@ namespace EdgeMq.Client;
 
 internal interface IEdgeMqApi
 {
-    [Get("/")]
+    [Get("/queue")]
     Task<IReadOnlyCollection<Queue>> GetQueuesAsync();
 
     [Get("/queue/{name}")]
