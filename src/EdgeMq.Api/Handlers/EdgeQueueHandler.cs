@@ -1,14 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using Ardalis.GuardClauses;
 using EdgeMq.Model;
 using EdgeMq.Service;
-using Microsoft.AspNetCore.Http;
 
 namespace EdgeMq.Api.Handlers;
 
@@ -29,7 +29,11 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         var result = new QueueMetrics
         {
             Name = queue.Name,
-            MessageCount = queue.MessageCount
+            MessageCount = queue.MessageCount,
+            MaxMessageCount = queue.MaxMessageCount,
+            StoreSizeBytes = queue.MessageSizeBytes,
+            MaxStoreBytes = queue.MaxMessageSizeBytes,
+            InputBufferMessageCount = queue.BufferMessageCount
         };
 
         return Task.FromResult(result);

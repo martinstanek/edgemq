@@ -6,9 +6,21 @@ public sealed record QueueMetrics
     
     public required ulong MessageCount { get; init; }
 
+    public required ulong MaxMessageCount { get; init; }
+
+    public required ulong StoreSizeBytes { get; init; }
+
+    public required ulong MaxStoreBytes { get; init; }
+
+    public required ulong InputBufferMessageCount { get; init; }
+
     public static QueueMetrics Empty => new()
     {
         Name = string.Empty,
-        MessageCount = 0
+        MessageCount = 0,
+        MaxMessageCount = 0,
+        StoreSizeBytes = 0,
+        MaxStoreBytes = 0,
+        InputBufferMessageCount = 0
     };
 }

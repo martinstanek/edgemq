@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 
 namespace EdgeMq.Api.Serialization;
