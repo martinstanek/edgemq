@@ -2,11 +2,31 @@
 @using EdgeMq.Client
 @inject IEdgeMqClient EdgeMqClient;
 
-<PageTitle>Dashboard</PageTitle>
+<PageTitle>EdgeMQ Dashboard</PageTitle>
 
-<MudText Typo="Typo.h5">Queues</MudText>
+<div>
+    <MudText Typo="Typo.h5">Queues</MudText>
+</div>
 
-<MudTable Items="@forecasts" Hover="true" Breakpoint="Breakpoint.Sm" Loading="false" LoadingProgressColor="Color.Info">
+@foreach (var queue in forecasts)
+{
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">@queue.Name</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText>@queue.Mode</MudText>
+            <MudText>@queue.Metrics.MessagesInPerSecond.ToString("F")</MudText>
+            <MudText>@queue.Metrics.MessagesOutPerSecond.ToString("F")</MudText>
+        </MudCardContent>
+    </MudCard>
+}
+
+<br/>
+
+<MudTable Items="@forecasts" Hover="true" >
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Mode</MudTh>
@@ -20,7 +40,7 @@
         <MudTd DataLabel="Mode">@context.Mode</MudTd>
         <MudTd DataLabel="Messages">@context.Metrics.MessageCount</MudTd>
         <MudTd DataLabel="Threshold" >@context.Metrics.MaxMessageCount</MudTd>
-        <MudTd DataLabel="MessagesInPerSecond">@context.Metrics.MessagesInPerSecond</MudTd>
-        <MudTd DataLabel="MessagesOutPerSecond" >@context.Metrics.MessagesOutPerSecond</MudTd>
+        <MudTd DataLabel="MessagesInPerSecond">@context.Metrics.MessagesInPerSecond.ToString("F")</MudTd>
+        <MudTd DataLabel="MessagesOutPerSecond" >@context.Metrics.MessagesOutPerSecond.ToString("F")</MudTd>
     </RowTemplate>
 </MudTable>

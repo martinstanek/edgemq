@@ -7,7 +7,8 @@ public static class WebAssemblyHostBuilderExtensions
 {
     public static WebAssemblyHostBuilder AddEdgeMqClient(this WebAssemblyHostBuilder builder)
     {
-        var uri = new Uri(builder.HostEnvironment.BaseAddress);
+        // var uri = new Uri(builder.HostEnvironment.BaseAddress);
+        var uri = new Uri("http://10.0.1.106:2323");
         var httpClient = new HttpClient { BaseAddress = uri };
         var client = new EdgeMqClient(httpClient);
 
