@@ -3,7 +3,10 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

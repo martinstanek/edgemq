@@ -15,7 +15,7 @@ public static class Program
 
         var httpClient = new HttpClient()
         {
-            BaseAddress = new Uri("http://localhost:2323")
+            BaseAddress = new Uri("http://10.0.1.106:2323")
         };
 
         var edgeMqClient = new EdgeMqClient(httpClient);

@@ -12,11 +12,15 @@
         <MudTh>Mode</MudTh>
         <MudTh>Messages</MudTh>
         <MudTh>Threshold</MudTh>
+        <MudTh>In/s</MudTh>
+        <MudTh>Out/s</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Mode">@context.Mode</MudTd>
         <MudTd DataLabel="Messages">@context.Metrics.MessageCount</MudTd>
         <MudTd DataLabel="Threshold" >@context.Metrics.MaxMessageCount</MudTd>
+        <MudTd DataLabel="MessagesInPerSecond">@context.Metrics.MessagesInPerSecond</MudTd>
+        <MudTd DataLabel="MessagesOutPerSecond" >@context.Metrics.MessagesOutPerSecond</MudTd>
     </RowTemplate>
 </MudTable>

@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Metrics;
