@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EdgeMq.Client;
-using EdgeMq.Model;
-using EdgeMq.Service.Store;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
+using EdgeMq.Model;
+using EdgeMq.Client;
 using Shouldly;
 using Xunit;
 
@@ -47,7 +45,6 @@ public sealed class EdgeMqApiTests
         var messages = await client.DequeueAsync(queueName, batchSize: 100);
         var stats = await client.GetMetricsAsync(queueName);
 
-        context.MessageStore.MessageCount.ShouldBe((ulong) 0);
         messages.Count.ShouldBe(1);
         messages.First().Payload.ShouldBe(payload);
         stats.Name.ShouldBe(queueName);
@@ -80,7 +77,6 @@ public sealed class EdgeMqApiTests
         }, token);
 
         stats.MessageCount.ShouldBe((uint) 3);
-        context.MessageStore.MessageCount.ShouldBe((ulong) 0);
 
         stats = await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
         {
@@ -91,7 +87,6 @@ public sealed class EdgeMqApiTests
         }, token);
 
         stats.MessageCount.ShouldBe((uint) 0);
-        context.MessageStore.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -111,8 +106,6 @@ public sealed class EdgeMqApiTests
 
         await Task.Delay(1000, token);
 
-        context.MessageStore.MessageCount.ShouldBe((ulong) 3);
-
         var stats = await client.DequeueAsync(queueName, batchSize: 2, timeOut, messages =>
         {
             messages.Count.ShouldBe(2);
@@ -122,7 +115,6 @@ public sealed class EdgeMqApiTests
         }, token);
 
         stats.MessageCount.ShouldBe((uint) 3);
-        context.MessageStore.MessageCount.ShouldBe((ulong) 1);
 
         stats = await client.DequeueAsync(queueName, batchSize: 1, timeOut, messages =>
         {
@@ -133,7 +125,6 @@ public sealed class EdgeMqApiTests
         }, token);
 
         stats.MessageCount.ShouldBe((uint) 1);
-        context.MessageStore.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -160,8 +151,6 @@ public sealed class EdgeMqApiTests
 
     private sealed class EdgeMqApiTestsContext
     {
-        private IMessageStore? _messageStore;
-
         internal IEdgeMqClient GetClient()
         {
             var application = new WebApplicationFactory<Program>()
@@ -169,7 +158,6 @@ public sealed class EdgeMqApiTests
 
             var httpClient = application.CreateClient();
 
-            _messageStore = application.Services.GetRequiredService<IMessageStore>();
 
             return new EdgeMqClient(httpClient);
         }
@@ -189,7 +177,5 @@ public sealed class EdgeMqApiTests
 
             return messages;
         }
-
-        internal IMessageStore MessageStore => _messageStore ?? throw new InvalidOperationException();
     }
 }

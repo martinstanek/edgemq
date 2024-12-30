@@ -1,42 +1,38 @@
 using System.IO;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace EdgeMq.Service.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddFileSystemEdgeMq(this IServiceCollection services, string name, string rootPath)
+    public static IServiceCollection AddQueueManager(
+        this IServiceCollection services,
+        IReadOnlyCollection<string> queues,
+        string rootPath,
+        bool isInMemory)
     {
-        var storeConfig = new MessageStoreConfiguration()
+        var manager = new QueueManager(isInMemory);
+
+        foreach (var queue in queues)
         {
-            Path = Path.Combine(rootPath, name)
-        };
+            var bufferConfig = new InputBufferConfiguration();
+            var storeConfig = new MessageStoreConfiguration
+            {
+                Path = Path.Combine(rootPath, queue)
+            };
+            var queueConfig = new EdgeQueueConfiguration
+            {
+                Name = queue,
+                BufferConfiguration = bufferConfig,
+                StoreConfiguration = storeConfig
+            };
 
-        var store = new FileSystemMessageStore(storeConfig);
+            manager.AddQueue(queue, queueConfig);
+        }
 
-        return AddEdgeMq(services, name, store);
-    }
-
-    public static IServiceCollection AddInMemoryEdgeMq(this IServiceCollection services, string name)
-    {
-        var storeConfig = new MessageStoreConfiguration();
-        var store = new InMemoryMessageStore(storeConfig);
-
-        return AddEdgeMq(services, name, store);
-    }
-
-    public static IServiceCollection AddEdgeMq(this IServiceCollection services, string name, IMessageStore store)
-    {
-        var queueConfig = new EdgeQueueConfiguration { Name = name };
-        var bufferConfig = new InputBufferConfiguration();
-        var buffer = new InputBuffer(bufferConfig);
-
-        return services
-            .AddSingleton(buffer)
-            .AddSingleton(queueConfig)
-            .AddSingleton<IMessageStore>(_ => store)
-            .AddSingleton<IEdgeMq, EdgeMq>();
+        return services.AddSingleton(manager);
     }
 }

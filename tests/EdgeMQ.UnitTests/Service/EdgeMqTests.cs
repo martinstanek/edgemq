@@ -178,9 +178,14 @@ public sealed class EdgeMqTests
     {
         internal IEdgeMq GetQueue()
         {
-            var queueConfig = new EdgeQueueConfiguration { Name = "test" };
             var storeConfig = new MessageStoreConfiguration();
             var bufferConfig = new InputBufferConfiguration();
+            var queueConfig = new EdgeQueueConfiguration
+            {
+                Name = "test",
+                BufferConfiguration = bufferConfig,
+                StoreConfiguration = storeConfig
+            };
             var buffer = new InputBuffer(bufferConfig);
             var store = new InMemoryMessageStore(storeConfig);
             var queue = new EdgeMq.Service.EdgeMq(buffer, store, queueConfig);

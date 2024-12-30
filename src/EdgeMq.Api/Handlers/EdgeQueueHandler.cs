@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Service;
 using Microsoft.AspNetCore.Http;
@@ -15,23 +14,22 @@ namespace EdgeMq.Api.Handlers;
 
 public sealed class EdgeQueueHandler : IEdgeQueueHandler
 {
-    private readonly EdgeMqServerConfiguration _serverConfiguration;
-    private readonly IEdgeMq _edgeMq;
+    private readonly QueueManager _queueManager;
 
-    public EdgeQueueHandler(IEdgeMq edgeMq, EdgeMqServerConfiguration serverConfiguration)
+    public EdgeQueueHandler(QueueManager queueManager)
     {
-        _edgeMq = edgeMq;
-        _serverConfiguration = serverConfiguration;
+        _queueManager = queueManager;
     }
 
     public Task<QueueMetrics> GetMetricsAsync(string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
+        var queue = _queueManager.GetQueue(queueName);
         var result = new QueueMetrics
         {
-            Name = _edgeMq.Name,
-            MessageCount = _edgeMq.MessageCount
+            Name = queue.Name,
+            MessageCount = queue.MessageCount
         };
 
         return Task.FromResult(result);
@@ -43,27 +41,22 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 
         using var reader = new StreamReader(request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false);
         var rawContent = await reader.ReadToEndAsync();
+        var queue = _queueManager.GetQueue(queueName);
 
-        await _edgeMq.QueueAsync(rawContent, CancellationToken.None);
+        await queue.QueueAsync(rawContent, CancellationToken.None);
 
-        return new QueueMetrics
-        {
-            Name = _edgeMq.Name,
-            MessageCount = _edgeMq.MessageCount
-        };
+        return await GetMetricsAsync(queueName);
     }
 
     public async Task<QueueMetrics> AcknowledgeAsync(string queueName, Guid batchId)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
-        await _edgeMq.AcknowledgeAsync(batchId, CancellationToken.None);
+        var queue = _queueManager.GetQueue(queueName);
 
-        return new QueueMetrics
-        {
-            Name = _edgeMq.Name,
-            MessageCount = _edgeMq.MessageCount
-        };
+        await queue.AcknowledgeAsync(batchId, CancellationToken.None);
+
+        return await GetMetricsAsync(queueName);
     }
 
     public async Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)
@@ -71,8 +64,8 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
 
-        var messages = await _edgeMq.DeQueueAsync(batchSize: (uint) batchSize, CancellationToken.None);
-
+        var queue = _queueManager.GetQueue(queueName);
+        var messages = await queue.DeQueueAsync(batchSize: (uint) batchSize, CancellationToken.None);
         var result = messages.Select(s => new QueueRawMessage
         {
             Id = s.Id,
@@ -88,8 +81,8 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
 
-        var messages = await _edgeMq.PeekAsync(batchSize: (uint) batchSize, CancellationToken.None);
-
+        var queue = _queueManager.GetQueue(queueName);
+        var messages = await queue.PeekAsync(batchSize: (uint) batchSize, CancellationToken.None);
         var result = messages.Select(s => new QueueRawMessage
         {
             Id = s.Id,
@@ -104,12 +97,12 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
     {
         var result = new List<Queue>();
 
-        foreach (var queue in _serverConfiguration.Queues)
+        foreach (var queue in _queueManager.Queues)
         {
             result.Add(new Queue
             {
                 Name = queue,
-                Mode = _serverConfiguration.Mode.ToString(),
+                Mode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
                 Metrics = await GetMetricsAsync(queue)
             });
         }
