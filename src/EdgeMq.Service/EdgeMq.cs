@@ -207,7 +207,7 @@ public sealed class EdgeMq : IEdgeMq
 
     public ulong MessageSizeBytes => _messageStore.MessageSizeBytes;
 
-    public ulong MaxMessageSizeBytes => _messageStore.MessageSizeBytes;
+    public ulong MaxMessageSizeBytes => _messageStore.MaxMessageSizeBytes;
 
     public ulong BufferMessageCount => _inputBuffer.MessageCount;
 

@@ -8,7 +8,7 @@
     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Tertiary">refresh</MudButton>
 </div>
 
-@foreach (var queue in forecasts)
+@foreach (var queue in _queues)
 {
     <MudCard Style="margin-bottom: 10px">
         <MudCardHeader>
@@ -38,10 +38,10 @@
                                     <MudText>Messages out:</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudText>Store pressure (count):</MudText>
+                                    <MudText>Pressure (count):</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudText>Store pressure (size):</MudText>
+                                    <MudText>Pressure (size):</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
                                     <MudText>Buffer pressure (count):</MudText>
@@ -69,16 +69,16 @@
                                     <MudText>@queue.Metrics.MessagesOutPerSecond.ToString("F")/s</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudText>0% (0 / 10000)</MudText>
+                                    <MudText>@GetCountPressure(queue.Metrics)</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudText>0% (0 / 10000)</MudText>
+                                    <MudText>@GetSizePressure(queue.Metrics)</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudText>0% (0 / 10000)</MudText>
+                                    <MudText>@GetBufferCountPressure(queue.Metrics)</MudText>
                                 </MudItem>
                                 <MudItem xs="12">
-                                    <MudText>0% (0 / 10000)</MudText>
+                                    <MudText>@GetBufferSizePressure(queue.Metrics)</MudText>
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
