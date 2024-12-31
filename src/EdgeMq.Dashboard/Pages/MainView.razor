@@ -1,7 +1,9 @@
 ﻿@page "/"
 @using EdgeMq.Client
 @using EdgeMq.Dashboard.Components
+@using EdgeMq.Dashboard.Eventing
 @inject IEdgeMqClient EdgeMqClient;
+@inject IQueueMetricsEventingService EventingService;
 
 <PageTitle>EdgeMQ Dashboard</PageTitle>
 

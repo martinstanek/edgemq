@@ -8,18 +8,30 @@ public partial class MainView
     private IReadOnlyCollection<Queue> _queues = [];
     private Timer? _timer;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        _queues = await EdgeMqClient.GetQueuesAsync();
         _timer = new Timer(async (s) => await OnTimerAsync() ,null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
+
+        return Task.CompletedTask;
     }
 
     private async Task OnTimerAsync()
     {
-        _queues = await EdgeMqClient.GetQueuesAsync();
+        await ReloadAsync();
+
         await InvokeAsync(() =>
         {
             StateHasChanged();
         });
+    }
+
+    private async Task ReloadAsync()
+    {
+        _queues = await EdgeMqClient.GetQueuesAsync();
+
+        foreach (var queue in _queues)
+        {
+            EventingService.SignalMetrics(queue.Metrics);
+        }
     }
 }

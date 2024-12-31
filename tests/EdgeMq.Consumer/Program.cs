@@ -9,6 +9,7 @@ public static class Program
     public static async Task Main()
     {
         Console.WriteLine("EdgeMQ Consumer");
+        var r = new Random();
 
         var httpClient = new HttpClient()
         {
@@ -19,7 +20,9 @@ public static class Program
 
         while (true)
         {
-            await edgeMqClient.DequeueAsync("test-queue", 100, TimeSpan.FromSeconds(1), messages =>
+            var batch = r.Next(1, 20);
+
+            await edgeMqClient.DequeueAsync("test-queue", batch, TimeSpan.FromSeconds(1), messages =>
             {
                 foreach (var message in messages)
                 {

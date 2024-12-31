@@ -1,4 +1,5 @@
 using EdgeMq.Infra.Metrics;
+using EdgeMq.Model;
 using MudBlazor;
 
 namespace EdgeMq.Dashboard.Components;
@@ -7,27 +8,38 @@ public partial class QueueThroughputChart
 {
     private sealed record ChartValue(string Label, double Value);
 
-    private const int MaxValues = 30;
+    private const int MaxValues = 15;
 
     private readonly LimitedSizeAddOnlyStack<ChartValue> _inValues = new(MaxValues);
     private readonly LimitedSizeAddOnlyStack<ChartValue> _outValues = new(MaxValues);
     private readonly ChartOptions _options = new();
     private int _chartIndex = -1;
 
-    public void AddValues(double inPerSecond, double outPerSecond)
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        EventingService.OnMetrics += AddValues;
+    }
+
+    private async void AddValues(object? sender, QueueMetrics queueMetrics)
     {
         var dateTime = $"{DateTime.Now.Minute:00}:{DateTime.Now.Second:00}";
 
-        _inValues.Push(new ChartValue(dateTime, inPerSecond));
-        _outValues.Push(new ChartValue(dateTime, outPerSecond));
+        _inValues.Push(new ChartValue(dateTime, queueMetrics.MessagesInPerSecond));
+        _outValues.Push(new ChartValue(dateTime, queueMetrics.MessagesOutPerSecond));
+
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
     }
 
-    private readonly List<ChartSeries> _series = new()
-    {
-        new ChartSeries { Name = "In/s", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
-        new ChartSeries { Name = "Out/s", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148 } },
-    };
+    private List<ChartSeries> Series =>
+    [
+        new() { Name = "In/s", Data = _inValues.Items.Reverse().Select(s => s.Value).ToArray() },
+        new() { Name = "Out/s", Data = _outValues.Items.Reverse().Select(s => s.Value).ToArray() }
+    ];
 
-    private string[] _xAxisLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
-
+    private string[] XAxisLabels => _inValues.Items.Reverse().Select(s => s.Label).ToArray();
 }

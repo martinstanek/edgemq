@@ -55,6 +55,16 @@ public class LimitedSizeAddOnlyStack<T>
         }
     }
 
+    public IReadOnlyCollection<T> Items {
+        get
+        {
+            lock (Lock)
+            {
+                return Stack;
+            }
+        }
+    }
+
     public int Count
     {
         get
