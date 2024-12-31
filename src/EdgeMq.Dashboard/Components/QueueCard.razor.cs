@@ -1,55 +1,41 @@
 using EdgeMq.Model;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace EdgeMq.Dashboard.Components;
 
 public partial class QueueCard
 {
-    [Parameter] public Queue queue { get; set; } = Queue.Empty;
+    [Parameter]
+    public Queue Queue { get; set; } = Queue.Empty;
 
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-
-    public string GetBufferSizePressure(QueueMetrics metrics) =>
-        GetPressureString(
-            metrics.BufferMessagesSizeBytes,
-            metrics.MaxBufferMessagesSizeBytes,
-            metrics.BufferMessagesSizePressure,
-            unit: "B");
-
-    public string GetBufferCountPressure(QueueMetrics metrics) =>
-        GetPressureString(
-            metrics.BufferMessageCount,
-            metrics.MaxBufferMessageCount,
-            metrics.BufferMessageCountPressure);
-
-    public string GetSizePressure(QueueMetrics metrics) =>
-        GetPressureString(
-            metrics.MessagesSizeBytes,
-            metrics.MaxMessagesSizeBytes,
-            metrics.MessagesSizePressure,
-            unit: "B");
-
-    public string GetCountPressure(QueueMetrics metrics) =>
-        GetPressureString(
-            metrics.MessageCount,
-            metrics.MaxMessageCount,
-            metrics.MessageCountPressure);
-
-    private string GetPressureString(ulong max, ulong value, double pressure, string unit = "")
+    private static string GetPressureString(ulong max, ulong value, double pressure, string unit = "")
     {
         return $"{pressure * 100:F}% ({value}{unit} / {max}{unit})";
     }
 
+    private string BufferSizePressure =>
+        GetPressureString(
+            Queue.Metrics.BufferMessagesSizeBytes,
+            Queue.Metrics.MaxBufferMessagesSizeBytes,
+            Queue.Metrics.BufferMessagesSizePressure,
+            unit: "B");
 
-    public ChartOptions Options = new ChartOptions();
+    private string BufferCountPressure =>
+        GetPressureString(
+            Queue.Metrics.BufferMessageCount,
+            Queue.Metrics.MaxBufferMessageCount,
+            Queue.Metrics.BufferMessageCountPressure);
 
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Fossil", Data = new double[] { 90, 79, 72, 69, 62, 62, 55, 65, 70 } },
-        new ChartSeries() { Name = "Renewable", Data = new double[] { 10, 41, 35, 51, 49, 62, 69, 91, 148 } },
-    };
+    private string SizePressure =>
+        GetPressureString(
+            Queue.Metrics.MessagesSizeBytes,
+            Queue.Metrics.MaxMessagesSizeBytes,
+            Queue.Metrics.MessagesSizePressure,
+            unit: "B");
 
-    public string[] XAxisLabels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
-
+    private string CountPressure =>
+        GetPressureString(
+            Queue.Metrics.MessageCount,
+            Queue.Metrics.MaxMessageCount,
+            Queue.Metrics.MessageCountPressure);
 }

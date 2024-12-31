@@ -1,7 +1,7 @@
 <MudCard Style="margin-bottom: 10px">
     <MudCardHeader>
         <CardHeaderContent>
-            <MudText Typo="Typo.h6">@queue.Name</MudText>
+            <MudText Typo="Typo.h6">@Queue.Name</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
@@ -42,38 +42,38 @@
                     <MudItem xs="6">
                         <MudGrid>
                             <MudItem xs="12">
-                                <MudText>@queue.Mode</MudText>
+                                <MudText>@Queue.Mode</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@queue.Metrics.MessageCount</MudText>
+                                <MudText>@Queue.Metrics.MessageCount</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@queue.Metrics.MessagesSizeBytes</MudText>
+                                <MudText>@Queue.Metrics.MessagesSizeBytes</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@queue.Metrics.MessagesInPerSecond.ToString("F")/s</MudText>
+                                <MudText>@Queue.Metrics.MessagesInPerSecond.ToString("F")/s</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@queue.Metrics.MessagesOutPerSecond.ToString("F")/s</MudText>
+                                <MudText>@Queue.Metrics.MessagesOutPerSecond.ToString("F")/s</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@GetCountPressure(queue.Metrics)</MudText>
+                                <MudText>@CountPressure</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@GetSizePressure(queue.Metrics)</MudText>
+                                <MudText>@SizePressure</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@GetBufferCountPressure(queue.Metrics)</MudText>
+                                <MudText>@BufferCountPressure</MudText>
                             </MudItem>
                             <MudItem xs="12">
-                                <MudText>@GetBufferSizePressure(queue.Metrics)</MudText>
+                                <MudText>@BufferSizePressure</MudText>
                             </MudItem>
                         </MudGrid>
                     </MudItem>
                 </MudGrid>
             </MudItem>
             <MudItem xs="6">
-                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options"/>
+                <QueueThroughputChart/>
             </MudItem>
         </MudGrid>
         <MudProgressLinear Color="Color.Primary" Buffer="true" Value="0.7d" BufferValue="0.2d" Class="my-7"/>
