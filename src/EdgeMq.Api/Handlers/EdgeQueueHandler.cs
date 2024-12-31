@@ -37,10 +37,10 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             MaxBufferMessageCount = queue.MaxBufferMessageCount,
             BufferMessagesSizeBytes = queue.BufferMessageSizeBytes,
             MaxBufferMessagesSizeBytes = queue.MaxBufferMessageSizeBytes,
-            MessageCountPressure = queue.MaxMessageCount / (double) queue.MessageCount,
-            MessagesSizePressure = queue.MaxMessageSizeBytes / (double) queue.MessageSizeBytes,
-            BufferMessageCountPressure = queue.MaxBufferMessageCount / (double) queue.BufferMessageCount,
-            BufferMessagesSizePressure = queue.MaxBufferMessageSizeBytes / (double) queue.BufferMessageSizeBytes,
+            MessageCountPressure = SafeDivide(queue.MaxMessageCount, queue.MessageCount),
+            MessagesSizePressure = SafeDivide(queue.MaxMessageSizeBytes, queue.MessageSizeBytes),
+            BufferMessageCountPressure = SafeDivide(queue.MaxBufferMessageCount, queue.BufferMessageCount),
+            BufferMessagesSizePressure = SafeDivide(queue.MaxBufferMessageSizeBytes, queue.BufferMessageSizeBytes),
             MessagesInPerSecond = queue.MessagesInPerSecond,
             MessagesOutPerSecond = queue.MessagesOutPerSecond
         };
@@ -121,5 +121,15 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         }
 
         return result;
+    }
+
+    private static double SafeDivide(ulong max, ulong value)
+    {
+        if (max == 0 || value == 0)
+        {
+            return 0d;
+        }
+
+        return max / (double) value;
     }
 }
