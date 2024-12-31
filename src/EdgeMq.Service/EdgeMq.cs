@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using Ardalis.GuardClauses;
+using EdgeMq.Infra.Metrics;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
-using EdgeMq.Service.Metrics;
 using EdgeMq.Service.Store;
 
 namespace EdgeMq.Service;

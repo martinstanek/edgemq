@@ -1,5 +1,5 @@
 using System;
-using EdgeMq.Service.Metrics;
+using EdgeMq.Infra.Metrics;
 using Shouldly;
 using Xunit;
 

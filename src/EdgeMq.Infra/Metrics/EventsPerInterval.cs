@@ -1,12 +1,12 @@
 using System;
 
-namespace EdgeMq.Service.Metrics;
+namespace EdgeMq.Infra.Metrics;
 
 public sealed class EventsPerInterval
 {
     public const int MaxSecondsEvaluation = 60;
 
-    private readonly LimitedSizeAddOnlyStack _stack = new(MaxSecondsEvaluation);
+    private readonly LimitedSizeAddOnlyStampStack _stack = new(MaxSecondsEvaluation);
 
     public void AddEvents(uint count)
     {

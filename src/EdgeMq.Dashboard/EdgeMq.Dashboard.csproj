@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\EdgeMq.Client\EdgeMq.Client.csproj" />
+      <ProjectReference Include="..\EdgeMq.Infra\EdgeMq.Infra.csproj" />
     </ItemGroup>
 
 </Project>

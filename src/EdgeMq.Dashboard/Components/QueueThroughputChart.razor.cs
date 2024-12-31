@@ -1,3 +1,4 @@
+using EdgeMq.Infra.Metrics;
 using MudBlazor;
 
 namespace EdgeMq.Dashboard.Components;
@@ -8,10 +9,18 @@ public partial class QueueThroughputChart
 
     private const int MaxValues = 30;
 
-    private readonly Queue<ChartValue> _inValues = new(MaxValues);
-    private readonly Queue<ChartValue> _outValues = new(MaxValues);
+    private readonly LimitedSizeAddOnlyStack<ChartValue> _inValues = new(MaxValues);
+    private readonly LimitedSizeAddOnlyStack<ChartValue> _outValues = new(MaxValues);
     private readonly ChartOptions _options = new();
     private int _chartIndex = -1;
+
+    public void AddValues(double inPerSecond, double outPerSecond)
+    {
+        var dateTime = $"{DateTime.Now.Minute:00}:{DateTime.Now.Second:00}";
+
+        _inValues.Push(new ChartValue(dateTime, inPerSecond));
+        _outValues.Push(new ChartValue(dateTime, outPerSecond));
+    }
 
     private readonly List<ChartSeries> _series = new()
     {

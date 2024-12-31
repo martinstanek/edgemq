@@ -25,4 +25,8 @@
       <ProjectReference Include="..\..\src\EdgeMq.Service\EdgeMq.Service.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infra\" />
+    </ItemGroup>
+
 </Project>

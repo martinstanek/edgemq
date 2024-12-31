@@ -1,8 +1,8 @@
 using System;
 
-namespace EdgeMq.Service.Metrics;
+namespace EdgeMq.Infra.Metrics;
 
-internal sealed class Stamp
+public sealed class Stamp
 {
     public Stamp(ulong value, DateTime time)
     {
