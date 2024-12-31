@@ -4,43 +4,92 @@
 
 <PageTitle>EdgeMQ Dashboard</PageTitle>
 
-<div>
-    <MudText Typo="Typo.h5">Queues</MudText>
+<div style="margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: right" >
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Tertiary">refresh</MudButton>
 </div>
 
 @foreach (var queue in forecasts)
 {
-    <MudCard>
+    <MudCard Style="margin-bottom: 10px">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudText Typo="Typo.h6">@queue.Name</MudText>
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
-            <MudText>@queue.Mode</MudText>
-            <MudText>@queue.Metrics.MessagesInPerSecond.ToString("F")</MudText>
-            <MudText>@queue.Metrics.MessagesOutPerSecond.ToString("F")</MudText>
+            <MudGrid Justify="Justify.FlexEnd">
+                <MudItem xs="6">
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudGrid>
+                                <MudItem xs="12">
+                                    <MudText>Mode:</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Count:</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Size:</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Messages in:</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Messages out:</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Store pressure (count):</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Store pressure (size):</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Buffer pressure (count):</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>Buffer pressure (size):</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudGrid>
+                                <MudItem xs="12">
+                                    <MudText>@queue.Mode</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>@queue.Metrics.MessageCount</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>@queue.Metrics.StoreSizeBytes</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>@queue.Metrics.MessagesInPerSecond.ToString("F")/s</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>@queue.Metrics.MessagesOutPerSecond.ToString("F")/s</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>0% (0 / 10000)</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>0% (0 / 10000)</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>0% (0 / 10000)</MudText>
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudText>0% (0 / 10000)</MudText>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options"/>
+                </MudItem>
+            </MudGrid>
+            <MudProgressLinear Color="Color.Primary" Buffer="true" Value="0.7d" BufferValue="0.2d" Class="my-7"/>
+            <MudProgressLinear Color="Color.Secondary" Buffer="true" Value="0.7d" BufferValue="0.2d" Class="my-7"/>
         </MudCardContent>
     </MudCard>
 }
-
-<br/>
-
-<MudTable Items="@forecasts" Hover="true" >
-    <HeaderContent>
-        <MudTh>Name</MudTh>
-        <MudTh>Mode</MudTh>
-        <MudTh>Messages</MudTh>
-        <MudTh>Threshold</MudTh>
-        <MudTh>In/s</MudTh>
-        <MudTh>Out/s</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Mode">@context.Mode</MudTd>
-        <MudTd DataLabel="Messages">@context.Metrics.MessageCount</MudTd>
-        <MudTd DataLabel="Threshold" >@context.Metrics.MaxMessageCount</MudTd>
-        <MudTd DataLabel="MessagesInPerSecond">@context.Metrics.MessagesInPerSecond.ToString("F")</MudTd>
-        <MudTd DataLabel="MessagesOutPerSecond" >@context.Metrics.MessagesOutPerSecond.ToString("F")</MudTd>
-    </RowTemplate>
-</MudTable>
