@@ -6,10 +6,12 @@ namespace EdgeMq.Dashboard.Pages;
 public partial class MainView
 {
     private IReadOnlyCollection<Queue> _queues = [];
+    private Timer? _timer;
 
     protected override async Task OnInitializedAsync()
     {
         _queues = await EdgeMqClient.GetQueuesAsync();
+        _timer = new Timer(async (s) => await OnTimerAsync() ,null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
     }
 
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
@@ -47,6 +49,15 @@ public partial class MainView
             metrics.MessageCount,
             metrics.MaxMessageCount,
             metrics.MessageCountPressure);
+
+    private async Task OnTimerAsync()
+    {
+        _queues = await EdgeMqClient.GetQueuesAsync();
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
 
     private string GetPressureString(ulong max, ulong value, double pressure, string unit = "")
     {
