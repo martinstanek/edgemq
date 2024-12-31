@@ -24,6 +24,14 @@ public sealed record QueueMetrics
 
     public required double MessagesOutPerSecond { get; init; }
 
+    public required double BufferMessagesSizePressure { get; init; }
+
+    public required double BufferMessageCountPressure { get; init; }
+
+    public required double MessageCountPressure { get; init; }
+
+    public required double MessagesSizePressure { get; init; }
+
     public static QueueMetrics Empty => new()
     {
         Name = string.Empty,
@@ -36,6 +44,10 @@ public sealed record QueueMetrics
         BufferMessagesSizeBytes = 0,
         MaxBufferMessagesSizeBytes = 0,
         MessagesInPerSecond = 0d,
-        MessagesOutPerSecond = 0d
+        MessagesOutPerSecond = 0d,
+        BufferMessageCountPressure = 0d,
+        BufferMessagesSizePressure = 0d,
+        MessageCountPressure = 0d,
+        MessagesSizePressure = 0d
     };
 }

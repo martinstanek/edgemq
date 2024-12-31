@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using Ardalis.GuardClauses;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Metrics;
@@ -32,11 +33,15 @@ public sealed class EdgeMq : IEdgeMq
 
     public Task QueueAsync(string payload, CancellationToken cancellationToken)
     {
+        Guard.Against.NullOrWhiteSpace(payload);
+
         return _inputBuffer.AddAsync(payload, cancellationToken);
     }
 
     public async Task DeQueueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
     {
+        Guard.Against.NegativeOrZero(batchSize);
+
         await _semaphore.WaitAsync(cancellationToken);
 
         var timeOutSource = new CancellationTokenSource(timeOut);
@@ -60,6 +65,8 @@ public sealed class EdgeMq : IEdgeMq
 
     public async Task<IReadOnlyCollection<Message>> DeQueueAsync(uint batchSize, CancellationToken cancellationToken)
     {
+        Guard.Against.NegativeOrZero(batchSize);
+
         await _semaphore.WaitAsync(cancellationToken);
 
         try
@@ -77,6 +84,8 @@ public sealed class EdgeMq : IEdgeMq
 
     public async Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken)
     {
+        Guard.Against.NegativeOrZero(batchSize);
+
         await _semaphore.WaitAsync(cancellationToken);
 
         try
