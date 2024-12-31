@@ -31,9 +31,12 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             Name = queue.Name,
             MessageCount = queue.MessageCount,
             MaxMessageCount = queue.MaxMessageCount,
-            StoreSizeBytes = queue.MessageSizeBytes,
-            MaxStoreBytes = queue.MaxMessageSizeBytes,
-            InputBufferMessageCount = queue.BufferMessageCount,
+            MessagesSizeBytes = queue.MessageSizeBytes,
+            MaxMessagesSizeBytes = queue.MaxMessageSizeBytes,
+            BufferMessageCount = queue.BufferMessageCount,
+            MaxBufferMessageCount = queue.MaxBufferMessageCount,
+            BufferMessagesSizeBytes = queue.BufferMessageSizeBytes,
+            MaxBufferMessagesSizeBytes = queue.MaxBufferMessageSizeBytes,
             MessagesInPerSecond = queue.MessagesInPerSecond,
             MessagesOutPerSecond = queue.MessagesOutPerSecond
         };

@@ -8,11 +8,17 @@ public sealed record QueueMetrics
 
     public required ulong MaxMessageCount { get; init; }
 
-    public required ulong StoreSizeBytes { get; init; }
+    public required ulong MessagesSizeBytes { get; init; }
 
-    public required ulong MaxStoreBytes { get; init; }
+    public required ulong MaxMessagesSizeBytes { get; init; }
 
-    public required ulong InputBufferMessageCount { get; init; }
+    public required ulong BufferMessageCount { get; init; }
+
+    public required ulong MaxBufferMessageCount { get; init; }
+
+    public required ulong BufferMessagesSizeBytes { get; init; }
+
+    public required ulong MaxBufferMessagesSizeBytes { get; init; }
 
     public required double MessagesInPerSecond { get; init; }
 
@@ -23,9 +29,12 @@ public sealed record QueueMetrics
         Name = string.Empty,
         MessageCount = 0,
         MaxMessageCount = 0,
-        StoreSizeBytes = 0,
-        MaxStoreBytes = 0,
-        InputBufferMessageCount = 0,
+        MessagesSizeBytes = 0,
+        MaxMessagesSizeBytes = 0,
+        BufferMessageCount = 0,
+        MaxBufferMessageCount = 0,
+        BufferMessagesSizeBytes = 0,
+        MaxBufferMessagesSizeBytes = 0,
         MessagesInPerSecond = 0d,
         MessagesOutPerSecond = 0d
     };

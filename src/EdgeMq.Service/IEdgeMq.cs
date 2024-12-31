@@ -25,15 +25,19 @@ public interface IEdgeMq : IDisposable
 
     public ulong MessageCount { get; }
 
+    public ulong MaxMessageCount { get; }
+
     public ulong MessageSizeBytes { get; }
+
+    public ulong MaxMessageSizeBytes { get; }
 
     public ulong BufferMessageCount { get; }
 
+    public ulong MaxBufferMessageCount { get; }
+
     public ulong BufferMessageSizeBytes { get; }
 
-    public ulong MaxMessageCount { get; }
-
-    public ulong MaxMessageSizeBytes { get; }
+    public ulong MaxBufferMessageSizeBytes { get; }
 
     public ulong CurrentCurrentId { get; }
 

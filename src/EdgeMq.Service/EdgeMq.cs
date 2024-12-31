@@ -194,15 +194,19 @@ public sealed class EdgeMq : IEdgeMq
 
     public ulong MessageCount => _messageStore.MessageCount;
 
+    public ulong MaxMessageCount => _messageStore.MaxMessageCount;
+
     public ulong MessageSizeBytes => _messageStore.MessageSizeBytes;
+
+    public ulong MaxMessageSizeBytes => _messageStore.MessageSizeBytes;
 
     public ulong BufferMessageCount => _inputBuffer.MessageCount;
 
+    public ulong MaxBufferMessageCount => _inputBuffer.MaxMessageCount;
+
     public ulong BufferMessageSizeBytes => _inputBuffer.MessageSizeBytes;
 
-    public ulong MaxMessageCount => _messageStore.MaxMessageCount;
-
-    public ulong MaxMessageSizeBytes => _messageStore.MessageSizeBytes;
+    public ulong MaxBufferMessageSizeBytes => _inputBuffer.MaxMessageSizeBytes;
 
     public ulong CurrentCurrentId => _messageStore.CurrentId;
 
