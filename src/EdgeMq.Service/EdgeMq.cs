@@ -4,16 +4,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using Ardalis.GuardClauses;
 using EdgeMq.Infra.Metrics;
+using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
+using Ardalis.GuardClauses;
 
 namespace EdgeMq.Service;
 
 public sealed class EdgeMq : IEdgeMq
 {
+    private const int ProcessingMessagesDelayMs = 100;
+
     private readonly ConcurrentBag<Message> _peekedMessages = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly EventsPerInterval _messagesOut = new();
@@ -31,7 +34,7 @@ public sealed class EdgeMq : IEdgeMq
         _configuration = configuration;
     }
 
-    public Task QueueAsync(string payload, CancellationToken cancellationToken)
+    public Task<bool> QueueAsync(string payload, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(payload);
 
@@ -114,7 +117,7 @@ public sealed class EdgeMq : IEdgeMq
 
     public void Start(CancellationToken cancellationToken)
     {
-        Task.Factory.StartNew(() => ProcessQueueAsync(cancellationToken), TaskCreationOptions.LongRunning);
+        Task.Factory.StartNew(() => ProcessBufferAsync(cancellationToken), TaskCreationOptions.LongRunning);
     }
 
     public void Stop()
@@ -161,7 +164,7 @@ public sealed class EdgeMq : IEdgeMq
         _messagesOut.AddEvents((uint) idsToDelete.Count);
     }
 
-    private async Task ProcessQueueAsync(CancellationToken cancellationToken)
+    private async Task ProcessBufferAsync(CancellationToken cancellationToken)
     {
         await _messageStore.InitAsync();
 
@@ -172,7 +175,6 @@ public sealed class EdgeMq : IEdgeMq
             try
             {
                 await PersistIncomingMessagesAsync(cancellationToken);
-                await Task.Delay(100, cancellationToken);
             }
             finally
             {
@@ -183,6 +185,13 @@ public sealed class EdgeMq : IEdgeMq
 
     private async Task PersistIncomingMessagesAsync(CancellationToken cancellationToken)
     {
+        await Task.Delay(ProcessingMessagesDelayMs, cancellationToken);
+
+        if (_messageStore.IsFull)
+        {
+            return;
+        }
+
         var incomingMessages = await _inputBuffer.ReadAllAsync(cancellationToken);
 
         if (!incomingMessages.Any())
@@ -194,9 +203,12 @@ public sealed class EdgeMq : IEdgeMq
             .Select(incomingMessage => incomingMessage.Payload)
             .ToList();
 
-        await _messageStore.AddMessagesAsync(messagePayloadsToStore);
+        var added = await _messageStore.AddMessagesAsync(messagePayloadsToStore);
 
-        _messagesIn.AddEvents((uint) messagePayloadsToStore.Count);
+        if (added)
+        {
+            _messagesIn.AddEvents((uint) messagePayloadsToStore.Count);
+        }
     }
 
     public string Name => _configuration.Name;

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Exceptions;
 
 namespace EdgeMq.Service.Input;
@@ -20,31 +21,33 @@ public sealed class InputBuffer
         _configuration = configuration;
     }
 
-    public async Task AddAsync(string payload, CancellationToken cancellationToken)
+    public async Task<bool> AddAsync(string payload, CancellationToken cancellationToken)
     {
-        if (!CheckConstraints(payload))
-        {
-            return;
-        }
-
         await _semaphore.WaitAsync(cancellationToken);
-
-        _currentSize += (uint) payload.Length;
-        _currentCount++;
-
-        var message = new BufferMessage
-        {
-            Payload = payload
-        };
 
         try
         {
+            if (!CheckConstraints(payload))
+            {
+                return false;
+            }
+
+            _currentSize += (uint) payload.Length;
+            _currentCount++;
+
+            var message = new BufferMessage
+            {
+                Payload = payload
+            };
+
             await _inputChanel.Writer.WriteAsync(message, cancellationToken);
         }
         finally
         {
             _semaphore.Release();
         }
+
+        return true;
     }
 
     public async Task<IReadOnlyCollection<BufferMessage>> ReadAllAsync(CancellationToken cancellationToken)
@@ -73,8 +76,8 @@ public sealed class InputBuffer
 
     private bool CheckConstraints(string payload)
     {
-        var valid = !(payload.Length > _configuration.MaxMessageSizeBytes
-                     || _currentSize + (uint) payload.Length > _configuration.MaxBufferSizeBytes
+        var valid = !(payload.Length > (int) _configuration.MaxPayloadSizeBytes // TODO fix not a length
+                     || _currentSize + (uint) payload.Length > _configuration.MaxMessageSizeBytes
                      || _currentCount + 1 > _configuration.MaxMessageCount);
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
@@ -91,5 +94,5 @@ public sealed class InputBuffer
 
     public ulong MaxMessageCount => _configuration.MaxMessageCount;
 
-    public ulong MaxMessageSizeBytes => _configuration.MaxBufferSizeBytes;
+    public ulong MaxMessageSizeBytes => _configuration.MaxPayloadSizeBytes;
 }

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using EdgeMq.Service.Configuration;
 
 namespace EdgeMq.Service.Store;
 
@@ -59,11 +60,11 @@ public sealed class FileSystemMessageStore : IMessageStore
         }
     }
 
-    public async Task AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
+    public async Task<bool> AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
     {
         if (messagePayloads.Count == 0)
         {
-            return;
+            return false;
         }
 
         await _semaphore.WaitAsync();
@@ -89,6 +90,8 @@ public sealed class FileSystemMessageStore : IMessageStore
         {
             _semaphore.Release();
         }
+
+        return true;
     }
 
     public Task<IReadOnlyCollection<Message>> ReadMessagesAsync()
@@ -164,6 +167,8 @@ public sealed class FileSystemMessageStore : IMessageStore
             _semaphore.Release();
         }
     }
+
+    public bool IsFull => false; //TODO implement
 
     public ulong MessageCount => _currentCount;
 

@@ -1,4 +1,4 @@
-namespace EdgeMq.Service.Input;
+namespace EdgeMq.Service.Configuration;
 
 public enum ConstraintViolationMode
 {

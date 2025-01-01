@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using EdgeMq.Service.Configuration;
 
 namespace EdgeMq.Service.Store;
 
@@ -33,7 +34,7 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Task.CompletedTask;
     }
 
-    public Task AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
+    public Task<bool> AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
     {
         lock (_lock)
         {
@@ -51,7 +52,7 @@ public sealed class InMemoryMessageStore : IMessageStore
             }
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 
     public Task<IReadOnlyCollection<Message>> ReadMessagesAsync()
@@ -100,6 +101,8 @@ public sealed class InMemoryMessageStore : IMessageStore
     {
         return Interlocked.Increment(ref _currentId);
     }
+
+    public bool IsFull => false; //TODO implement
 
     public ulong MessageCount => _currentCount;
 

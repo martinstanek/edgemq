@@ -20,3 +20,5 @@ app.MapOpenApi();
 app.Run();
 
 public partial class Program { }
+
+// TODO all constraints tests, dynamic readout/processing delays

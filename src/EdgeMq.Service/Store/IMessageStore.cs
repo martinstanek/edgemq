@@ -7,13 +7,15 @@ public interface IMessageStore
 {
     Task InitAsync();
 
-    Task AddMessagesAsync(IReadOnlyCollection<string> messagePayloads);
+    Task<bool> AddMessagesAsync(IReadOnlyCollection<string> messagePayloads);
 
     Task<IReadOnlyCollection<Message>> ReadMessagesAsync();
 
     Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize);
 
     Task DeleteMessagesAsync(IReadOnlyCollection<ulong> messageIds);
+
+    public bool IsFull { get; }
 
     public ulong MessageCount { get; }
 

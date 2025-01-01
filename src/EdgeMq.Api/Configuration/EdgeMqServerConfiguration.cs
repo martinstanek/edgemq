@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace EdgeMq.Api.Configuration;
 
@@ -20,6 +19,8 @@ public sealed record EdgeMqServerConfiguration
 
     public ulong MaxBufferMessageSizeBytes { get; init; } = 1048576;
 
+    public uint MaxPayloadSizeBytes { get; init; } = 1024 * 1024;
+
     public uint DefaultBatchSize { get; init; } = 100;
 
     public static EdgeMqServerConfiguration Empty => new()
@@ -33,7 +34,7 @@ public sealed record EdgeMqServerConfiguration
     {
         var defaultConfig = Empty;
         var path = Environment.GetEnvironmentVariable("EDGEMQ_PATH") ?? defaultConfig.Path;
-        var queues = Environment.GetEnvironmentVariable("EDGEMQ_QUEUES") ?? defaultConfig.Queues.First();
+        var queues = Environment.GetEnvironmentVariable("EDGEMQ_QUEUES") ?? "default";
         var mode = Enum.TryParse<QueueStoreMode>(Environment.GetEnvironmentVariable("EDGEMQ_MODE"), out var envMode)
             ? envMode
             : QueueStoreMode.InMemory;
@@ -52,6 +53,9 @@ public sealed record EdgeMqServerConfiguration
         var batchSize = uint.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_BATCHSIZE"), out var envBatchSize)
             ? envBatchSize
             : defaultConfig.DefaultBatchSize;
+        var payloadSize = uint.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_PAYLOADIZEBYTES"), out var envPayloadSize)
+            ? envPayloadSize
+            : defaultConfig.MaxPayloadSizeBytes;
 
         return new EdgeMqServerConfiguration
         {
@@ -62,7 +66,8 @@ public sealed record EdgeMqServerConfiguration
             MaxMessageSizeBytes = maxSize,
             MaxBufferMessageCount = maxBufferCount,
             MaxBufferMessageSizeBytes = maxBufferSize,
-            DefaultBatchSize = batchSize
+            DefaultBatchSize = batchSize,
+            MaxPayloadSizeBytes = payloadSize
         };
     }
 }

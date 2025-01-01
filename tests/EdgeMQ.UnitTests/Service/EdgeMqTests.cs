@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Service;
+using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
 using Shouldly;
@@ -184,7 +185,8 @@ public sealed class EdgeMqTests
             {
                 Name = "test",
                 BufferConfiguration = bufferConfig,
-                StoreConfiguration = storeConfig
+                StoreConfiguration = storeConfig,
+                ConstraintViolationMode = ConstraintViolationMode.Ignore
             };
             var buffer = new InputBuffer(bufferConfig);
             var store = new InMemoryMessageStore(storeConfig);

@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Input;
 using Shouldly;
 using Xunit;
@@ -55,7 +56,7 @@ public sealed class InputBufferTests
     {
         var config = new InputBufferConfiguration
         {
-            MaxBufferSizeBytes = 10
+            MaxMessageSizeBytes = 10
         };
 
         var buffer = new InputBuffer(config);
@@ -75,7 +76,7 @@ public sealed class InputBufferTests
     {
         var config = new InputBufferConfiguration
         {
-            MaxMessageSizeBytes = 4
+            MaxPayloadSizeBytes = 4
         };
 
         var buffer = new InputBuffer(config);
