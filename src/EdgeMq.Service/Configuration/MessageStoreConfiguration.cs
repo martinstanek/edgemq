@@ -2,11 +2,11 @@ namespace EdgeMq.Service.Configuration;
 
 public sealed record MessageStoreConfiguration
 {
-    public ulong MaxMessageCount { get; init; } = 1000000;
+    public ulong MaxMessageCount { get; init; } = Constants.DefaultMaxMessageCount;
 
-    public ulong MaxMessageSizeBytes { get; init; } = 536870912;
+    public ulong MaxMessageSizeBytes { get; init; } = Constants.DefaultMaxMessageSizeBytes;
 
-    public uint DefaultBatchSize { get; init; } = 100;
+    public uint DefaultBatchSize { get; init; } = Constants.DefaultBatchSize;
 
-    public string Path { get; init; } = "./queues/default";
+    public string Path { get; init; } = Constants.DefaultQueuePath;
 }

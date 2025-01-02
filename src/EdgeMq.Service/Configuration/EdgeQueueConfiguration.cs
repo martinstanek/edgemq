@@ -2,7 +2,7 @@ namespace EdgeMq.Service.Configuration;
 
 public sealed record EdgeQueueConfiguration
 {
-    public required string Name { get; init; } = "default";
+    public required string Name { get; init; } = Constants.DefaultQueueName;
 
     public required ConstraintViolationMode ConstraintViolationMode { get; init; } = ConstraintViolationMode.Ignore;
 

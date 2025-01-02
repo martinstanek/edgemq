@@ -56,7 +56,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         var rawContent = await reader.ReadToEndAsync();
         var queue = _queueManager.GetQueue(queueName);
 
-        await queue.QueueAsync(rawContent, CancellationToken.None);
+        await queue.EnqueueAsync(rawContent, CancellationToken.None);
 
         return await GetMetricsAsync(queueName);
     }
@@ -78,7 +78,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         Guard.Against.NegativeOrZero(batchSize);
 
         var queue = _queueManager.GetQueue(queueName);
-        var messages = await queue.DeQueueAsync(batchSize: (uint) batchSize, CancellationToken.None);
+        var messages = await queue.DequeueAsync(batchSize: (uint) batchSize, CancellationToken.None);
         var result = messages.Select(s => new QueueRawMessage
         {
             Id = s.Id,

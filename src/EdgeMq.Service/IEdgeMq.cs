@@ -7,11 +7,11 @@ namespace EdgeMq.Service;
 
 public interface IEdgeMq : IDisposable
 {
-    Task<bool> QueueAsync(string payload, CancellationToken cancellationToken);
+    Task<bool> EnqueueAsync(string payload, CancellationToken cancellationToken);
 
-    Task DeQueueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken);
+    Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken);
 
-    Task<IReadOnlyCollection<Message>> DeQueueAsync(uint batchSize, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<Message>> DequeueAsync(uint batchSize, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken);
 

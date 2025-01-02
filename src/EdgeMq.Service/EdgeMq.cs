@@ -34,14 +34,14 @@ public sealed class EdgeMq : IEdgeMq
         _configuration = configuration;
     }
 
-    public Task<bool> QueueAsync(string payload, CancellationToken cancellationToken)
+    public Task<bool> EnqueueAsync(string payload, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(payload);
 
         return _inputBuffer.AddAsync(payload, cancellationToken);
     }
 
-    public async Task DeQueueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
+    public async Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
     {
         Guard.Against.NegativeOrZero(batchSize);
 
@@ -66,7 +66,7 @@ public sealed class EdgeMq : IEdgeMq
         }
     }
 
-    public async Task<IReadOnlyCollection<Message>> DeQueueAsync(uint batchSize, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<Message>> DequeueAsync(uint batchSize, CancellationToken cancellationToken)
     {
         Guard.Against.NegativeOrZero(batchSize);
 

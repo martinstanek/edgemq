@@ -24,9 +24,9 @@ public sealed class EdgeMqTests
 
         queue.Start(CancellationToken.None);
 
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
         await Task.Delay(1000, token);
 
         var messages = await EdgeMqTestsContext.PeekUntilPeekedAsync(queue, 10, token);
@@ -50,9 +50,9 @@ public sealed class EdgeMqTests
 
         queue.Start(CancellationToken.None);
 
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
         await Task.Delay(1000, token);
 
         var messages = await EdgeMqTestsContext.PeekUntilPeekedAsync(queue, 10, token);
@@ -75,12 +75,12 @@ public sealed class EdgeMqTests
 
         queue.Start(CancellationToken.None);
 
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
         await Task.Delay(1000, token);
 
-        var messages = await queue.DeQueueAsync(10, token);
+        var messages = await queue.DequeueAsync(10, token);
 
         messages.Count.ShouldBe(3);
         queue.MessageSizeBytes.ShouldBe((ulong) 0);
@@ -98,12 +98,12 @@ public sealed class EdgeMqTests
 
         queue.Start(CancellationToken.None);
 
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
         await Task.Delay(1000, token);
 
-        await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
+        await queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
             m.Count.ShouldBe(3);
             messages = m.ToArray();
@@ -127,19 +127,19 @@ public sealed class EdgeMqTests
 
         queue.Start(CancellationToken.None);
 
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
         await Task.Delay(1000, token);
 
-        await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
+        await queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
             m.Count.ShouldBe(3);
             return Task.CompletedTask;
 
         }, token);
 
-        await queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
+        await queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
             m.Count.ShouldBe(0);
             return Task.CompletedTask;
@@ -160,14 +160,14 @@ public sealed class EdgeMqTests
 
         queue.Start(CancellationToken.None);
 
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
-        await queue.QueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
+        await queue.EnqueueAsync(payload, token);
         await Task.Delay(1000, token);
 
-        var t1 = queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
-        var t2 = queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
-        var t3 = queue.DeQueueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
+        var t1 = queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
+        var t2 = queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
+        var t3 = queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), _ => Task.CompletedTask, token);
 
         await Task.WhenAll(t1, t2, t3);
 
