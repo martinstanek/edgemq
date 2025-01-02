@@ -5,11 +5,14 @@ namespace EdgeMq.Api.Configuration;
 
 public sealed record EdgeMqServerConfiguration
 {
+    public const string DefaultPath = "./queues";
+    public const string DefaultQueue = "default";
+
     public required QueueStoreMode Mode { get; init; } = QueueStoreMode.InMemory;
 
-    public required string Path { get; init; } = "./queues";
+    public required string Path { get; init; } = DefaultPath;
 
-    public required IReadOnlyCollection<string> Queues { get; init; } = [ "default" ];
+    public required IReadOnlyCollection<string> Queues { get; init; } = [ DefaultQueue ];
 
     public ulong MaxMessageCount { get; init; } = 1000000;
 
@@ -23,51 +26,28 @@ public sealed record EdgeMqServerConfiguration
 
     public uint DefaultBatchSize { get; init; } = 100;
 
+    public static EdgeMqServerConfiguration ReadFromEnvironment()
+    {
+        var defaultConfig = Empty;
+
+        return new EdgeMqServerConfiguration
+        {
+            Mode = Enum.Parse<QueueStoreMode>(EnvReader.GetEnvironmentValue("EDGEMQ_MODE", QueueStoreMode.InMemory.ToString())),
+            Path = EnvReader.GetEnvironmentValue("EDGEMQ_PATH", defaultConfig.Path),
+            Queues = EnvReader.GetEnvironmentValue("EDGEMQ_QUEUES", DefaultQueue).Split(','),
+            DefaultBatchSize = EnvReader.GetEnvironmentValue("EDGEMQ_BATCHSIZE", defaultConfig.DefaultBatchSize),
+            MaxMessageCount = EnvReader.GetEnvironmentValue("EDGEMQ_MAXCOUNT", defaultConfig.MaxMessageCount),
+            MaxMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXSIZEBYTES", defaultConfig.MaxMessageSizeBytes),
+            MaxPayloadSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_PAYLOADSIZEBYTES", defaultConfig.MaxPayloadSizeBytes),
+            MaxBufferMessageCount = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERCOUNT", defaultConfig.MaxBufferMessageCount),
+            MaxBufferMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERSIZEBYTES", defaultConfig.MaxBufferMessageSizeBytes)
+        };
+    }
+
     public static EdgeMqServerConfiguration Empty => new()
     {
         Mode = QueueStoreMode.InMemory,
         Path = string.Empty,
         Queues = []
     };
-
-    public static EdgeMqServerConfiguration ReadFromEnvironment()
-    {
-        var defaultConfig = Empty;
-        var path = Environment.GetEnvironmentVariable("EDGEMQ_PATH") ?? defaultConfig.Path;
-        var queues = Environment.GetEnvironmentVariable("EDGEMQ_QUEUES") ?? "default";
-        var mode = Enum.TryParse<QueueStoreMode>(Environment.GetEnvironmentVariable("EDGEMQ_MODE"), out var envMode)
-            ? envMode
-            : QueueStoreMode.InMemory;
-        var maxCount = ulong.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_MAXCOUNT"), out var envMaxCount)
-            ? envMaxCount
-            : defaultConfig.MaxMessageCount;
-        var maxSize = ulong.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_MAXSIZEBYTES"), out var envMaxSize)
-            ? envMaxSize
-            : defaultConfig.MaxMessageSizeBytes;
-        var maxBufferCount = ulong.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_MAXBUFFERCOUNT"), out var envMaxBufferCount)
-            ? envMaxBufferCount
-            : defaultConfig.MaxBufferMessageCount;
-        var maxBufferSize = ulong.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_MAXBUFFERSIZEBYTES"), out var envMaxBufferSize)
-            ? envMaxBufferSize
-            : defaultConfig.MaxBufferMessageSizeBytes;
-        var batchSize = uint.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_BATCHSIZE"), out var envBatchSize)
-            ? envBatchSize
-            : defaultConfig.DefaultBatchSize;
-        var payloadSize = uint.TryParse(Environment.GetEnvironmentVariable("EDGEMQ_PAYLOADIZEBYTES"), out var envPayloadSize)
-            ? envPayloadSize
-            : defaultConfig.MaxPayloadSizeBytes;
-
-        return new EdgeMqServerConfiguration
-        {
-            Mode = mode,
-            Path = path,
-            Queues = queues.Split(','),
-            MaxMessageCount = maxCount,
-            MaxMessageSizeBytes = maxSize,
-            MaxBufferMessageCount = maxBufferCount,
-            MaxBufferMessageSizeBytes = maxBufferSize,
-            DefaultBatchSize = batchSize,
-            MaxPayloadSizeBytes = payloadSize
-        };
-    }
 }
