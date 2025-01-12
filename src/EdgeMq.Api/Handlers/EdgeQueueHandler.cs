@@ -21,6 +21,26 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         _queueManager = queueManager;
     }
 
+    public async Task AcknowledgeAsync(string queueName, Guid batchId)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+
+        var queue = _queueManager.GetQueue(queueName);
+
+        await queue.AcknowledgeAsync(batchId, CancellationToken.None);
+    }
+
+    public async Task<bool> EnqueueAsync(HttpRequest request, string queueName)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+
+        using var reader = new StreamReader(request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false);
+        var rawContent = await reader.ReadToEndAsync();
+        var queue = _queueManager.GetQueue(queueName);
+
+        return await queue.EnqueueAsync(rawContent, CancellationToken.None);
+    }
+
     public Task<QueueMetrics> GetMetricsAsync(string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
@@ -46,30 +66,6 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         };
 
         return Task.FromResult(result);
-    }
-
-    public async Task<QueueMetrics> EnqueueAsync(HttpRequest request, string queueName)
-    {
-        Guard.Against.NullOrWhiteSpace(queueName);
-
-        using var reader = new StreamReader(request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false);
-        var rawContent = await reader.ReadToEndAsync();
-        var queue = _queueManager.GetQueue(queueName);
-
-        await queue.EnqueueAsync(rawContent, CancellationToken.None);
-
-        return await GetMetricsAsync(queueName);
-    }
-
-    public async Task<QueueMetrics> AcknowledgeAsync(string queueName, Guid batchId)
-    {
-        Guard.Against.NullOrWhiteSpace(queueName);
-
-        var queue = _queueManager.GetQueue(queueName);
-
-        await queue.AcknowledgeAsync(batchId, CancellationToken.None);
-
-        return await GetMetricsAsync(queueName);
     }
 
     public async Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)

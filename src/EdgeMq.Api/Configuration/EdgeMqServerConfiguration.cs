@@ -6,7 +6,9 @@ namespace EdgeMq.Api.Configuration;
 
 public sealed record EdgeMqServerConfiguration
 {
-    public required QueueStoreMode Mode { get; init; } = QueueStoreMode.InMemory;
+    public required QueueStoreMode StoreMode { get; init; } = QueueStoreMode.InMemory;
+
+    public required QueueApiConstraintsMode ConstraintsMode { get; init; } = QueueApiConstraintsMode.Ignore;
 
     public required string Path { get; init; } = Constants.DefaultRootPath;
 
@@ -30,7 +32,6 @@ public sealed record EdgeMqServerConfiguration
 
         return new EdgeMqServerConfiguration
         {
-            Mode = Enum.Parse<QueueStoreMode>(EnvReader.GetEnvironmentValue("EDGEMQ_MODE", QueueStoreMode.InMemory.ToString())),
             Path = EnvReader.GetEnvironmentValue("EDGEMQ_PATH", defaultConfig.Path),
             Queues = EnvReader.GetEnvironmentValue("EDGEMQ_QUEUES", Constants.DefaultQueueName).Split(','),
             DefaultBatchSize = EnvReader.GetEnvironmentValue("EDGEMQ_BATCHSIZE", defaultConfig.DefaultBatchSize),
@@ -38,13 +39,16 @@ public sealed record EdgeMqServerConfiguration
             MaxMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXSIZEBYTES", defaultConfig.MaxMessageSizeBytes),
             MaxPayloadSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_PAYLOADSIZEBYTES", defaultConfig.MaxPayloadSizeBytes),
             MaxBufferMessageCount = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERCOUNT", defaultConfig.MaxBufferMessageCount),
-            MaxBufferMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERSIZEBYTES", defaultConfig.MaxBufferMessageSizeBytes)
+            MaxBufferMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERSIZEBYTES", defaultConfig.MaxBufferMessageSizeBytes),
+            StoreMode = Enum.Parse<QueueStoreMode>(EnvReader.GetEnvironmentValue("EDGEMQ_STOREMODE", defaultConfig.StoreMode.ToString())),
+            ConstraintsMode = Enum.Parse<QueueApiConstraintsMode>(EnvReader.GetEnvironmentValue("EDGEMQ_CONSTRAINTSMODE", defaultConfig.ConstraintsMode.ToString()))
         };
     }
 
     public static EdgeMqServerConfiguration Default => new()
     {
-        Mode = QueueStoreMode.InMemory,
+        StoreMode = QueueStoreMode.InMemory,
+        ConstraintsMode = QueueApiConstraintsMode.Ignore,
         Path = string.Empty,
         Queues = []
     };

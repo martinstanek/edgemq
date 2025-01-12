@@ -24,5 +24,4 @@ public static class EnvReader
 
         return (T) result;
     }
-
 }

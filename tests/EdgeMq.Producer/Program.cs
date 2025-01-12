@@ -29,6 +29,8 @@ public static class Program
             Console.WriteLine($"{++_count} - {payload}");
 
             await Task.Delay(100);
+
+            Console.ReadLine();
         }
     }
 }

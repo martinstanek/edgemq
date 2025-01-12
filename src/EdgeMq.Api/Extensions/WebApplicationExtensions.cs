@@ -1,8 +1,9 @@
 using System;
-using EdgeMq.Api.Handlers;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
+using EdgeMq.Api.Configuration;
+using EdgeMq.Api.Handlers;
 
 namespace EdgeMq.Api.Extensions;
 
@@ -24,11 +25,21 @@ public static class WebApplicationExtensions
         api.MapGet("/{name}/peek", async (string name, [FromQuery] int batchSize, [FromServices] IEdgeQueueHandler handler)
             => Results.Ok(await handler.PeekAsync(name, batchSize)));
 
-        api.MapPut("/{name}", async (string name, HttpRequest request, [FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.EnqueueAsync(request, name)));
+        api.MapPatch("/{name}", async (string name, [FromQuery] Guid batchId, [FromServices] IEdgeQueueHandler handler) =>
+        {
+            await handler.AcknowledgeAsync(name, batchId);
 
-        api.MapPatch("/{name}", async (string name, [FromQuery] Guid batchId, [FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.AcknowledgeAsync(name, batchId)));
+            return Results.NoContent();
+        });
+
+        api.MapPut("/{name}", async (string name, HttpRequest request, [FromServices] IEdgeQueueHandler handler, [FromServices] EdgeMqServerConfiguration config) =>
+        {
+            var added = await handler.EnqueueAsync(request, name);
+
+            return !added && config.ConstraintsMode == QueueApiConstraintsMode.Fail
+                ? Results.UnprocessableEntity()
+                : Results.NoContent();
+        });
 
         return webApplication;
     }

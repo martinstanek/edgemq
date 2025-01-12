@@ -31,7 +31,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return _api.Value.GetMetricsAsync(queueName);
     }
 
-    public Task<QueueMetrics> EnqueueAsync(string queueName, string payload)
+    public Task EnqueueAsync(string queueName, string payload)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NullOrWhiteSpace(payload);
@@ -39,7 +39,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return _api.Value.EnqueueAsync(queueName, payload);
     }
 
-    public Task<QueueMetrics> AcknowledgeAsync(string queueName, Guid batchId)
+    public Task AcknowledgeAsync(string queueName, Guid batchId)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 

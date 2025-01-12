@@ -51,7 +51,8 @@ public static class ServiceCollectionExtensions
         }
 
         return services
-            .AddQueueManager(queueConfigs, serverConfig.Mode == QueueStoreMode.InMemory)
+            .AddSingleton(serverConfig)
+            .AddQueueManager(queueConfigs, serverConfig.StoreMode == QueueStoreMode.InMemory)
             .AddSingleton<IEdgeQueueHandler, EdgeQueueHandler>()
             .AddHostedService<QueueService>();
     }
