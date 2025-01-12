@@ -25,6 +25,7 @@ public sealed class EdgeMq : IEdgeMq
     private readonly InputBuffer _inputBuffer;
     private readonly IMessageStore _messageStore;
     private Guid _currentBatchId = Guid.Empty;
+    private ulong _processedMessages;
     private bool _isStopped;
 
     public EdgeMq(InputBuffer inputBuffer, IMessageStore messageStore, EdgeQueueConfiguration configuration)
@@ -162,6 +163,7 @@ public sealed class EdgeMq : IEdgeMq
         await _messageStore.DeleteMessagesAsync(idsToDelete);
 
         _messagesOut.AddEvents((uint) idsToDelete.Count);
+        _processedMessages += (ulong) idsToDelete.Count;
     }
 
     private async Task ProcessBufferAsync(CancellationToken cancellationToken)
@@ -230,6 +232,8 @@ public sealed class EdgeMq : IEdgeMq
     public ulong MaxBufferMessageSizeBytes => _inputBuffer.MaxMessageSizeBytes;
 
     public ulong CurrentCurrentId => _messageStore.CurrentId;
+
+    public ulong ProcessedMessages => _processedMessages;
 
     public double MessagesInPerSecond => _messagesIn.CurrentEventsPerSecond();
 

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Service;
@@ -19,6 +20,7 @@ public sealed class QueueService : IHostedService
     {
         _queueManager.Start(cancellationToken);
 
+        Console.WriteLine(Assembly.GetEntryAssembly()?.GetName().Version?.ToString());
         Console.WriteLine($"Started: {string.Join(',', _queueManager.Queues)}");
 
         return Task.CompletedTask;

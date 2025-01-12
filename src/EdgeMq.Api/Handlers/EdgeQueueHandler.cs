@@ -18,6 +18,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 {
     private readonly QueueManager _queueManager;
     private readonly EdgeMqServerConfiguration _configuration;
+    private readonly DateTime _started = DateTime.Now;
 
     public EdgeQueueHandler(QueueManager queueManager, EdgeMqServerConfiguration configuration)
     {
@@ -56,6 +57,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             MessageCount = queue.MessageCount,
             MaxMessageCount = queue.MaxMessageCount,
             MessagesSizeBytes = queue.MessageSizeBytes,
+            ProcessedMessages = queue.ProcessedMessages,
             MaxMessagesSizeBytes = queue.MaxMessageSizeBytes,
             BufferMessageCount = queue.BufferMessageCount,
             MaxBufferMessageCount = queue.MaxBufferMessageCount,
@@ -66,7 +68,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             BufferMessageCountPressure = SafeDivide(queue.BufferMessageCount, queue.MaxBufferMessageCount),
             BufferMessagesSizePressure = SafeDivide(queue.BufferMessageSizeBytes, queue.MaxBufferMessageSizeBytes),
             MessagesInPerSecond = queue.MessagesInPerSecond,
-            MessagesOutPerSecond = queue.MessagesOutPerSecond
+            MessagesOutPerSecond = queue.MessagesOutPerSecond,
         };
 
         return Task.FromResult(result);
@@ -108,11 +110,11 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 
     public async Task<QueueServer> GetQueuesAsync()
     {
-        var queus = new List<Queue>();
+        var queues = new List<Queue>();
 
         foreach (var queue in _queueManager.Queues)
         {
-            queus.Add(new Queue
+            queues.Add(new Queue
             {
                 Name = queue,
                 StoreMode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
@@ -122,7 +124,8 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 
         return new QueueServer
         {
-            Queues = queus,
+            Queues = queues,
+            UptimeSeconds = (ulong) Math.Round(DateTime.Now.Subtract(_started).TotalSeconds, 0),
             ConstraintsViolationMode = _configuration.ConstraintsMode.ToString(),
             Version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? string.Empty
         };

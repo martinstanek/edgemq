@@ -20,6 +20,7 @@ public sealed record QueueMetrics
 
     public required ulong MaxBufferMessagesSizeBytes { get; init; }
 
+    public required ulong ProcessedMessages { get; init; }
     public required double MessagesInPerSecond { get; init; }
 
     public required double MessagesOutPerSecond { get; init; }
@@ -43,6 +44,7 @@ public sealed record QueueMetrics
         MaxBufferMessageCount = 0,
         BufferMessagesSizeBytes = 0,
         MaxBufferMessagesSizeBytes = 0,
+        ProcessedMessages = 0,
         MessagesInPerSecond = 0d,
         MessagesOutPerSecond = 0d,
         BufferMessageCountPressure = 0d,

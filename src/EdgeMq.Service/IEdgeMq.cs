@@ -41,6 +41,8 @@ public interface IEdgeMq : IDisposable
 
     public ulong CurrentCurrentId { get; }
 
+    public ulong ProcessedMessages { get; }
+
     public double MessagesInPerSecond { get; }
 
     public double MessagesOutPerSecond { get; }
