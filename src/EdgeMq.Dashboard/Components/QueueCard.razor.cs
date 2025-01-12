@@ -13,6 +13,9 @@ public partial class QueueCard
         return $"{pressure * 100:F}% ({value}{unit} / {max}{unit})";
     }
 
+    private string CurrentSize =>
+        $"{Queue.Metrics.MessagesSizeBytes}/B";
+
     private string MessagesInPerSecond =>
         $"{Queue.Metrics.MessagesInPerSecond:F2}/s";
 

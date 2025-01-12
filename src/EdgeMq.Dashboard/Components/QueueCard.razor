@@ -9,7 +9,8 @@
             <MudItem xs="6">
                 <ValueLabel Label="StoreMode:" Value="@Queue.StoreMode"/>
                 <ValueLabel Label="Count:" Value="@Queue.Metrics.MessageCount.ToString()" />
-                <ValueLabel Label="Size:" Value="@Queue.Metrics.MessagesSizeBytes.ToString()" />
+                <ValueLabel Label="Size:" Value="@CurrentSize" />
+                <ValueLabel Label="Processed messages:" Value="@Queue.Metrics.ProcessedMessages.ToString()" />
                 <ValueLabel Label="Messages in:" Value="@MessagesInPerSecond" />
                 <ValueLabel Label="Messages out:" Value="@MessagesOutPerSecond" />
                 <ValueLabel Label="Pressure (count):" Value="@CountPressure" />
