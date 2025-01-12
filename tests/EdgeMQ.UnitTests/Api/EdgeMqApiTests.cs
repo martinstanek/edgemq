@@ -36,6 +36,9 @@ public sealed class EdgeMqApiTests
         const string queueName = "default";
 
         using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables();
+
         var client = context.GetClient();
 
         var messages = await client.PeekAsync(queueName, batchSize: 100);
@@ -53,6 +56,9 @@ public sealed class EdgeMqApiTests
         const string payload = "hallo";
 
         using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables();
+
         var client = context.GetClient();
 
         await client.EnqueueAsync(queueName, payload);
