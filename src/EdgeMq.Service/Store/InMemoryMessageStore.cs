@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -11,15 +12,15 @@ namespace EdgeMq.Service.Store;
 public sealed class InMemoryMessageStore : IMessageStore
 {
     private readonly ConcurrentDictionary<ulong, Message> _messages = new();
-    private readonly MessageStoreConfiguration _config;
+    private readonly MessageStoreConfiguration _configuration;
     private readonly Lock _lock = new();
     private ulong _currentCount;
     private ulong _currentSize;
     private ulong _currentId;
 
-    public InMemoryMessageStore(MessageStoreConfiguration config)
+    public InMemoryMessageStore(MessageStoreConfiguration configuration)
     {
-        _config = config;
+        _configuration = configuration;
     }
 
     public Task InitAsync()
@@ -48,7 +49,7 @@ public sealed class InMemoryMessageStore : IMessageStore
 
                 _messages[message.Id] = message;
                 _currentCount++;
-                _currentSize += (ulong)message.Payload.Length;
+                _currentSize += (ulong) Encoding.UTF8.GetByteCount(message.Payload);
             }
         }
 
@@ -57,7 +58,7 @@ public sealed class InMemoryMessageStore : IMessageStore
 
     public Task<IReadOnlyCollection<Message>> ReadMessagesAsync()
     {
-        return ReadMessagesAsync(_config.DefaultBatchSize);
+        return ReadMessagesAsync(_configuration.DefaultBatchSize);
     }
 
     public Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize)
@@ -90,7 +91,7 @@ public sealed class InMemoryMessageStore : IMessageStore
                 }
 
                 _currentCount--;
-                _currentSize -= (uint)deletedMessage.Payload.Length; // TODO: lenght != bytes
+                _currentSize -= (uint) Encoding.UTF8.GetByteCount(deletedMessage.Payload);
             }
         }
 
@@ -102,7 +103,7 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Interlocked.Increment(ref _currentId);
     }
 
-    public bool IsFull => false; //TODO implement
+    public bool IsFull => _currentCount >= _configuration.MaxMessageCount || _currentSize >= _configuration.MaxMessageSizeBytes;
 
     public ulong MessageCount => _currentCount;
 
@@ -110,7 +111,7 @@ public sealed class InMemoryMessageStore : IMessageStore
 
     public ulong CurrentId => _currentId;
 
-    public ulong MaxMessageCount => _config.MaxMessageCount;
+    public ulong MaxMessageCount => _configuration.MaxMessageCount;
 
-    public ulong MaxMessageSizeBytes => _config.MaxMessageSizeBytes;
+    public ulong MaxMessageSizeBytes => _configuration.MaxMessageSizeBytes;
 }

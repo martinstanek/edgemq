@@ -168,7 +168,7 @@ public sealed class FileSystemMessageStore : IMessageStore
         }
     }
 
-    public bool IsFull => false; //TODO implement
+    public bool IsFull => _currentCount >= _configuration.MaxMessageCount || _currentSize >= _configuration.MaxMessageSizeBytes;
 
     public ulong MessageCount => _currentCount;
 

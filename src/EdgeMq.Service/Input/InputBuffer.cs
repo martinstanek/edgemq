@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -76,9 +77,11 @@ public sealed class InputBuffer
 
     private bool CheckConstraints(string payload)
     {
-        var valid = !(payload.Length > (int) _configuration.MaxPayloadSizeBytes // TODO fix not a length
-                     || _currentSize + (uint) payload.Length > _configuration.MaxMessageSizeBytes
-                     || _currentCount + 1 > _configuration.MaxMessageCount);
+        var payloadBytesCount = (uint) Encoding.UTF8.GetByteCount(payload);
+        var isFull = _currentSize + payloadBytesCount > _configuration.MaxMessageSizeBytes;
+        var isTooBig = payloadBytesCount > (int) _configuration.MaxPayloadSizeBytes;
+        var isTooMany = _currentCount + 1 > _configuration.MaxMessageCount;
+        var valid = !(isFull || isTooBig || isTooMany);
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
         {
