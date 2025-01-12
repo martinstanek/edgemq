@@ -69,6 +69,11 @@ public sealed class FileSystemMessageStore : IMessageStore
 
         await _semaphore.WaitAsync();
 
+        if (IsFull)
+        {
+            return false;
+        }
+
         try
         {
             foreach (var messagePayload in messagePayloads)

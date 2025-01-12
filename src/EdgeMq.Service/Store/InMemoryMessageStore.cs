@@ -37,8 +37,18 @@ public sealed class InMemoryMessageStore : IMessageStore
 
     public Task<bool> AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
     {
+        if (messagePayloads.Count == 0)
+        {
+            return Task.FromResult(false);
+        }
+
         lock (_lock)
         {
+            if (IsFull)
+            {
+                return Task.FromResult(false);
+            }
+
             foreach (var payload in messagePayloads)
             {
                 var message = new Message

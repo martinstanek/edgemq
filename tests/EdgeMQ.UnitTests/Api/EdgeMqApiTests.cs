@@ -3,9 +3,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net;
 using Microsoft.AspNetCore.Mvc.Testing;
+using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Client;
+using Refit;
 using Shouldly;
 using Xunit;
 
@@ -18,7 +21,7 @@ public sealed class EdgeMqApiTests
     {
         const string queueName = "default";
 
-        var context = new EdgeMqApiTestsContext();
+        using var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
 
         var queues = await client.GetQueuesAsync();
@@ -32,7 +35,7 @@ public sealed class EdgeMqApiTests
     {
         const string queueName = "default";
 
-        var context = new EdgeMqApiTestsContext();
+        using var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
 
         var messages = await client.PeekAsync(queueName, batchSize: 100);
@@ -49,7 +52,7 @@ public sealed class EdgeMqApiTests
         const string queueName = "default";
         const string payload = "hallo";
 
-        var context = new EdgeMqApiTestsContext();
+        using var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
 
         await client.EnqueueAsync(queueName, payload);
@@ -71,7 +74,7 @@ public sealed class EdgeMqApiTests
         const string queueName = "default";
         const string payload = "hallo";
 
-        var context = new EdgeMqApiTestsContext();
+        using var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
         var timeOut = TimeSpan.FromSeconds(5);
         var token = CancellationToken.None;
@@ -109,7 +112,7 @@ public sealed class EdgeMqApiTests
         const string queueName = "default";
         const string payload = "hallo";
 
-        var context = new EdgeMqApiTestsContext();
+        using var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
         var timeOut = TimeSpan.FromSeconds(5);
         var token = CancellationToken.None;
@@ -147,7 +150,7 @@ public sealed class EdgeMqApiTests
         const string queueName = "default";
         const string payload = "hallo";
 
-        var context = new EdgeMqApiTestsContext();
+        using var context = new EdgeMqApiTestsContext();
         var client = context.GetClient();
 
         await client.EnqueueAsync(queueName, payload);
@@ -163,8 +166,87 @@ public sealed class EdgeMqApiTests
         stats.MessageCount.ShouldBe((uint)0);
     }
 
-    private sealed class EdgeMqApiTestsContext
+    [Fact]
+    public async Task Enqueue_PayloadSizeTooBig_ModeSetToFail_Throws()
     {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(maxPayloadSize: 4, ignoreConstraintsViolation: false);
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<ApiException>(() => client.EnqueueAsync(queueName, payload));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task Enqueue_MaximumCountReached_ModeSetToFail_Throws()
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(maxMessageCount: 2, maxBufferMessageCount: 1, ignoreConstraintsViolation: false);
+
+        var client = context.GetClient();
+
+        await client.EnqueueAsync(queueName, payload);
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+        await client.EnqueueAsync(queueName, payload);
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+        await client.EnqueueAsync(queueName, payload);
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+
+        var exception = await Should.ThrowAsync<ApiException>(() => client.EnqueueAsync(queueName, payload));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+
+        var stats = await client.GetMetricsAsync(queueName);
+
+        stats.MessageCount.ShouldBe((ulong) 2);
+    }
+
+    [Fact]
+    public async Task Enqueue_MaximumSizeReached_ModeSetToFail_Throws()
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(maxMessagesStoreSizeBytes: 10, maxMessagesBufferSizeBytes: 5, ignoreConstraintsViolation: false);
+
+        var client = context.GetClient();
+
+        await client.EnqueueAsync(queueName, payload);
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+        await client.EnqueueAsync(queueName, payload);
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+        await client.EnqueueAsync(queueName, payload);
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+
+        var exception = await Should.ThrowAsync<ApiException>(() => client.EnqueueAsync(queueName, payload));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+
+        await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
+
+        var stats = await client.GetMetricsAsync(queueName);
+
+        stats.MessageCount.ShouldBe((ulong) 2);
+    }
+
+    private sealed class EdgeMqApiTestsContext : IDisposable
+    {
+        private const EnvironmentVariableTarget Target = EnvironmentVariableTarget.Process;
+
         internal IEdgeMqClient GetClient()
         {
             var application = new WebApplicationFactory<Program>()
@@ -190,6 +272,41 @@ public sealed class EdgeMqApiTests
             }
 
             return messages;
+        }
+
+        internal void DeclareVariables(
+            byte maxMessageCount = 10,
+            byte maxMessagesStoreSizeBytes = 200,
+            byte maxBufferMessageCount = 5,
+            byte maxMessagesBufferSizeBytes = 100,
+            byte maxPayloadSize = 10,
+            bool ignoreConstraintsViolation = true)
+        {
+            var constraintMode = ignoreConstraintsViolation
+                ? QueueApiConstraintsMode.Ignore
+                : QueueApiConstraintsMode.Fail;
+
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageCount, maxMessageCount.ToString(), Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageSizeBytes, maxMessagesStoreSizeBytes.ToString(), Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageSizeBytes, maxMessagesBufferSizeBytes.ToString(), Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageCount, maxBufferMessageCount.ToString(), Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxPayloadSizeBytes, maxPayloadSize.ToString(), Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqConstraintsMode, constraintMode.ToString(), Target);
+        }
+
+        private static void RemoveVariables()
+        {
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageCount, string.Empty, Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageSizeBytes, string.Empty, Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageSizeBytes, string.Empty, Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageCount, string.Empty, Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxPayloadSizeBytes, string.Empty, Target);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqConstraintsMode, string.Empty, Target);
+        }
+
+        public void Dispose()
+        {
+            RemoveVariables();
         }
     }
 }

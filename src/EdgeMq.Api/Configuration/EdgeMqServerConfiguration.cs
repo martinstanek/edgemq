@@ -6,6 +6,17 @@ namespace EdgeMq.Api.Configuration;
 
 public sealed record EdgeMqServerConfiguration
 {
+    public const string EdgeMqPath = "EDGEMQ_PATH";
+    public const string EdgeMqQueues = "EDGEMQ_QUEUES";
+    public const string EdgeMqStoreMode = "EDGEMQ_STOREMODE";
+    public const string EdgeMqConstraintsMode = "EDGEMQ_CONSTRAINTSMODE";
+    public const string EdgeMqDefaultBatchSize = "EDGEMQ_BATCHSIZE";
+    public const string EdgeMqMaxMessageCount = "EDGEMQ_MAXCOUNT";
+    public const string EdgeMqMaxMessageSizeBytes = "EDGEMQ_MAXSIZEBYTES";
+    public const string EdgeMqMaxPayloadSizeBytes = "EDGEMQ_PAYLOADSIZEBYTES";
+    public const string EdgeMqMaxBufferMessageCount = "EDGEMQ_MAXBUFFERCOUNT";
+    public const string EdgeMqMaxBufferMessageSizeBytes = "EDGEMQ_MAXBUFFERSIZEBYTES";
+
     public required QueueStoreMode StoreMode { get; init; } = QueueStoreMode.InMemory;
 
     public required QueueApiConstraintsMode ConstraintsMode { get; init; } = QueueApiConstraintsMode.Ignore;
@@ -32,16 +43,16 @@ public sealed record EdgeMqServerConfiguration
 
         return new EdgeMqServerConfiguration
         {
-            Path = EnvReader.GetEnvironmentValue("EDGEMQ_PATH", defaultConfig.Path),
-            Queues = EnvReader.GetEnvironmentValue("EDGEMQ_QUEUES", Constants.DefaultQueueName).Split(','),
-            DefaultBatchSize = EnvReader.GetEnvironmentValue("EDGEMQ_BATCHSIZE", defaultConfig.DefaultBatchSize),
-            MaxMessageCount = EnvReader.GetEnvironmentValue("EDGEMQ_MAXCOUNT", defaultConfig.MaxMessageCount),
-            MaxMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXSIZEBYTES", defaultConfig.MaxMessageSizeBytes),
-            MaxPayloadSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_PAYLOADSIZEBYTES", defaultConfig.MaxPayloadSizeBytes),
-            MaxBufferMessageCount = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERCOUNT", defaultConfig.MaxBufferMessageCount),
-            MaxBufferMessageSizeBytes = EnvReader.GetEnvironmentValue("EDGEMQ_MAXBUFFERSIZEBYTES", defaultConfig.MaxBufferMessageSizeBytes),
-            StoreMode = Enum.Parse<QueueStoreMode>(EnvReader.GetEnvironmentValue("EDGEMQ_STOREMODE", defaultConfig.StoreMode.ToString())),
-            ConstraintsMode = Enum.Parse<QueueApiConstraintsMode>(EnvReader.GetEnvironmentValue("EDGEMQ_CONSTRAINTSMODE", defaultConfig.ConstraintsMode.ToString()))
+            Path = EnvReader.GetEnvironmentValue(EdgeMqPath, defaultConfig.Path),
+            Queues = EnvReader.GetEnvironmentValue(EdgeMqQueues, Constants.DefaultQueueName).Split(','),
+            DefaultBatchSize = EnvReader.GetEnvironmentValue(EdgeMqDefaultBatchSize, defaultConfig.DefaultBatchSize),
+            MaxMessageCount = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageCount, defaultConfig.MaxMessageCount),
+            MaxMessageSizeBytes = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageSizeBytes, defaultConfig.MaxMessageSizeBytes),
+            MaxPayloadSizeBytes = EnvReader.GetEnvironmentValue(EdgeMqMaxPayloadSizeBytes, defaultConfig.MaxPayloadSizeBytes),
+            MaxBufferMessageCount = EnvReader.GetEnvironmentValue(EdgeMqMaxBufferMessageCount, defaultConfig.MaxBufferMessageCount),
+            MaxBufferMessageSizeBytes = EnvReader.GetEnvironmentValue(EdgeMqMaxBufferMessageSizeBytes, defaultConfig.MaxBufferMessageSizeBytes),
+            StoreMode = Enum.Parse<QueueStoreMode>(EnvReader.GetEnvironmentValue(EdgeMqStoreMode, defaultConfig.StoreMode.ToString())),
+            ConstraintsMode = Enum.Parse<QueueApiConstraintsMode>(EnvReader.GetEnvironmentValue(EdgeMqConstraintsMode, defaultConfig.ConstraintsMode.ToString()))
         };
     }
 

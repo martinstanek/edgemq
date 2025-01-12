@@ -1,6 +1,5 @@
 using System.IO;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Api.Handlers;
@@ -21,39 +20,37 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    public static IServiceCollection AddQueue(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddQueue(this IServiceCollection services)
     {
         var serverConfig = EdgeMqServerConfiguration.ReadFromEnvironment();
-        var queueConfigs = new List<EdgeQueueConfiguration>();
-
-        foreach (var queue in serverConfig.Queues)
-        {
-            var config = new EdgeQueueConfiguration
-            {
-                Name = queue,
-                BufferConfiguration = new InputBufferConfiguration
-                {
-                    MaxMessageCount = serverConfig.MaxBufferMessageCount,
-                    MaxMessageSizeBytes = serverConfig.MaxBufferMessageSizeBytes,
-                    MaxPayloadSizeBytes = serverConfig.MaxPayloadSizeBytes
-                },
-                StoreConfiguration = new MessageStoreConfiguration
-                {
-                    Path = Path.Combine(serverConfig.Path, queue),
-                    MaxMessageCount = serverConfig.MaxMessageCount,
-                    MaxMessageSizeBytes = serverConfig.MaxMessageSizeBytes,
-                    DefaultBatchSize = serverConfig.DefaultBatchSize
-                },
-                ConstraintViolationMode = ConstraintViolationMode.Ignore
-            };
-
-            queueConfigs.Add(config);
-        }
+        var queueConfigs = serverConfig.Queues.Select(queue => FromConfig(queue, serverConfig)).ToList();
 
         return services
             .AddSingleton(serverConfig)
             .AddQueueManager(queueConfigs, serverConfig.StoreMode == QueueStoreMode.InMemory)
             .AddSingleton<IEdgeQueueHandler, EdgeQueueHandler>()
             .AddHostedService<QueueService>();
+    }
+
+    private static EdgeQueueConfiguration FromConfig(string queue, EdgeMqServerConfiguration serverConfig)
+    {
+        return new EdgeQueueConfiguration
+        {
+            Name = queue,
+            BufferConfiguration = new InputBufferConfiguration
+            {
+                MaxMessageCount = serverConfig.MaxBufferMessageCount,
+                MaxMessageSizeBytes = serverConfig.MaxBufferMessageSizeBytes,
+                MaxPayloadSizeBytes = serverConfig.MaxPayloadSizeBytes
+            },
+            StoreConfiguration = new MessageStoreConfiguration
+            {
+                Path = Path.Combine(serverConfig.Path, queue),
+                MaxMessageCount = serverConfig.MaxMessageCount,
+                MaxMessageSizeBytes = serverConfig.MaxMessageSizeBytes,
+                DefaultBatchSize = serverConfig.DefaultBatchSize
+            },
+            ConstraintViolationMode = ConstraintViolationMode.Ignore
+        };
     }
 }
