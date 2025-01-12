@@ -27,7 +27,7 @@ public partial class MainView
 
     private async Task ReloadAsync()
     {
-        _queues = await EdgeMqClient.GetQueuesAsync();
+        _queues = (await EdgeMqClient.GetQueuesAsync()).Queues;
 
         foreach (var queue in _queues)
         {

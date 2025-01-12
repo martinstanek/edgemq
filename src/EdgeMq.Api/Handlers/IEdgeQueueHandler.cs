@@ -18,5 +18,5 @@ public interface IEdgeQueueHandler
 
     Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize);
 
-    Task<IReadOnlyCollection<Queue>> GetQueuesAsync();
+    Task<QueueServer> GetQueuesAsync();
 }

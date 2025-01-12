@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Ardalis.GuardClauses;
+using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Service;
 
@@ -15,10 +17,12 @@ namespace EdgeMq.Api.Handlers;
 public sealed class EdgeQueueHandler : IEdgeQueueHandler
 {
     private readonly QueueManager _queueManager;
+    private readonly EdgeMqServerConfiguration _configuration;
 
-    public EdgeQueueHandler(QueueManager queueManager)
+    public EdgeQueueHandler(QueueManager queueManager, EdgeMqServerConfiguration configuration)
     {
         _queueManager = queueManager;
+        _configuration = configuration;
     }
 
     public async Task AcknowledgeAsync(string queueName, Guid batchId)
@@ -102,21 +106,26 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         return result.ToArray();
     }
 
-    public async Task<IReadOnlyCollection<Queue>> GetQueuesAsync()
+    public async Task<QueueServer> GetQueuesAsync()
     {
-        var result = new List<Queue>();
+        var queus = new List<Queue>();
 
         foreach (var queue in _queueManager.Queues)
         {
-            result.Add(new Queue
+            queus.Add(new Queue
             {
                 Name = queue,
-                Mode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
+                StoreMode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
                 Metrics = await GetMetricsAsync(queue)
             });
         }
 
-        return result;
+        return new QueueServer
+        {
+            Queues = queus,
+            ConstraintsViolationMode = _configuration.ConstraintsMode.ToString(),
+            Version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? string.Empty
+        };
     }
 
     private static double SafeDivide(ulong max, ulong value)

@@ -7,7 +7,7 @@ namespace EdgeMq.Api.Serialization;
 
 [JsonSerializable(typeof(Int32))]
 [JsonSerializable(typeof(Queue))]
-[JsonSerializable(typeof(QueueMetrics))]
+[JsonSerializable(typeof(QueueServer))]
 [JsonSerializable(typeof(QueueRawMessage))]
 [JsonSerializable(typeof(QueueRawMessage[]))]
 [JsonSerializable(typeof(QueueEnqueueResult))]

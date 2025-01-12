@@ -26,8 +26,8 @@ public sealed class EdgeMqApiTests
 
         var queues = await client.GetQueuesAsync();
 
-        queues.Count.ShouldBe(1);
-        queues.First().Name.ShouldBe(queueName);
+        queues.Queues.Count.ShouldBe(1);
+        queues.Queues.Single().Name.ShouldBe(queueName);
     }
 
     [Fact]
