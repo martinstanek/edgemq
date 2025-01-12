@@ -5,7 +5,7 @@ namespace EdgeMq.Dashboard.Pages;
 
 public partial class MainView
 {
-    private IReadOnlyCollection<Queue> _queues = [];
+    private QueueServer _server = QueueServer.Empty;
     private Timer? _timer;
 
     protected override Task OnInitializedAsync()
@@ -27,9 +27,9 @@ public partial class MainView
 
     private async Task ReloadAsync()
     {
-        _queues = (await EdgeMqClient.GetQueuesAsync()).Queues;
+        _server = await EdgeMqClient.GetQueuesAsync();
 
-        foreach (var queue in _queues)
+        foreach (var queue in _server.Queues)
         {
             EventingService.SignalMetrics(queue.Metrics);
         }

@@ -7,75 +7,20 @@
     <MudCardContent>
         <MudGrid Justify="Justify.FlexEnd">
             <MudItem xs="6">
-                <MudGrid>
-                    <MudItem xs="6">
-                        <MudGrid>
-                            <MudItem xs="12">
-                                <MudText>StoreMode:</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Count:</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Size:</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Messages in:</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Messages out:</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Pressure (count):</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Pressure (size):</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Buffer pressure (count):</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>Buffer pressure (size):</MudText>
-                            </MudItem>
-                        </MudGrid>
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudGrid>
-                            <MudItem xs="12">
-                                <MudText>@Queue.StoreMode</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@Queue.Metrics.MessageCount</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@Queue.Metrics.MessagesSizeBytes</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@Queue.Metrics.MessagesInPerSecond.ToString("F")/s</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@Queue.Metrics.MessagesOutPerSecond.ToString("F")/s</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@CountPressure</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@SizePressure</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@BufferCountPressure</MudText>
-                            </MudItem>
-                            <MudItem xs="12">
-                                <MudText>@BufferSizePressure</MudText>
-                            </MudItem>
-                        </MudGrid>
-                    </MudItem>
-                </MudGrid>
+                <ValueLabel Label="StoreMode:" Value="@Queue.StoreMode"/>
+                <ValueLabel Label="Count:" Value="@Queue.Metrics.MessageCount.ToString()" />
+                <ValueLabel Label="Size:" Value="@Queue.Metrics.MessagesSizeBytes.ToString()" />
+                <ValueLabel Label="Messages in:" Value="@MessagesInPerSecond" />
+                <ValueLabel Label="Messages out:" Value="@MessagesOutPerSecond" />
+                <ValueLabel Label="Pressure (count):" Value="@CountPressure" />
+                <ValueLabel Label="Pressure (size):" Value="@SizePressure" />
+                <ValueLabel Label="Buffer pressure (count):" Value="@BufferCountPressure" />
+                <ValueLabel Label="Buffer pressure (size):" Value="@BufferSizePressure" />
             </MudItem>
             <MudItem xs="6">
                 <QueueThroughputChart/>
             </MudItem>
         </MudGrid>
-        <QueuePressureChart />
+        <QueuePressureChart/>
     </MudCardContent>
 </MudCard>

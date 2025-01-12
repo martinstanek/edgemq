@@ -7,11 +7,21 @@
 
 <PageTitle>EdgeMQ Dashboard</PageTitle>
 
-<div style="margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: right" >
-    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Tertiary">refresh</MudButton>
-</div>
+<MudGrid>
+    <MudItem xs="6">
+        <div style="margin-left: 5px; margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: left" >
+            <MudText>EdgeMQ @_server.Version</MudText>
+        </div>
+    </MudItem>
+    <MudItem xs="6">
+        <div style="margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: right" >
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Tertiary">refresh</MudButton>
+        </div>
+    </MudItem>
+</MudGrid>
 
-@foreach (var queue in _queues)
+
+@foreach (var queue in _server.Queues)
 {
     <QueueCard Queue="@queue" />
 }
