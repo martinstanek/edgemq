@@ -106,13 +106,83 @@ public sealed class FileSystemMessageStoreTests
         store.MessageSizeBytes.ShouldBe((ulong) 4);
     }
 
+    [Fact]
+    public async Task IsFull_CountExceeded_ReturnsTrue()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageCount = 4
+        };
+        var store = context.GetMessageStore(config);
+        var payload = "hello";
+
+        await store.InitAsync();
+        await store.AddMessagesAsync([payload, payload, payload, payload]);
+
+        store.IsFull.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IsFull_CountNotExceeded_ReturnsFalse()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageCount = 4
+        };
+        var store = context.GetMessageStore(config);
+        var payload = "hello";
+
+        await store.InitAsync();
+        await store.AddMessagesAsync([payload, payload, payload]);
+
+        store.IsFull.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task IsFull_SizeExceeded_ReturnsTrue()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageSizeBytes = 15
+        };
+        var store = context.GetMessageStore(config);
+        var payload = "hello";
+
+        await store.InitAsync();
+        await store.AddMessagesAsync([payload, payload, payload]);
+
+        store.IsFull.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IsFull_SizeNotExceeded_ReturnsFalse()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageSizeBytes = 100
+        };
+        var store = context.GetMessageStore(config);
+        var payload = "hello";
+
+        await store.InitAsync();
+        await store.AddMessagesAsync([payload, payload, payload]);
+
+        store.IsFull.ShouldBeFalse();
+    }
+
     private sealed class FileSystemMessageStoreTestsContext : IDisposable
     {
         private string _path = string.Empty;
 
-        public IMessageStore GetMessageStore()
+        public IMessageStore GetMessageStore(MessageStoreConfiguration? configuration = null)
         {
-            var config = new MessageStoreConfiguration
+            var config = configuration ?? new MessageStoreConfiguration();
+
+            config = config with
             {
                 Path = "./test-queue"
             };
