@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Api.Handlers;
+using EdgeMq.Model;
 
 namespace EdgeMq.Api.Extensions;
 
@@ -38,7 +39,7 @@ public static class WebApplicationExtensions
 
             return !added && config.ConstraintsMode == QueueApiConstraintsMode.Fail
                 ? Results.UnprocessableEntity()
-                : Results.NoContent();
+                : Results.Ok(new QueueEnqueueResult(added));
         });
 
         return webApplication;

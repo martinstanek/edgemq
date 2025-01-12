@@ -10,6 +10,7 @@ namespace EdgeMq.Api.Serialization;
 [JsonSerializable(typeof(QueueMetrics))]
 [JsonSerializable(typeof(QueueRawMessage))]
 [JsonSerializable(typeof(QueueRawMessage[]))]
+[JsonSerializable(typeof(QueueEnqueueResult))]
 [JsonSerializable(typeof(IReadOnlyCollection<Queue>))]
 [JsonSerializable(typeof(IReadOnlyCollection<QueueRawMessage>))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext { }

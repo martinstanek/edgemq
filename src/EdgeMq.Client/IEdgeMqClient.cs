@@ -12,7 +12,7 @@ public interface IEdgeMqClient
 
     Task<QueueMetrics> GetMetricsAsync(string queueName);
 
-    Task EnqueueAsync(string queueName, string payload);
+    Task<QueueEnqueueResult> EnqueueAsync(string queueName, string payload);
 
     Task AcknowledgeAsync(string queueName, Guid batchId);
 

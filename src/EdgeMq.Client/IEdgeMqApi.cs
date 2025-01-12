@@ -21,7 +21,7 @@ internal interface IEdgeMqApi
     Task<QueueMetrics> GetMetricsAsync(string name);
 
     [Put("/queue/{name}")]
-    Task EnqueueAsync(string name, [Body] string payload);
+    Task<QueueEnqueueResult> EnqueueAsync(string name, [Body] string payload);
 
     [Patch("/queue/{name}")]
     Task AcknowledgeAsync(string name, [Query] Guid batchId);

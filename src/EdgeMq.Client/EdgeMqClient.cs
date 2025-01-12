@@ -31,7 +31,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return _api.Value.GetMetricsAsync(queueName);
     }
 
-    public Task EnqueueAsync(string queueName, string payload)
+    public Task<QueueEnqueueResult> EnqueueAsync(string queueName, string payload)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NullOrWhiteSpace(payload);

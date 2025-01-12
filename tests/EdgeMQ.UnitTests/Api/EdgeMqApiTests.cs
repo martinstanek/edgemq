@@ -190,6 +190,38 @@ public sealed class EdgeMqApiTests
     }
 
     [Fact]
+    public async Task Enqueue_PayloadSizeTooBig_ModeSetToIgnore_DoesNotThrow_ReturnsFalse()
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(maxPayloadSize: 4, ignoreConstraintsViolation: true);
+
+        var client = context.GetClient();
+        var result = await client.EnqueueAsync(queueName, payload);
+
+        result.Added.ShouldBe(false);
+    }
+
+    [Fact]
+    public async Task Enqueue_PayloadSizeIsOk_ModeSetToIgnore_DoesNotThrow_ReturnsTrue()
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(maxPayloadSize: 10, ignoreConstraintsViolation: true);
+
+        var client = context.GetClient();
+        var result = await client.EnqueueAsync(queueName, payload);
+
+        result.Added.ShouldBe(true);
+    }
+
+    [Fact]
     public async Task Enqueue_MaximumCountReached_ModeSetToFail_Throws()
     {
         const string queueName = "default";
