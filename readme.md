@@ -5,7 +5,7 @@
 ![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/logo.svg?raw=true)
 
 [![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52) \
-.. NuGet \
+https://www.nuget.org/packages/Awitec.EdgeMq.Client
 https://hub.docker.com/r/awitec/edgemq
 
 ### Enqueue
