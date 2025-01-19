@@ -2,11 +2,11 @@
 
  *... a simple (like really simple) queue designed to have minimal memory footprint and feature set*
 
-![logo](https://github.com/martinstanek/bucket/blob/main/misc/logo.png?raw=true)
+![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/logo.svg?raw=true)
 
 [![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52) \
 .. NuGet \
-.. Docker
+https://hub.docker.com/r/awitec/edgemq
 
 ### Enqueue
 
@@ -31,7 +31,7 @@ services:
   edgemq:
     hostname: edgemq
     container_name: edgemq
-    image: "awitec.azurecr.io/edgemq:0.0.70-arm64"
+    image: "awitec/edgemq:0.0.70-arm64"
     ports:
       - 2323:2323
     environment:
