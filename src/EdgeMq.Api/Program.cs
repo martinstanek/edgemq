@@ -22,4 +22,3 @@ app.Run();
 public partial class Program { }
 
 // TODO dynamic readout/processing delays
-// TODO fix the pressure bars

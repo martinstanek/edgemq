@@ -10,12 +10,12 @@
 <MudGrid>
     <MudItem xs="6">
         <div style="margin-left: 5px; margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: left" >
-            <MudText>EdgeMQ @_server.Version</MudText>
+            <MudText>EdgeMQ @_server.Version.TrimEnd(['.', '0'])</MudText>
         </div>
     </MudItem>
     <MudItem xs="6">
         <div style="margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: right" >
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Tertiary">refresh</MudButton>
+            <MudSwitch @bind-Value="_autoRefresh" Label="auto refresh" Color="Color.Tertiary" />
         </div>
     </MudItem>
 </MudGrid>
