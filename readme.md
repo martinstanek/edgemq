@@ -11,14 +11,14 @@
 ### Enqueue
 
 ```csharp
-public static viod ChangeMe()
+public static void ChangeMe()
 {}
 ```
 
 ### Dequeue
 
 ```csharp
-public static viod ChangeMe()
+public static void ChangeMe()
 {}
 ```
 
