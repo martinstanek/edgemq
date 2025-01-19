@@ -33,6 +33,8 @@ await edgeMqClient.DequeueAsync("test-queue", batch, TimeSpan.FromSeconds(1), me
 }, CancellationToken.None);
 ```
 
+Available Docker Tags: https://hub.docker.com/repository/docker/awitec/edgemq/tags
+
 ### Compose
 
 ```yml
@@ -41,7 +43,7 @@ services:
   edgemq:
     hostname: edgemq
     container_name: edgemq
-    image: "awitec/edgemq:0.0.70-arm64"
+    image: "awitec/edgemq:0.0.79-arm64"
     ports:
       - 2323:2323
     environment:
