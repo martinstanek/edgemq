@@ -17,6 +17,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{C545537C-99D8-425B-8DD7-EF67CC9F3847}"
 	ProjectSection(SolutionItems) = preProject
 		misc\Dockerfile = misc\Dockerfile
+		readme.md = readme.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EdgeMq.Producer", "tests\EdgeMq.Producer\EdgeMq.Producer.csproj", "{CEDB7B42-550A-4F26-AE6C-786A131811B4}"
