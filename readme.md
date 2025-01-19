@@ -4,9 +4,9 @@
 
 ![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/logo.svg?raw=true)
 
-[![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52) \
-https://www.nuget.org/packages/Awitec.EdgeMq.Client
-https://hub.docker.com/r/awitec/edgemq
+[![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52)
+[![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.Client.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.Client) 
+![Docker Image Version](https://img.shields.io/docker/v/awitec/edgemq)
 
 ### Enqueue
 
