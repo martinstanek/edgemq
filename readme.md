@@ -11,19 +11,29 @@
 ### Enqueue
 
 ```csharp
-public static void ChangeMe()
-{}
+var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:2323") };
+var edgeMqClient = new EdgeMqClient(httpClient);
+await edgeMqClient.EnqueueAsync("test-queue", "hello world!");
 ```
 
 ### Dequeue
 
 ```csharp
-public static void ChangeMe()
-{}
+var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:2323") };
+var edgeMqClient = new EdgeMqClient(httpClient);
+await edgeMqClient.DequeueAsync("test-queue", batch, TimeSpan.FromSeconds(1), messages =>
+{
+    foreach (var message in messages)
+    {
+        Console.WriteLine(message.Payload);
+    }
+
+    return Task.CompletedTask;
+
+}, CancellationToken.None);
 ```
 
 ### Compose
-
 
 ```yml
 services:
