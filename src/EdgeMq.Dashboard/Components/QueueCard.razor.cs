@@ -24,27 +24,27 @@ public partial class QueueCard
 
     private string BufferSizePressure =>
         GetPressureString(
-            Queue.Metrics.BufferMessagesSizeBytes,
             Queue.Metrics.MaxBufferMessagesSizeBytes,
+            Queue.Metrics.BufferMessagesSizeBytes,
             Queue.Metrics.BufferMessagesSizePressure,
             unit: "B");
 
     private string BufferCountPressure =>
         GetPressureString(
-            Queue.Metrics.BufferMessageCount,
             Queue.Metrics.MaxBufferMessageCount,
+            Queue.Metrics.BufferMessageCount,
             Queue.Metrics.BufferMessageCountPressure);
 
     private string SizePressure =>
         GetPressureString(
-            Queue.Metrics.MessagesSizeBytes,
             Queue.Metrics.MaxMessagesSizeBytes,
+            Queue.Metrics.MessagesSizeBytes,
             Queue.Metrics.MessagesSizePressure,
             unit: "B");
 
     private string CountPressure =>
         GetPressureString(
-            Queue.Metrics.MessageCount,
             Queue.Metrics.MaxMessageCount,
+            Queue.Metrics.MessageCount,
             Queue.Metrics.MessageCountPressure);
 }

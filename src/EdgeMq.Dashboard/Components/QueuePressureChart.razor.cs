@@ -1,6 +1,4 @@
-using EdgeMq.Infra.Metrics;
 using EdgeMq.Model;
-using MudBlazor;
 
 namespace EdgeMq.Dashboard.Components;
 
@@ -20,14 +18,38 @@ public partial class QueuePressureChart
 
     private async void OnMetrics(object? sender, QueueMetrics queueMetrics)
     {
-        _sizePressure = queueMetrics.MessagesSizePressure * 100;
-        _sizeBufferPressure = queueMetrics.BufferMessagesSizePressure * 100;
-        _countPressure = queueMetrics.MessageCountPressure * 100;
-        _countBufferPressure = queueMetrics.BufferMessageCountPressure * 100;
+        var adjustedCountPressures = GetAdjustedPressures(
+            queueMetrics.MaxMessageCount,
+            queueMetrics.MaxBufferMessageCount,
+            queueMetrics.MessageCountPressure,
+            queueMetrics.BufferMessageCountPressure);
 
-        await InvokeAsync(() =>
-        {
-            StateHasChanged();
-        });
+
+        var adjustedSizePressures = GetAdjustedPressures(
+            queueMetrics.MessagesSizeBytes,
+            queueMetrics.MaxBufferMessagesSizeBytes,
+            queueMetrics.MessagesSizePressure,
+            queueMetrics.BufferMessagesSizePressure);
+
+        _sizePressure = adjustedSizePressures.AdjustedPressure;
+        _sizeBufferPressure = adjustedSizePressures.AdjustedBufferPressure;
+        _countPressure = adjustedCountPressures.AdjustedPressure;
+        _countBufferPressure = adjustedCountPressures.AdjustedBufferPressure;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private static (double AdjustedPressure, double AdjustedBufferPressure) GetAdjustedPressures(
+        ulong maxCount,
+        ulong maxBufferCount,
+        double pressure,
+        double bufferPressure)
+    {
+        var percent = 100 / (double) (maxCount + maxBufferCount);
+        var countRatio = maxCount * percent / 100;
+        var adjustedPressure = pressure * countRatio * 100;
+        var adjustedBufferPressure = ((bufferPressure * (1 - countRatio)) + countRatio) * 100;
+
+        return (adjustedPressure, adjustedBufferPressure);
     }
 }
