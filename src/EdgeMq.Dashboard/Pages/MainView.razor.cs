@@ -5,7 +5,7 @@ namespace EdgeMq.Dashboard.Pages;
 public partial class MainView
 {
     private QueueServer _server = QueueServer.Empty;
-    private bool _autoRefresh;
+    private bool _autoRefresh = true;
     private bool _rendered;
 
     protected override Task OnInitializedAsync()
