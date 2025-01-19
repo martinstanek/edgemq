@@ -1,4 +1,4 @@
-FROM scratch
+FROM alpine:edge
 EXPOSE 2323
 ENV ASPNETCORE_URLS=http://*:2323
 
