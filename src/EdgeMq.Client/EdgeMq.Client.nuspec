@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <package>
     <metadata>
+        <version>#{BuildNumber}#</version>
         <id>Awitec.EdgeMq.Client</id>
         <title>Awitec.EdgeMq.Client</title>
         <authors>Martin Stanek</authors>
