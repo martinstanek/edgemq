@@ -7,7 +7,7 @@
         <authors>Martin Stanek</authors>
         <owners>Awitec</owners>
         <copyright>Martin Stanek</copyright>
-        <license type="MIT"/>
+        <license type="expression">MIT</license>
         <readme>nuget.readme.md</readme>
         <tags>Queue; EdgeMQ; Edge</tags>
         <projectUrl>https://github.com/martinstanek/edgemq</projectUrl>
