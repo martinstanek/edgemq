@@ -31,7 +31,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="nuget.readme.md" Pack="true" PackagePath="\"/>
+        <None Include="nuget.readme.md" Pack="true" PackagePath="\">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
