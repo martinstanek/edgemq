@@ -14,7 +14,7 @@
         <repository>https://github.com/martinstanek/edgemq</repository>
         <description>This library contains the .NET native client for the EdgeMQ server.</description>
         <dependencies>
-            <group targetFramework="netstandard2.0" />
+            <group targetFramework="net9.0" />
         </dependencies>
     </metadata>
     <files>
