@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>Awitec.EdgeMq.Client</id>
+        <title>Awitec.EdgeMq.Client</title>
+        <version>0.0.0</version>
+        <authors>Martin Stanek</authors>
+        <owners>Awitec</owners>
+        <copyright>Martin Stanek</copyright>
+        <license type="MIT"/>
+        <readme>nuget.readme.md</readme>
+        <tags>Queue; EdgeMQ; Edge</tags>
+        <projectUrl>https://github.com/martinstanek/edgemq</projectUrl>
+        <repository>https://github.com/martinstanek/edgemq</repository>
+        <description>This library contains the .NET native client for the EdgeMQ server.</description>
+        <dependencies>
+            <group targetFramework="netstandard2.0" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="bin\Release\net9.0\EdgeMq.*.dll" target="lib\net9.0" />
+        <file src="bin\Release\net9.0\nuget.readme.md" target="lib\net9.0" />
+    </files>
+</package>
