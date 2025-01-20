@@ -8,7 +8,7 @@
         <owners>Awitec</owners>
         <copyright>Martin Stanek</copyright>
         <license type="expression">MIT</license>
-        <readme>nuget.readme.md</readme>
+        <readme>docs\nuget.readme.md</readme>
         <tags>Queue; EdgeMQ; Edge</tags>
         <projectUrl>https://github.com/martinstanek/edgemq</projectUrl>
         <repository>https://github.com/martinstanek/edgemq</repository>
@@ -19,6 +19,6 @@
     </metadata>
     <files>
         <file src="bin\Release\net9.0\EdgeMq.*.dll" target="lib\net9.0" />
-        <file src="bin\Release\net9.0\nuget.readme.md" target="lib\net9.0" />
+        <file src="bin\Release\net9.0\nuget.readme.md" target="docs\" />
     </files>
 </package>
