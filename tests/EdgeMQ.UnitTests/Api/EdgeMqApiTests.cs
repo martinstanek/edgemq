@@ -9,7 +9,6 @@ using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Client;
 using EdgeMq.Client.Exceptions;
-using Refit;
 using Shouldly;
 using Xunit;
 
