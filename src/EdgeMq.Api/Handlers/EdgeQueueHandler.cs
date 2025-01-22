@@ -46,7 +46,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         var headers = request.Headers
             .ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty)
             .Where(p => p.Key.StartsWith(EdgeHeaderPrefix))
-            .ToDictionary();
+            .ToDictionary(k => k.Key.Replace(EdgeHeaderPrefix, string.Empty), v => v.Value);
 
         var queue = _queueManager.GetQueue(queueName);
 

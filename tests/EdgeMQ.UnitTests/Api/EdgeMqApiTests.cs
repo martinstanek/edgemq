@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Client;
+using EdgeMq.Client.Exceptions;
 using Refit;
 using Shouldly;
 using Xunit;
@@ -206,7 +207,7 @@ public sealed class EdgeMqApiTests
 
         var client = context.GetClient();
 
-        var exception = await Should.ThrowAsync<ApiException>(() => client.EnqueueAsync(queueName, payload));
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.EnqueueAsync(queueName, payload));
 
         exception.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
     }
@@ -262,7 +263,7 @@ public sealed class EdgeMqApiTests
         await client.EnqueueAsync(queueName, payload);
         await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
 
-        var exception = await Should.ThrowAsync<ApiException>(() => client.EnqueueAsync(queueName, payload));
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.EnqueueAsync(queueName, payload));
 
         exception.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
 
@@ -292,7 +293,7 @@ public sealed class EdgeMqApiTests
         await client.EnqueueAsync(queueName, payload);
         await EdgeMqApiTestsContext.PeekUntilPeekedAsync(client, queueName, batchSize: 100);
 
-        var exception = await Should.ThrowAsync<ApiException>(() => client.EnqueueAsync(queueName, payload));
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.EnqueueAsync(queueName, payload));
 
         exception.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
 
