@@ -29,9 +29,10 @@ public sealed class FileSystemMessageStoreTests
     {
         using var context = new FileSystemMessageStoreTestsContext();
         var store = context.GetMessageStore();
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync(["test"]);
+        await store.AddMessagesAsync([message]);
         await store.InitAsync();
 
         store.MessageCount.ShouldBe((ulong) 1);
@@ -44,9 +45,10 @@ public sealed class FileSystemMessageStoreTests
     {
         using var context = new FileSystemMessageStoreTestsContext();
         var store = context.GetMessageStore();
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync(["test", "test", "test"]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.MessageCount.ShouldBe((ulong) 3);
         store.CurrentId.ShouldBe((ulong) 3);
@@ -58,9 +60,10 @@ public sealed class FileSystemMessageStoreTests
     {
         using var context = new FileSystemMessageStoreTestsContext();
         var store = context.GetMessageStore();
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync(["test", "test", "test"]);
+        await store.AddMessagesAsync([message, message, message]);
 
         var messages = await store.ReadMessagesAsync();
 
@@ -72,9 +75,10 @@ public sealed class FileSystemMessageStoreTests
     {
         using var context = new FileSystemMessageStoreTestsContext();
         var store = context.GetMessageStore();
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync(["test", "test", "test"]);
+        await store.AddMessagesAsync([message, message, message]);
 
         var messages = await store.ReadMessagesAsync();
         var ids = messages.Select(s => s.Id).ToList();
@@ -91,9 +95,10 @@ public sealed class FileSystemMessageStoreTests
     {
         using var context = new FileSystemMessageStoreTestsContext();
         var store = context.GetMessageStore();
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync(["test", "test", "test"]);
+        await store.AddMessagesAsync([message, message, message]);
 
         var messages = await store.ReadMessagesAsync(2);
         var ids = messages.Select(s => s.Id).ToList();
@@ -115,10 +120,10 @@ public sealed class FileSystemMessageStoreTests
             MaxMessageCount = 4
         };
         var store = context.GetMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync([payload, payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message, message]);
 
         store.IsFull.ShouldBeTrue();
     }
@@ -132,10 +137,10 @@ public sealed class FileSystemMessageStoreTests
             MaxMessageCount = 4
         };
         var store = context.GetMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync([payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.IsFull.ShouldBeFalse();
     }
@@ -149,10 +154,10 @@ public sealed class FileSystemMessageStoreTests
             MaxMessageSizeBytes = 15
         };
         var store = context.GetMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync([payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.IsFull.ShouldBeTrue();
     }
@@ -166,10 +171,10 @@ public sealed class FileSystemMessageStoreTests
             MaxMessageSizeBytes = 100
         };
         var store = context.GetMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "test" };
 
         await store.InitAsync();
-        await store.AddMessagesAsync([payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.IsFull.ShouldBeFalse();
     }

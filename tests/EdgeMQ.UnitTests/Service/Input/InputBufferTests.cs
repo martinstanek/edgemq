@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Service.Configuration;
@@ -15,11 +16,12 @@ public sealed class InputBufferTests
         var config = new InputBufferConfiguration();
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
 
         buffer.MessageCount.ShouldBe((ulong) 3);
         buffer.MessageSizeBytes.ShouldBe((ulong) 15);
@@ -41,11 +43,12 @@ public sealed class InputBufferTests
 
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
 
         buffer.MessageCount.ShouldBe((ulong) 2);
         buffer.MessageSizeBytes.ShouldBe((ulong) 10);
@@ -61,11 +64,12 @@ public sealed class InputBufferTests
 
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
 
         buffer.MessageCount.ShouldBe((ulong) 2);
         buffer.MessageSizeBytes.ShouldBe((ulong) 10);
@@ -81,11 +85,12 @@ public sealed class InputBufferTests
 
         var buffer = new InputBuffer(config);
         var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
-        await buffer.AddAsync(message, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
+        await buffer.AddAsync(message, headers, token);
 
         buffer.MessageCount.ShouldBe((ulong) 0);
         buffer.MessageSizeBytes.ShouldBe((ulong) 0);

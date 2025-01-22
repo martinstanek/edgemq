@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using EdgeMq.Model;
+using Ardalis.GuardClauses;
+using Refit;
 
 namespace EdgeMq.Client;
 
 public sealed class EdgeMqClient : IEdgeMqClient
 {
+    private const string EdgeHeaderPrefix = "EDGQ_";
+
     private readonly Lazy<IEdgeMqApi> _api;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+
+    private readonly RefitSettings _settings = new()
+    {
+        HttpMessageHandlerFactory =
+    };
 
     public EdgeMqClient(HttpClient httpClient)
     {
@@ -36,7 +45,17 @@ public sealed class EdgeMqClient : IEdgeMqClient
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NullOrWhiteSpace(payload);
 
-        return _api.Value.EnqueueAsync(queueName, payload);
+        return _api.Value.EnqueueAsync(queueName, payload, headers: ReadOnlyDictionary<string, string>.Empty);
+    }
+
+    public Task<QueueEnqueueResult> EnqueueAsync(string queueName, string payload, IReadOnlyDictionary<string, string> headers)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+        Guard.Against.NullOrWhiteSpace(payload);
+
+        var queueHeaders = headers.ToDictionary(k => $"{EdgeHeaderPrefix}{k}", v => v.Value);
+
+        return _api.Value.EnqueueAsync(queueName, payload, queueHeaders);
     }
 
     public Task AcknowledgeAsync(string queueName, Guid batchId)

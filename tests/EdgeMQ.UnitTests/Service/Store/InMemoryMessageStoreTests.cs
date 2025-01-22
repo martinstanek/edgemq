@@ -14,9 +14,9 @@ public sealed class InMemoryMessageStoreTests
     {
         var config = new MessageStoreConfiguration();
         var store = new InMemoryMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
-        await store.AddMessagesAsync([payload, payload]);
+        await store.AddMessagesAsync([message, message]);
 
         store.MessageCount.ShouldBe((ulong) 2);
         store.MessageSizeBytes.ShouldBe((ulong) 10);
@@ -27,9 +27,9 @@ public sealed class InMemoryMessageStoreTests
     {
         var config = new MessageStoreConfiguration();
         var store = new InMemoryMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
-        await store.AddMessagesAsync([payload, payload]);
+        await store.AddMessagesAsync([message, message]);
 
         var messages = await store.ReadMessagesAsync();
 
@@ -54,9 +54,9 @@ public sealed class InMemoryMessageStoreTests
             MaxMessageCount = 4
         };
         var store = new InMemoryMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
-        await store.AddMessagesAsync([payload, payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message, message]);
 
         store.IsFull.ShouldBeTrue();
     }
@@ -69,9 +69,9 @@ public sealed class InMemoryMessageStoreTests
             MaxMessageCount = 4
         };
         var store = new InMemoryMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
-        await store.AddMessagesAsync([payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.IsFull.ShouldBeFalse();
     }
@@ -84,9 +84,9 @@ public sealed class InMemoryMessageStoreTests
             MaxMessageSizeBytes = 15
         };
         var store = new InMemoryMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
-        await store.AddMessagesAsync([payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.IsFull.ShouldBeTrue();
     }
@@ -99,9 +99,9 @@ public sealed class InMemoryMessageStoreTests
             MaxMessageSizeBytes = 100
         };
         var store = new InMemoryMessageStore(config);
-        var payload = "hello";
+        var message = new StoreMessage { Payload = "hello" };
 
-        await store.AddMessagesAsync([payload, payload, payload]);
+        await store.AddMessagesAsync([message, message, message]);
 
         store.IsFull.ShouldBeFalse();
     }

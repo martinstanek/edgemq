@@ -33,7 +33,7 @@ public static class WebApplicationExtensions
             return Results.NoContent();
         });
 
-        api.MapPut("/{name}", async (string name, HttpRequest request, [FromServices] IEdgeQueueHandler handler, [FromServices] EdgeMqServerConfiguration config) =>
+        api.MapPost("/{name}", async (string name, HttpRequest request, [FromServices] IEdgeQueueHandler handler, [FromServices] EdgeMqServerConfiguration config) =>
         {
             var added = await handler.EnqueueAsync(request, name);
 

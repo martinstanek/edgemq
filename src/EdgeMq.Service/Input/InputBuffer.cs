@@ -22,7 +22,7 @@ public sealed class InputBuffer
         _configuration = configuration;
     }
 
-    public async Task<bool> AddAsync(string payload, CancellationToken cancellationToken)
+    public async Task<bool> AddAsync(string payload, IReadOnlyDictionary<string, string> headers, CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
 
@@ -38,7 +38,8 @@ public sealed class InputBuffer
 
             var message = new BufferMessage
             {
-                Payload = payload
+                Payload = payload,
+                Headers = headers
             };
 
             await _inputChanel.Writer.WriteAsync(message, cancellationToken);

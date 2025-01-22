@@ -9,6 +9,8 @@ public interface IEdgeMq : IDisposable
 {
     Task<bool> EnqueueAsync(string payload, CancellationToken cancellationToken);
 
+    Task<bool> EnqueueAsync(string payload, IReadOnlyDictionary<string, string> headers, CancellationToken cancellationToken);
+
     Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<Message>> DequeueAsync(uint batchSize, CancellationToken cancellationToken);

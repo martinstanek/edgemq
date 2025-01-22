@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using EdgeMq.Service.Configuration;
 
 namespace EdgeMq.Service.Store;
@@ -60,9 +61,9 @@ public sealed class FileSystemMessageStore : IMessageStore
         }
     }
 
-    public async Task<bool> AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
+    public async Task<bool> AddMessagesAsync(IReadOnlyCollection<StoreMessage> messages)
     {
-        if (messagePayloads.Count == 0)
+        if (messages.Count == 0)
         {
             return false;
         }
@@ -76,13 +77,13 @@ public sealed class FileSystemMessageStore : IMessageStore
 
         try
         {
-            foreach (var messagePayload in messagePayloads)
+            foreach (var m in messages)
             {
                 _currentId++;
 
                 var path = Path.Combine(_configuration.Path, _currentId.ToString());
 
-                await File.WriteAllTextAsync(path, messagePayload);
+                await File.WriteAllTextAsync(path, m.Payload);
 
                 var info = new FileInfo(path);
 
@@ -124,7 +125,8 @@ public sealed class FileSystemMessageStore : IMessageStore
                 {
                     Id = file.Key,
                     BatchId = Guid.Empty,
-                    Payload = await File.ReadAllTextAsync(file.Value.FullName)
+                    Payload = await File.ReadAllTextAsync(file.Value.FullName),
+                    Headers = ReadOnlyDictionary<string, string>.Empty
                 };
 
                 result.Add(message);

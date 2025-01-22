@@ -16,6 +16,8 @@ namespace EdgeMq.Api.Handlers;
 
 public sealed class EdgeQueueHandler : IEdgeQueueHandler
 {
+    private const string EdgeHeaderPrefix = "EDGQ_";
+
     private readonly QueueManager _queueManager;
     private readonly EdgeMqServerConfiguration _configuration;
     private readonly DateTime _started = DateTime.Now;
@@ -41,9 +43,14 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 
         using var reader = new StreamReader(request.Body, encoding: Encoding.UTF8, detectEncodingFromByteOrderMarks: false);
         var rawContent = await reader.ReadToEndAsync();
+        var headers = request.Headers
+            .ToDictionary(k => k.Key, v => v.Value.FirstOrDefault() ?? string.Empty)
+            .Where(p => p.Key.StartsWith(EdgeHeaderPrefix))
+            .ToDictionary();
+
         var queue = _queueManager.GetQueue(queueName);
 
-        return await queue.EnqueueAsync(rawContent, CancellationToken.None);
+        return await queue.EnqueueAsync(rawContent, headers, CancellationToken.None);
     }
 
     public Task<QueueMetrics> GetMetricsAsync(string queueName)
@@ -85,7 +92,8 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         {
             Id = s.Id,
             BatchId = s.BatchId,
-            Payload = s.Payload
+            Payload = s.Payload,
+            Headers = s.Headers
         });
 
         return result.ToArray();
@@ -102,7 +110,8 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         {
             Id = s.Id,
             BatchId = s.BatchId,
-            Payload = s.Payload
+            Payload = s.Payload,
+            Headers = s.Headers
         });
 
         return result.ToArray();

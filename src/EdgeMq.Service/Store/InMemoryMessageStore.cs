@@ -35,9 +35,9 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Task.CompletedTask;
     }
 
-    public Task<bool> AddMessagesAsync(IReadOnlyCollection<string> messagePayloads)
+    public Task<bool> AddMessagesAsync(IReadOnlyCollection<StoreMessage> messages)
     {
-        if (messagePayloads.Count == 0)
+        if (messages.Count == 0)
         {
             return Task.FromResult(false);
         }
@@ -49,12 +49,13 @@ public sealed class InMemoryMessageStore : IMessageStore
                 return Task.FromResult(false);
             }
 
-            foreach (var payload in messagePayloads)
+            foreach (var m in messages)
             {
                 var message = new Message
                 {
                     Id = GetNextId(),
-                    Payload = payload
+                    Payload = m.Payload,
+                    Headers = m.Headers
                 };
 
                 _messages[message.Id] = message;
@@ -81,7 +82,7 @@ public sealed class InMemoryMessageStore : IMessageStore
         var result = _messages
             .OrderBy(m => m.Key)
             .Select(s => s.Value)
-            .Take((int)batchSize)
+            .Take((int) batchSize)
             .ToList();
 
         return Task.FromResult<IReadOnlyCollection<Message>>(result);

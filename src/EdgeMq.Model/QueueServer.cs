@@ -12,7 +12,7 @@ public sealed record QueueServer
 
     public required IReadOnlyCollection<Queue> Queues { get; init; } = [];
 
-    public static QueueServer Empty => new QueueServer
+    public static QueueServer Empty => new()
     {
         Version = string.Empty,
         UptimeSeconds = 0,

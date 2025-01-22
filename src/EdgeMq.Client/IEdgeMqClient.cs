@@ -14,6 +14,8 @@ public interface IEdgeMqClient
 
     Task<QueueEnqueueResult> EnqueueAsync(string queueName, string payload);
 
+    Task<QueueEnqueueResult> EnqueueAsync(string queueName, string payload, IReadOnlyDictionary<string, string> headers);
+
     Task AcknowledgeAsync(string queueName, Guid batchId);
 
     Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize);

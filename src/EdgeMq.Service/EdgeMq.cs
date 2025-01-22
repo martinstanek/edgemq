@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using EdgeMq.Infra.Metrics;
 using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Exceptions;
@@ -37,9 +38,14 @@ public sealed class EdgeMq : IEdgeMq
 
     public Task<bool> EnqueueAsync(string payload, CancellationToken cancellationToken)
     {
+        return EnqueueAsync(payload, ReadOnlyDictionary<string, string>.Empty, cancellationToken);
+    }
+
+    public Task<bool> EnqueueAsync(string payload, IReadOnlyDictionary<string, string> headers, CancellationToken cancellationToken)
+    {
         Guard.Against.NullOrWhiteSpace(payload);
 
-        return _inputBuffer.AddAsync(payload, cancellationToken);
+        return _inputBuffer.AddAsync(payload, headers, cancellationToken);
     }
 
     public async Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
@@ -201,15 +207,19 @@ public sealed class EdgeMq : IEdgeMq
             return;
         }
 
-        var messagePayloadsToStore = incomingMessages
-            .Select(incomingMessage => incomingMessage.Payload)
+        var messagesToStore = incomingMessages
+            .Select(incomingMessage => new StoreMessage
+            {
+                Payload = incomingMessage.Payload,
+                Headers = incomingMessage.Headers
+            })
             .ToList();
 
-        var added = await _messageStore.AddMessagesAsync(messagePayloadsToStore);
+        var added = await _messageStore.AddMessagesAsync(messagesToStore);
 
         if (added)
         {
-            _messagesIn.AddEvents((uint) messagePayloadsToStore.Count);
+            _messagesIn.AddEvents((uint) messagesToStore.Count);
         }
     }
 

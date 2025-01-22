@@ -75,6 +75,28 @@ public sealed class EdgeMqApiTests
     }
 
     [Fact]
+    public async Task Dequeue_HeadersUsed_HeadersReturned()
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+        var headers = new Dictionary<string, string> { {"key1", "value1"}, {"key2", "value2"} };
+
+        context.DeclareVariables();
+
+        var client = context.GetClient();
+
+        await client.EnqueueAsync(queueName, payload, headers);
+
+        await Task.Delay(1000, CancellationToken.None);
+
+        var messages = await client.DequeueAsync(queueName, batchSize: 100);
+
+        messages.First().Headers.ShouldBe(headers);
+    }
+
+    [Fact]
     public async Task DequeueByProcessing_MessagesAdded_QueueIsEmpty()
     {
         const string queueName = "default";
