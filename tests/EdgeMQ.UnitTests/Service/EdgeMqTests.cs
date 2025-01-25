@@ -7,6 +7,7 @@ using EdgeMq.Service;
 using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
+using EdgeMq.Service.Store.InMemory;
 using Shouldly;
 using Xunit;
 

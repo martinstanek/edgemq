@@ -1,13 +1,13 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using EdgeMq.Service.Configuration;
 
-namespace EdgeMq.Service.Store;
+namespace EdgeMq.Service.Store.InMemory;
 
 public sealed class InMemoryMessageStore : IMessageStore
 {

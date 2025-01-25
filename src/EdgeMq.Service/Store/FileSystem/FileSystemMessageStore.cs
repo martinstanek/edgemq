@@ -1,14 +1,14 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using EdgeMq.Service.Configuration;
 
-namespace EdgeMq.Service.Store;
+namespace EdgeMq.Service.Store.FileSystem;
 
 public sealed class FileSystemMessageStore : IMessageStore
 {
@@ -83,7 +83,7 @@ public sealed class FileSystemMessageStore : IMessageStore
 
                 var path = Path.Combine(_configuration.Path, _currentId.ToString());
 
-                await File.WriteAllTextAsync(path, m.Payload);
+                await File.WriteAllBytesAsync(path, StoreMessageBinaryConverter.FromStoreMessage(m));
 
                 var info = new FileInfo(path);
 
@@ -121,12 +121,14 @@ public sealed class FileSystemMessageStore : IMessageStore
         {
             foreach (var file in files)
             {
+                var bytes = await File.ReadAllBytesAsync(file.Value.FullName);
+                var storeMessage = StoreMessageBinaryConverter.FromBytes(bytes);
                 var message = new Message
                 {
                     Id = file.Key,
                     BatchId = Guid.Empty,
-                    Payload = await File.ReadAllTextAsync(file.Value.FullName),
-                    Headers = ReadOnlyDictionary<string, string>.Empty
+                    Payload = storeMessage.Payload,
+                    Headers = storeMessage.Headers
                 };
 
                 result.Add(message);

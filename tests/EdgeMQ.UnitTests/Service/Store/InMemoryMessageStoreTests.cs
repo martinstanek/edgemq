@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Store;
+using EdgeMq.Service.Store.InMemory;
 using Shouldly;
 using Xunit;
 
