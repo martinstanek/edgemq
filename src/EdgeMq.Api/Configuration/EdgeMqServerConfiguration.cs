@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using EdgeMq.Service.Configuration;
 
 namespace EdgeMq.Api.Configuration;
@@ -52,7 +53,7 @@ public sealed record EdgeMqServerConfiguration
             StoreMode = storeMode,
             ConstraintsMode = constraintsMode,
             Path = EnvReader.GetEnvironmentValue(EdgeMqPath, defaultConfig.Path),
-            Queues = EnvReader.GetEnvironmentValue(EdgeMqQueues, Constants.DefaultQueueName).Split(','),
+            Queues = EnvReader.GetEnvironmentValue(EdgeMqQueues, Constants.DefaultQueueName).Split(',').Select(s => s.Trim()).ToList(),
             DefaultBatchSize = EnvReader.GetEnvironmentValue(EdgeMqDefaultBatchSize, defaultConfig.DefaultBatchSize),
             MaxMessageCount = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageCount, defaultConfig.MaxMessageCount),
             MaxMessageSizeBytes = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageSizeBytes, defaultConfig.MaxMessageSizeBytes),
