@@ -103,6 +103,37 @@ public sealed class EdgeMqApiTests
         messages.First().Headers["key2"].ShouldBe("value2");
     }
 
+    [Theory]
+    [InlineData(QueueStoreMode.InMemory)]
+    [InlineData(QueueStoreMode.FileSystem)]
+    public async Task Dequeue_HeadersUsedMultipleMessages_HeadersReturned(QueueStoreMode storeMode)
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+        var headers1 = new Dictionary<string, string> { {"key", "value1"} };
+        var headers2 = new Dictionary<string, string> { {"key", "value2"} };
+        var headers3 = new Dictionary<string, string> { {"key", "value3"} };
+
+        context.DeclareVariables(storeMode: storeMode);
+
+        var client = context.GetClient();
+
+        await client.EnqueueAsync(queueName, payload, headers1);
+        await client.EnqueueAsync(queueName, payload, headers2);
+        await client.EnqueueAsync(queueName, payload, headers3);
+
+        await Task.Delay(1000, CancellationToken.None);
+
+        var messages = await client.DequeueAsync(queueName, batchSize: 100);
+
+        messages.Count.ShouldBe(3);
+        messages.Any(a => a.Headers["key"].Equals("value1")).ShouldBeTrue();
+        messages.Any(a => a.Headers["key"].Equals("value2")).ShouldBeTrue();
+        messages.Any(a => a.Headers["key"].Equals("value3")).ShouldBeTrue();
+    }
+
     [Fact]
     public async Task DequeueByProcessing_MessagesAdded_QueueIsEmpty()
     {

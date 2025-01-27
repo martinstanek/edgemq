@@ -52,6 +52,13 @@ public sealed class EdgeMqClient : IEdgeMqClient
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NullOrWhiteSpace(payload);
 
+        var oldHeaders = _httpClient.DefaultRequestHeaders.Where(s => s.Key.StartsWith(EdgeHeaderPrefix));
+
+        foreach (var oldHeader in oldHeaders)
+        {
+            _httpClient.DefaultRequestHeaders.Remove(oldHeader.Key);
+        }
+
         foreach (var header in headers)
         {
             _httpClient.DefaultRequestHeaders.Add($"{EdgeHeaderPrefix}{header.Key}" , [header.Value]);
