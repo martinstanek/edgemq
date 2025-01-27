@@ -43,7 +43,7 @@ services:
   edgemq:
     hostname: edgemq
     container_name: edgemq
-    image: "awitec/edgemq:0.0.79-arm64"
+    image: "awitec/edgemq:latest-arm64"
     ports:
       - 2323:2323
     environment:
