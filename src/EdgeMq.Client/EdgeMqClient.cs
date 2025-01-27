@@ -115,7 +115,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
-        Guard.Against.NegativeOrZero(timeOut.Seconds);
+        Guard.Against.NegativeOrZero(timeOut.TotalSeconds);
 
         var timeOutSource = new CancellationTokenSource(timeOut);
         var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(timeOutSource.Token, cancellationToken);
