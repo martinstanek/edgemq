@@ -1,4 +1,4 @@
-FROM alpine:3.21.2
+FROM ubuntu:22.04
 EXPOSE 2323
 ENV ASPNETCORE_URLS=http://*:2323
 
