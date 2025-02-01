@@ -6,6 +6,7 @@
         <LangVersion>latest</LangVersion>
         <InvariantGlobalization>true</InvariantGlobalization>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
         <PublishAot>true</PublishAot>
     </PropertyGroup>
 

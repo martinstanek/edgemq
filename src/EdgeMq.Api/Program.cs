@@ -19,4 +19,4 @@ app.UseCors(p => { p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
 app.MapOpenApi();
 app.Run();
 
-public partial class Program { }
+public partial class Program;

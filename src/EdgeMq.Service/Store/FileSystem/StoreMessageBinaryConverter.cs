@@ -5,7 +5,7 @@ namespace EdgeMq.Service.Store.FileSystem;
 
 public static class StoreMessageBinaryConverter
 {
-    private const byte Delimiter = 0xFF;
+    private const byte ChunkDelimiter = 0xFF;
 
     public static StoreMessage FromBytes(byte[] bytes)
     {
@@ -15,7 +15,7 @@ public static class StoreMessageBinaryConverter
 
         for (var i = 0; i < bytes.Length; i++)
         {
-            if (bytes[i] == Delimiter)
+            if (bytes[i] == ChunkDelimiter)
             {
                 chunkString = Encoding.UTF8.GetString(buffer.ToArray());
                 chunks.Push(chunkString);
@@ -54,9 +54,9 @@ public static class StoreMessageBinaryConverter
         foreach (var messageHeader in message.Headers)
         {
             headersArray.AddRange(Encoding.UTF8.GetBytes(messageHeader.Key));
-            headersArray.Add(Delimiter);
+            headersArray.Add(ChunkDelimiter);
             headersArray.AddRange(Encoding.UTF8.GetBytes(messageHeader.Value));
-            headersArray.Add(Delimiter);
+            headersArray.Add(ChunkDelimiter);
         }
 
         headersArray.AddRange(Encoding.UTF8.GetBytes(message.Payload));

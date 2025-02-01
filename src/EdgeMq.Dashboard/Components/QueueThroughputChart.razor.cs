@@ -8,10 +8,10 @@ public partial class QueueThroughputChart
 {
     private sealed record ChartValue(string Label, double Value);
 
-    private const int MaxValues = 15;
+    private const int EdgeChartMaxValues = 15;
 
-    private readonly LimitedSizeAddOnlyStack<ChartValue> _inValues = new(MaxValues);
-    private readonly LimitedSizeAddOnlyStack<ChartValue> _outValues = new(MaxValues);
+    private readonly LimitedSizeAddOnlyStack<ChartValue> _inValues = new(EdgeChartMaxValues);
+    private readonly LimitedSizeAddOnlyStack<ChartValue> _outValues = new(EdgeChartMaxValues);
     private readonly ChartOptions _options = new();
     private int _chartIndex = -1;
 
