@@ -5,8 +5,10 @@ using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
 using Ardalis.GuardClauses;
 using EdgeMq.Service.Configuration;
+using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Store.FileSystem;
 using EdgeMq.Service.Store.InMemory;
+using EdgeMq.Service.Validation;
 
 namespace EdgeMq.Service;
 
@@ -39,6 +41,11 @@ public sealed class QueueManager
     public QueueManager AddQueue(string name, EdgeQueueConfiguration queueConfiguration)
     {
         Guard.Against.NullOrWhiteSpace(name);
+
+        if (!Validations.IsQueueNameValid(name))
+        {
+            throw new EdgeQueueException($"The provided name {name} for the queue is invalid.");
+        }
 
         var store = _isInMemory
             ? (IMessageStore) new InMemoryMessageStore(queueConfiguration.StoreConfiguration)

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Service;
 using EdgeMq.Service.Configuration;
+using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store.InMemory;
 using Shouldly;
@@ -175,15 +176,47 @@ public sealed class EdgeMqTests
         queue.MessageCount.ShouldBe((ulong) 0);
     }
 
+    [Fact]
+    public void AddQueue_NameIsInvalid_UnicodeChar_ThrowsEdgeQueueException()
+    {
+        var context = new EdgeMqTestsContext();
+
+        Should.Throw<EdgeQueueException>(() => context.GetQueue("ŽŽŽ-čkkk"));
+    }
+
+    [Fact]
+    public void AddQueue_NameIsInvalid_SpecialChar_ThrowsEdgeQueueException()
+    {
+        var context = new EdgeMqTestsContext();
+
+        Should.Throw<EdgeQueueException>(() => context.GetQueue("aaaaa=bbb"));
+    }
+
+    [Fact]
+    public void AddQueue_NameIsInvalid_TooSmall_ThrowsEdgeQueueException()
+    {
+        var context = new EdgeMqTestsContext();
+
+        Should.Throw<EdgeQueueException>(() => context.GetQueue("a"));
+    }
+
+    [Fact]
+    public void AddQueue_NameIsInvalid_TooBig_ThrowsEdgeQueueException()
+    {
+        var context = new EdgeMqTestsContext();
+
+        Should.Throw<EdgeQueueException>(() => context.GetQueue("1234567890123456789012345678901234567890"));
+    }
+
     private sealed class EdgeMqTestsContext
     {
-        internal IEdgeMq GetQueue()
+        internal IEdgeMq GetQueue(string name = "test")
         {
             var storeConfig = new MessageStoreConfiguration();
             var bufferConfig = new InputBufferConfiguration();
             var queueConfig = new EdgeQueueConfiguration
             {
-                Name = "test",
+                Name = name,
                 BufferConfiguration = bufferConfig,
                 StoreConfiguration = storeConfig,
                 ConstraintViolationMode = ConstraintViolationMode.Ignore

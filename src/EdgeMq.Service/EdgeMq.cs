@@ -11,6 +11,7 @@ using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
 using Ardalis.GuardClauses;
+using EdgeMq.Service.Validation;
 
 namespace EdgeMq.Service;
 
@@ -31,6 +32,11 @@ public sealed class EdgeMq : IEdgeMq
 
     public EdgeMq(InputBuffer inputBuffer, IMessageStore messageStore, EdgeQueueConfiguration configuration)
     {
+        if (!Validations.IsConfigurationValid(configuration))
+        {
+            throw new EdgeConfigurationException("The configuration is invalid");
+        }
+
         _inputBuffer = inputBuffer;
         _messageStore = messageStore;
         _configuration = configuration;
