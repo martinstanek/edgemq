@@ -106,7 +106,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return result ?? throw new EdgeClientException("Invalid response");
     }
 
-    public async Task<QueueMetrics> DequeueAsync(
+    public async Task DequeueAsync(
         string queueName,
         int batchSize,
         TimeSpan timeOut,
@@ -126,20 +126,17 @@ public sealed class EdgeMqClient : IEdgeMqClient
         try
         {
             var messages = await PeekAsync(queueName, batchSize);
-            var metrics = await GetMetricsAsync(queueName);
 
             await Task.Run(() => process(messages), linkedToken);
 
             if (messages.Count == 0)
             {
-                return metrics;
+                return;
             }
 
             var batchId = messages.First().BatchId;
 
             await AcknowledgeAsync(queueName, batchId);
-
-            return metrics;
         }
         finally
         {

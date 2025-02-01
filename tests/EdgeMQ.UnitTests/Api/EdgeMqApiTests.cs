@@ -151,7 +151,7 @@ public sealed class EdgeMqApiTests
 
         await Task.Delay(1000, token);
 
-        var stats = await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
+        await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
         {
             messages.Count.ShouldBe(3);
 
@@ -159,17 +159,17 @@ public sealed class EdgeMqApiTests
 
         }, token);
 
-        stats.MessageCount.ShouldBe((uint) 3);
+        var stats = await client.GetMetricsAsync(queueName);
 
-        stats = await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
+        stats.MessageCount.ShouldBe((uint) 0);
+
+        await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
         {
             messages.Count.ShouldBe(0);
 
             return Task.CompletedTask;
 
         }, token);
-
-        stats.MessageCount.ShouldBe((uint) 0);
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public sealed class EdgeMqApiTests
 
         await Task.Delay(1000, token);
 
-        var stats = await client.DequeueAsync(queueName, batchSize: 2, timeOut, messages =>
+        await client.DequeueAsync(queueName, batchSize: 2, timeOut, messages =>
         {
             messages.Count.ShouldBe(2);
 
@@ -197,9 +197,11 @@ public sealed class EdgeMqApiTests
 
         }, token);
 
-        stats.MessageCount.ShouldBe((uint) 3);
+        var stats = await client.GetMetricsAsync(queueName);
 
-        stats = await client.DequeueAsync(queueName, batchSize: 1, timeOut, messages =>
+        stats.MessageCount.ShouldBe((uint) 1);
+
+        await client.DequeueAsync(queueName, batchSize: 1, timeOut, messages =>
         {
             messages.Count.ShouldBe(1);
 
@@ -207,7 +209,9 @@ public sealed class EdgeMqApiTests
 
         }, token);
 
-        stats.MessageCount.ShouldBe((uint) 1);
+        stats = await client.GetMetricsAsync(queueName);
+
+        stats.MessageCount.ShouldBe((uint) 0);
     }
 
     [Fact]

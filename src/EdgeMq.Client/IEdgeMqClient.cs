@@ -22,7 +22,7 @@ public interface IEdgeMqClient
 
     Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize);
 
-    Task<QueueMetrics> DequeueAsync(
+    Task DequeueAsync(
         string queueName,
         int batchSize,
         TimeSpan timeOut,
