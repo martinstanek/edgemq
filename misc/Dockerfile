@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.21.2
 EXPOSE 2323
 ENV ASPNETCORE_URLS=http://*:2323
 
