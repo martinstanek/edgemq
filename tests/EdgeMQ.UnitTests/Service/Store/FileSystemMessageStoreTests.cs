@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -159,6 +160,28 @@ public sealed class FileSystemMessageStoreTests
 
         await store.InitAsync();
         await store.AddMessagesAsync([message, message, message]);
+
+        store.IsFull.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IsFull_HeadersAccounted_SizeExceeded_ReturnsTrue()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageSizeBytes = 15
+        };
+        var store = context.GetMessageStore(config);
+
+        var message = new StoreMessage
+        {
+            Payload = "hello",
+            Headers = new Dictionary<string, string> {{"hello", "hello"}}
+        };
+
+        await store.InitAsync();
+        await store.AddMessagesAsync([message]);
 
         store.IsFull.ShouldBeTrue();
     }

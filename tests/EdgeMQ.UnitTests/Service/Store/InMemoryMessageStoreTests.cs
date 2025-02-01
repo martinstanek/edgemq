@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EdgeMq.Service.Configuration;
@@ -88,6 +89,25 @@ public sealed class InMemoryMessageStoreTests
         var message = new StoreMessage { Payload = "hello" };
 
         await store.AddMessagesAsync([message, message, message]);
+
+        store.IsFull.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task IsFull_HeadersAccounted_SizeExceeded_ReturnsTrue()
+    {
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageSizeBytes = 15
+        };
+        var store = new InMemoryMessageStore(config);
+        var message = new StoreMessage
+        {
+            Payload = "hello",
+            Headers = new Dictionary<string, string> {{"hello", "hello"}}
+        };
+
+        await store.AddMessagesAsync([message]);
 
         store.IsFull.ShouldBeTrue();
     }

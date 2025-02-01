@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 using EdgeMq.Service.Configuration;
 
 namespace EdgeMq.Service.Store.InMemory;
@@ -60,7 +59,7 @@ public sealed class InMemoryMessageStore : IMessageStore
 
                 _messages[message.Id] = message;
                 _currentCount++;
-                _currentSize += (ulong) Encoding.UTF8.GetByteCount(message.Payload);
+                _currentSize += message.GetMessageSizeBytes();
             }
         }
 
@@ -102,7 +101,7 @@ public sealed class InMemoryMessageStore : IMessageStore
                 }
 
                 _currentCount--;
-                _currentSize -= (uint) Encoding.UTF8.GetByteCount(deletedMessage.Payload);
+                _currentSize -= deletedMessage.GetMessageSizeBytes();
             }
         }
 
