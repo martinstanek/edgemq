@@ -64,12 +64,14 @@ public sealed class QueueManager
         return this;
     }
 
-    public IEdgeMq GetQueue(string name)
+    private IEdgeMq GetQueue(string name)
     {
         Guard.Against.NullOrWhiteSpace(name);
 
         return _queues[name];
     }
+
+    public IEdgeMq this[string name] => GetQueue(name);
 
     public IReadOnlyCollection<string> Queues => _queues.Keys.ToList();
 

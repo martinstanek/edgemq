@@ -32,9 +32,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
-        var queue = _queueManager.GetQueue(queueName);
-
-        await queue.AcknowledgeAsync(batchId, CancellationToken.None);
+        await _queueManager[queueName].AcknowledgeAsync(batchId, CancellationToken.None);
     }
 
     public async Task<bool> EnqueueAsync(HttpRequest request, string queueName)
@@ -48,16 +46,14 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             .Where(p => p.Key.StartsWith(EdgeHeaderPrefix))
             .ToDictionary(k => k.Key.Replace(EdgeHeaderPrefix, string.Empty), v => v.Value);
 
-        var queue = _queueManager.GetQueue(queueName);
-
-        return await queue.EnqueueAsync(rawContent, headers, CancellationToken.None);
+        return await _queueManager[queueName].EnqueueAsync(rawContent, headers, CancellationToken.None);
     }
 
     public Task<QueueMetrics> GetMetricsAsync(string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
-        var queue = _queueManager.GetQueue(queueName);
+        var queue = _queueManager[queueName];
         var result = new QueueMetrics
         {
             Name = queue.Name,
@@ -86,8 +82,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
 
-        var queue = _queueManager.GetQueue(queueName);
-        var messages = await queue.DequeueAsync(batchSize: (uint) batchSize, CancellationToken.None);
+        var messages = await _queueManager[queueName].DequeueAsync(batchSize: (uint) batchSize, CancellationToken.None);
         var result = messages.Select(s => new QueueRawMessage
         {
             Id = s.Id,
@@ -104,8 +99,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
 
-        var queue = _queueManager.GetQueue(queueName);
-        var messages = await queue.PeekAsync(batchSize: (uint) batchSize, CancellationToken.None);
+        var messages = await _queueManager[queueName].PeekAsync(batchSize: (uint) batchSize, CancellationToken.None);
         var result = messages.Select(s => new QueueRawMessage
         {
             Id = s.Id,
