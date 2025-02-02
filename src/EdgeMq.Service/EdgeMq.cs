@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using EdgeMq.Infra.Metrics;
 using EdgeMq.Service.Configuration;
@@ -12,14 +11,13 @@ using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
 using EdgeMq.Service.Validation;
 using Ardalis.GuardClauses;
+using EdgeMq.Service.Model;
 
 namespace EdgeMq.Service;
 
 public sealed class EdgeMq : IEdgeMq
 {
-    private const int EdgeProcessingMessagesDelayMs = 100;
-
-    private readonly ConcurrentBag<Message> _peekedMessages = new();
+    private readonly List<Message> _peekedMessages = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly EventsPerInterval _messagesOut = new();
     private readonly EventsPerInterval _messagesIn = new();
@@ -130,7 +128,11 @@ public sealed class EdgeMq : IEdgeMq
 
     public void Start(CancellationToken cancellationToken)
     {
-        Task.Factory.StartNew(() => ProcessBufferAsync(cancellationToken), TaskCreationOptions.LongRunning);
+        Task.Factory.StartNew(
+            () => ProcessBufferAsync(cancellationToken),
+            cancellationToken,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
     }
 
     public void Stop()
@@ -199,29 +201,53 @@ public sealed class EdgeMq : IEdgeMq
 
     private async Task PersistIncomingMessagesAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(EdgeProcessingMessagesDelayMs, cancellationToken);
+        await Task.Delay(_configuration.EdgeProcessingMessagesDelayMs, cancellationToken);
 
         if (_messageStore.IsFull)
         {
             return;
         }
 
-        var incomingMessages = await _inputBuffer.ReadAllAsync(cancellationToken);
+        var messagesToStore = await ExtractIncomingMessagesAsync(cancellationToken);
 
-        if (!incomingMessages.Any())
+        if (!messagesToStore.Any())
         {
             return;
         }
 
-        var messagesToStore = incomingMessages
+        await StoreIncomingMessagesAsync(messagesToStore);
+    }
+
+    private async Task<IReadOnlyCollection<StoreMessage>> ExtractIncomingMessagesAsync(CancellationToken cancellationToken)
+    {
+        var incomingMessages = await _inputBuffer.ReadAllAsync(cancellationToken);
+
+        return incomingMessages
             .Select(incomingMessage => new StoreMessage
             {
                 Payload = incomingMessage.Payload,
                 Headers = incomingMessage.Headers
             })
             .ToList();
+    }
 
-        var added = await _messageStore.AddMessagesAsync(messagesToStore);
+    private async Task StoreIncomingMessagesAsync(IReadOnlyCollection<StoreMessage> messagesToStore)
+    {
+        bool added;
+
+        try
+        {
+            added = await _messageStore.AddMessagesAsync(messagesToStore);
+        }
+        catch
+        {
+            if (_configuration.ConstraintViolationMode == ConstraintViolationMode.ThrowException)
+            {
+                throw new EdgeQueueException("Failed to store incoming messages");
+            }
+
+            added = false;
+        }
 
         if (added)
         {
@@ -231,27 +257,19 @@ public sealed class EdgeMq : IEdgeMq
 
     public string Name => _configuration.Name;
 
-    public ulong MessageCount => _messageStore.MessageCount;
-
-    public ulong MaxMessageCount => _messageStore.MaxMessageCount;
-
-    public ulong MessageSizeBytes => _messageStore.MessageSizeBytes;
-
-    public ulong MaxMessageSizeBytes => _messageStore.MaxMessageSizeBytes;
-
-    public ulong BufferMessageCount => _inputBuffer.MessageCount;
-
-    public ulong MaxBufferMessageCount => _inputBuffer.MaxMessageCount;
-
-    public ulong BufferMessageSizeBytes => _inputBuffer.MessageSizeBytes;
-
-    public ulong MaxBufferMessageSizeBytes => _inputBuffer.MaxMessageSizeBytes;
-
-    public ulong CurrentCurrentId => _messageStore.CurrentId;
-
-    public ulong ProcessedMessages => _processedMessages;
-
-    public double MessagesInPerSecond => _messagesIn.CurrentEventsPerSecond();
-
-    public double MessagesOutPerSecond => _messagesOut.CurrentEventsPerSecond();
+    public Metrics Metrics => new Metrics
+    {
+        MessageCount = _messageStore.MessageCount,
+        MaxMessageCount = _messageStore.MaxMessageCount,
+        MessageSizeBytes = _messageStore.MessageSizeBytes,
+        MaxMessageSizeBytes = _messageStore.MaxMessageSizeBytes,
+        BufferMessageCount = _inputBuffer.MessageCount,
+        MaxBufferMessageCount = _inputBuffer.MaxMessageCount,
+        BufferMessageSizeBytes = _inputBuffer.MessageSizeBytes,
+        MaxBufferMessageSizeBytes = _inputBuffer.MaxMessageSizeBytes,
+        CurrentCurrentId = _messageStore.CurrentId,
+        ProcessedMessages = _processedMessages,
+        MessagesInPerSecond = _messagesIn.CurrentEventsPerSecond(),
+        MessagesOutPerSecond = _messagesOut.CurrentEventsPerSecond()
+    };
 }

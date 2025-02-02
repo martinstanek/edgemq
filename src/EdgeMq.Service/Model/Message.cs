@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EdgeMq.Service;
+namespace EdgeMq.Service.Model;
 
 public sealed record Message
 {

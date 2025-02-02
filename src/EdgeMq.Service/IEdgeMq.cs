@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using EdgeMq.Service.Model;
 
 namespace EdgeMq.Service;
 
@@ -25,27 +26,5 @@ public interface IEdgeMq : IDisposable
 
     public string Name { get; }
 
-    public ulong MessageCount { get; }
-
-    public ulong MaxMessageCount { get; }
-
-    public ulong MessageSizeBytes { get; }
-
-    public ulong MaxMessageSizeBytes { get; }
-
-    public ulong BufferMessageCount { get; }
-
-    public ulong MaxBufferMessageCount { get; }
-
-    public ulong BufferMessageSizeBytes { get; }
-
-    public ulong MaxBufferMessageSizeBytes { get; }
-
-    public ulong CurrentCurrentId { get; }
-
-    public ulong ProcessedMessages { get; }
-
-    public double MessagesInPerSecond { get; }
-
-    public double MessagesOutPerSecond { get; }
+    public Metrics Metrics { get; }
 }

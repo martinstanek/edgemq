@@ -25,6 +25,7 @@ public static class Validations
         result &= configuration.StoreConfiguration.MaxMessageCount > 0;
         result &= configuration.StoreConfiguration.MaxMessageSizeBytes > 0;
         result &= configuration.StoreConfiguration.DefaultBatchSize > 0;
+        result &= configuration.EdgeProcessingMessagesDelayMs > 10;
         result &= !string.IsNullOrWhiteSpace(configuration.StoreConfiguration.Path);
         result &= IsQueueNameValid(configuration.Name);
 

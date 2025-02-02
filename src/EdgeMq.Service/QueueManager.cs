@@ -1,20 +1,21 @@
+using System.Collections.Concurrent;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
-using Ardalis.GuardClauses;
 using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Store.FileSystem;
 using EdgeMq.Service.Store.InMemory;
 using EdgeMq.Service.Validation;
+using Ardalis.GuardClauses;
 
 namespace EdgeMq.Service;
 
 public sealed class QueueManager
 {
-    private readonly Dictionary<string, IEdgeMq> _queues = [];
+    private readonly ConcurrentDictionary<string, IEdgeMq> _queues = [];
     private readonly bool _isInMemory;
 
     public QueueManager(bool isInMemory)
@@ -47,6 +48,11 @@ public sealed class QueueManager
             throw new EdgeQueueException($"The provided name {name} for the queue is invalid.");
         }
 
+        if (_queues.ContainsKey(name))
+        {
+            return this;
+        }
+
         var store = _isInMemory
             ? (IMessageStore) new InMemoryMessageStore(queueConfiguration.StoreConfiguration)
             : new FileSystemMessageStore(queueConfiguration.StoreConfiguration);
@@ -65,7 +71,7 @@ public sealed class QueueManager
         return _queues[name];
     }
 
-    public IReadOnlyCollection<string> Queues => _queues.Select(s => s.Key).ToList();
+    public IReadOnlyCollection<string> Queues => _queues.Keys.ToList();
 
     public bool IsInMemory => _isInMemory;
 }

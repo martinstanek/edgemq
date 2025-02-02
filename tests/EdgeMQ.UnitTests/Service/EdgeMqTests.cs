@@ -7,6 +7,7 @@ using EdgeMq.Service;
 using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
+using EdgeMq.Service.Model;
 using EdgeMq.Service.Store.InMemory;
 using Shouldly;
 using Xunit;
@@ -34,11 +35,11 @@ public sealed class EdgeMqTests
 
         messages.Count.ShouldBe(3);
         messages.All(a => a.BatchId == messages.First().BatchId).ShouldBeTrue();
-        queue.BufferMessageCount.ShouldBe((ulong) 0);
-        queue.BufferMessageSizeBytes.ShouldBe((ulong) 0);
-        queue.CurrentCurrentId.ShouldBe((ulong) 3);
-        queue.MessageSizeBytes.ShouldBe((ulong) 12);
-        queue.MessageCount.ShouldBe((ulong) 3);
+        queue.Metrics.BufferMessageCount.ShouldBe((ulong) 0);
+        queue.Metrics.BufferMessageSizeBytes.ShouldBe((ulong) 0);
+        queue.Metrics.CurrentCurrentId.ShouldBe((ulong) 3);
+        queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 12);
+        queue.Metrics.MessageCount.ShouldBe((ulong) 3);
     }
 
     [Fact]
@@ -62,8 +63,8 @@ public sealed class EdgeMqTests
 
         await queue.AcknowledgeAsync(batchId, token);
 
-        queue.MessageSizeBytes.ShouldBe((ulong) 0);
-        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.Metrics.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -84,8 +85,8 @@ public sealed class EdgeMqTests
         var messages = await queue.DequeueAsync(10, token);
 
         messages.Count.ShouldBe(3);
-        queue.MessageSizeBytes.ShouldBe((ulong) 0);
-        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.Metrics.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -114,8 +115,8 @@ public sealed class EdgeMqTests
         }, token);
 
         messages.Length.ShouldBe(3);
-        queue.MessageSizeBytes.ShouldBe((ulong) 0);
-        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.Metrics.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -147,8 +148,8 @@ public sealed class EdgeMqTests
 
         }, token);
 
-        queue.MessageSizeBytes.ShouldBe((ulong) 0);
-        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.Metrics.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]
@@ -172,8 +173,8 @@ public sealed class EdgeMqTests
 
         await Task.WhenAll(t1, t2, t3);
 
-        queue.MessageSizeBytes.ShouldBe((ulong) 0);
-        queue.MessageCount.ShouldBe((ulong) 0);
+        queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
+        queue.Metrics.MessageCount.ShouldBe((ulong) 0);
     }
 
     [Fact]

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Service.Configuration;
+using EdgeMq.Service.Model;
 
 namespace EdgeMq.Service.Store.FileSystem;
 

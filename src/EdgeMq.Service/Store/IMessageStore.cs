@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EdgeMq.Service.Model;
 
 namespace EdgeMq.Service.Store;
 

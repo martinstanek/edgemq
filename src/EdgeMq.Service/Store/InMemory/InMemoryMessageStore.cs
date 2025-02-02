@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using EdgeMq.Service.Configuration;
+using EdgeMq.Service.Model;
 
 namespace EdgeMq.Service.Store.InMemory;
 
