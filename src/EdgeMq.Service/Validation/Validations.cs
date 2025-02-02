@@ -5,13 +5,13 @@ namespace EdgeMq.Service.Validation;
 
 public static class Validations
 {
-    private const int MaxQueueNameLenght = 20;
-    private const int MinQueueNameLenght = 2;
+    private const int EdgeMaxQueueNameLenght = 20;
+    private const int EdgeMinQueueNameLenght = 2;
 
     public static bool IsQueueNameValid(string queueName)
     {
-        return queueName.Length >= MinQueueNameLenght
-               && queueName.Length <= MaxQueueNameLenght
+        return queueName.Length >= EdgeMinQueueNameLenght
+               && queueName.Length <= EdgeMaxQueueNameLenght
                && queueName.All(ch => char.IsAsciiLetterOrDigit(ch) || ch.Equals('-'));
     }
 

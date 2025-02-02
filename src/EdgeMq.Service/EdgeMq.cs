@@ -17,7 +17,7 @@ namespace EdgeMq.Service;
 
 public sealed class EdgeMq : IEdgeMq
 {
-    private const int ProcessingMessagesDelayMs = 100;
+    private const int EdgeProcessingMessagesDelayMs = 100;
 
     private readonly ConcurrentBag<Message> _peekedMessages = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -199,7 +199,7 @@ public sealed class EdgeMq : IEdgeMq
 
     private async Task PersistIncomingMessagesAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(ProcessingMessagesDelayMs, cancellationToken);
+        await Task.Delay(EdgeProcessingMessagesDelayMs, cancellationToken);
 
         if (_messageStore.IsFull)
         {
