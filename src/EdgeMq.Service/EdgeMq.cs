@@ -10,8 +10,8 @@ using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
-using Ardalis.GuardClauses;
 using EdgeMq.Service.Validation;
+using Ardalis.GuardClauses;
 
 namespace EdgeMq.Service;
 
