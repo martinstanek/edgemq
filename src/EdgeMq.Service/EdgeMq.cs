@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using EdgeMq.Infra.Metrics;
-using EdgeMq.Service.Configuration;
-using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
-using EdgeMq.Service.Validation;
-using Ardalis.GuardClauses;
 using EdgeMq.Service.Model;
+using EdgeMq.Service.Validation;
+using EdgeMq.Service.Exceptions;
+using EdgeMq.Service.Configuration;
+using Ardalis.GuardClauses;
 
 namespace EdgeMq.Service;
 
@@ -49,7 +49,7 @@ public sealed class EdgeMq : IEdgeMq
     {
         Guard.Against.NullOrWhiteSpace(payload);
 
-        return _inputBuffer.AddAsync(payload, headers, cancellationToken);
+        return _inputBuffer.TryAddAsync(payload, headers, cancellationToken);
     }
 
     public async Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
@@ -263,9 +263,9 @@ public sealed class EdgeMq : IEdgeMq
         MaxMessageCount = _messageStore.MaxMessageCount,
         MessageSizeBytes = _messageStore.MessageSizeBytes,
         MaxMessageSizeBytes = _messageStore.MaxMessageSizeBytes,
-        BufferMessageCount = _inputBuffer.MessageCount,
+        BufferMessageCount = _inputBuffer.MessageMessageCount,
         MaxBufferMessageCount = _inputBuffer.MaxMessageCount,
-        BufferMessageSizeBytes = _inputBuffer.MessageSizeBytes,
+        BufferMessageSizeBytes = _inputBuffer.MessageMessagesSize,
         MaxBufferMessageSizeBytes = _inputBuffer.MaxMessageSizeBytes,
         CurrentCurrentId = _messageStore.CurrentId,
         ProcessedMessages = _processedMessages,

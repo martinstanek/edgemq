@@ -19,18 +19,41 @@ public sealed class InputBufferTests
         var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
 
-        buffer.MessageCount.ShouldBe((ulong) 3);
-        buffer.MessageSizeBytes.ShouldBe((ulong) 15);
+        buffer.MessageMessageCount.ShouldBe((ulong) 3);
+        buffer.MessageMessagesSize.ShouldBe((ulong) 15);
 
         var messages = await buffer.ReadAllAsync(token);
 
         messages.Count.ShouldBe(3);
-        buffer.MessageCount.ShouldBe((ulong) 0);
-        buffer.MessageSizeBytes.ShouldBe((ulong) 0);
+        buffer.MessageMessageCount.ShouldBe((ulong) 0);
+        buffer.MessageMessagesSize.ShouldBe((ulong) 0);
+    }
+
+    [Fact]
+    public async Task ReadAllAsync_NoMessages_ReturnsEmptyList()
+    {
+        var config = new InputBufferConfiguration();
+        var buffer = new InputBuffer(config);
+        var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
+        var message = "hello";
+
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+
+        buffer.MessageMessageCount.ShouldBe((ulong) 3);
+        buffer.MessageMessagesSize.ShouldBe((ulong) 15);
+
+        var messages1 = await buffer.ReadAllAsync(token);
+        var messages2 = await buffer.ReadAllAsync(token);
+
+        messages1.ShouldNotBeEmpty();
+        messages2.ShouldBeEmpty();
     }
 
     [Fact]
@@ -46,12 +69,12 @@ public sealed class InputBufferTests
         var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
 
-        buffer.MessageCount.ShouldBe((ulong) 2);
-        buffer.MessageSizeBytes.ShouldBe((ulong) 10);
+        buffer.MessageMessageCount.ShouldBe((ulong) 2);
+        buffer.MessageMessagesSize.ShouldBe((ulong) 10);
     }
 
     [Fact]
@@ -67,12 +90,12 @@ public sealed class InputBufferTests
         var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
 
-        buffer.MessageCount.ShouldBe((ulong) 2);
-        buffer.MessageSizeBytes.ShouldBe((ulong) 10);
+        buffer.MessageMessageCount.ShouldBe((ulong) 2);
+        buffer.MessageMessagesSize.ShouldBe((ulong) 10);
     }
 
     [Fact]
@@ -88,11 +111,11 @@ public sealed class InputBufferTests
         var headers = ReadOnlyDictionary<string, string>.Empty;
         var message = "hello";
 
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
-        await buffer.AddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
+        await buffer.TryAddAsync(message, headers, token);
 
-        buffer.MessageCount.ShouldBe((ulong) 0);
-        buffer.MessageSizeBytes.ShouldBe((ulong) 0);
+        buffer.MessageMessageCount.ShouldBe((ulong) 0);
+        buffer.MessageMessagesSize.ShouldBe((ulong) 0);
     }
 }

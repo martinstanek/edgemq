@@ -13,8 +13,8 @@ public sealed class InputBuffer
     private readonly InputBufferConfiguration _configuration;
     private readonly Channel<BufferMessage> _inputChanel;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private ulong _currentCount;
-    private ulong _currentSize;
+    private ulong _currentMessageCount;
+    private ulong _currentMessagesSize;
 
     public InputBuffer(InputBufferConfiguration configuration)
     {
@@ -22,7 +22,7 @@ public sealed class InputBuffer
         _configuration = configuration;
     }
 
-    public async Task<bool> AddAsync(string payload, IReadOnlyDictionary<string, string> headers, CancellationToken cancellationToken)
+    public async Task<bool> TryAddAsync(string payload, IReadOnlyDictionary<string, string> headers, CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
 
@@ -33,8 +33,8 @@ public sealed class InputBuffer
                 return false;
             }
 
-            _currentSize += (uint) payload.Length;
-            _currentCount++;
+            _currentMessagesSize += (uint) payload.Length;
+            _currentMessageCount++;
 
             var message = new BufferMessage
             {
@@ -62,8 +62,8 @@ public sealed class InputBuffer
         {
             while (_inputChanel.Reader.TryRead(out var message))
             {
-                _currentSize -= (uint) message.Payload.Length;
-                _currentCount--;
+                _currentMessagesSize -= (uint) message.Payload.Length;
+                _currentMessageCount--;
 
                 messages.Add(message);
             }
@@ -79,9 +79,9 @@ public sealed class InputBuffer
     private bool CheckConstraints(string payload)
     {
         var payloadBytesCount = (uint) Encoding.UTF8.GetByteCount(payload);
-        var isFull = _currentSize + payloadBytesCount > _configuration.MaxMessageSizeBytes;
+        var isFull = _currentMessagesSize + payloadBytesCount > _configuration.MaxMessageSizeBytes;
         var isTooBig = payloadBytesCount > (int) _configuration.MaxPayloadSizeBytes;
-        var isTooMany = _currentCount + 1 > _configuration.MaxMessageCount;
+        var isTooMany = _currentMessageCount + 1 > _configuration.MaxMessageCount;
         var valid = !(isFull || isTooBig || isTooMany);
 
         if (!valid && _configuration.Mode == ConstraintViolationMode.ThrowException)
@@ -92,9 +92,9 @@ public sealed class InputBuffer
         return valid;
     }
 
-    public ulong MessageCount => _currentCount;
+    public ulong MessageMessageCount => _currentMessageCount;
 
-    public ulong MessageSizeBytes => _currentSize;
+    public ulong MessageMessagesSize => _currentMessagesSize;
 
     public ulong MaxMessageCount => _configuration.MaxMessageCount;
 
