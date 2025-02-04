@@ -48,7 +48,7 @@ public sealed record EdgeMqServerConfiguration
                 ? varConstraintMode
                 : defaultConfig.ConstraintsMode;
 
-        return new EdgeMqServerConfiguration
+       return new EdgeMqServerConfiguration
         {
             StoreMode = storeMode,
             ConstraintsMode = constraintsMode,

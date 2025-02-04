@@ -18,7 +18,7 @@ public static class EnvReader
                 result = ulong.TryParse(env, out var ulongVal) ? ulongVal : ulongDefaultValue;
                 break;
             case string stringDefaultValue:
-                result = env ?? stringDefaultValue;
+                result = string.IsNullOrEmpty(env) ? stringDefaultValue : env;
                 break;
         }
 

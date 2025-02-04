@@ -81,6 +81,43 @@ public sealed class EdgeMqApiTests
     [Theory]
     [InlineData(QueueStoreMode.InMemory)]
     [InlineData(QueueStoreMode.FileSystem)]
+    public async Task Dequeue_MultipleQueues_QueuesAreEmpty(QueueStoreMode storeMode)
+    {
+        const string payload = "hallo";
+        const string queue1 = "test-queue1";
+        const string queue2 = "test-queue2";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(queues: $"{queue1}, {queue2}", storeMode: storeMode);
+
+        var client = context.GetClient();
+
+        await client.EnqueueAsync(queue1, payload);
+        await client.EnqueueAsync(queue1, payload);
+        await client.EnqueueAsync(queue2, payload);
+        await client.EnqueueAsync(queue2, payload);
+
+        await Task.Delay(1000, CancellationToken.None);
+
+        var stats1 = await client.GetMetricsAsync(queue1);
+        var stats2 = await client.GetMetricsAsync(queue2);
+        var messages1 = await client.DequeueAsync(queue1, batchSize: 100);
+        var messages2 = await client.DequeueAsync(queue2, batchSize: 100);
+        var statsPost1 = await client.GetMetricsAsync(queue1);
+        var statsPost2 = await client.GetMetricsAsync(queue2);
+
+        stats1.MessageCount.ShouldBe((ulong) 2);
+        stats2.MessageCount.ShouldBe((ulong) 2);
+        messages1.Count.ShouldBe(2);
+        messages2.Count.ShouldBe(2);
+        statsPost1.MessageCount.ShouldBe((ulong) 0);
+        statsPost2.MessageCount.ShouldBe((ulong) 0);
+    }
+
+    [Theory]
+    [InlineData(QueueStoreMode.InMemory)]
+    [InlineData(QueueStoreMode.FileSystem)]
     public async Task Dequeue_HeadersUsed_HeadersReturned(QueueStoreMode storeMode)
     {
         const string queueName = "default";
@@ -395,6 +432,7 @@ public sealed class EdgeMqApiTests
         }
 
         internal void DeclareVariables(
+            string queues = "default",
             byte maxMessageCount = 10,
             byte maxMessagesStoreSizeBytes = 200,
             byte maxBufferMessageCount = 5,
@@ -407,6 +445,7 @@ public sealed class EdgeMqApiTests
                 ? QueueApiConstraintsMode.Ignore
                 : QueueApiConstraintsMode.Fail;
 
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqQueues, queues, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageCount, maxMessageCount.ToString(), EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageSizeBytes, maxMessagesStoreSizeBytes.ToString(), EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageSizeBytes, maxMessagesBufferSizeBytes.ToString(), EdgeTarget);
@@ -418,6 +457,7 @@ public sealed class EdgeMqApiTests
 
         private static void RemoveVariables()
         {
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqQueues, string.Empty, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageCount, string.Empty, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageSizeBytes, string.Empty, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageSizeBytes, string.Empty, EdgeTarget);
