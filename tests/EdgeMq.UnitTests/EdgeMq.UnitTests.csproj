@@ -27,6 +27,7 @@
 
     <ItemGroup>
       <Folder Include="Infra\" />
+      <Folder Include="Infra\Metrics\" />
     </ItemGroup>
 
 </Project>

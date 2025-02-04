@@ -7,7 +7,7 @@ using EdgeMq.Service.Store.InMemory;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.UnitTests.Service.Store;
+namespace EdgeMq.UnitTests.Service.Store;
 
 public sealed class InMemoryMessageStoreTests
 {

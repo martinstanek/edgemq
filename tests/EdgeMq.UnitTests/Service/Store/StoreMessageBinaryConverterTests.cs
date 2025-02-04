@@ -4,7 +4,7 @@ using EdgeMq.Service.Store.FileSystem;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.UnitTests.Service.Store;
+namespace EdgeMq.UnitTests.Service.Store;
 
 public sealed class StoreMessageBinaryConverterTests
 {

@@ -12,7 +12,7 @@ using EdgeMq.Service.Store.InMemory;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.UnitTests.Service;
+namespace EdgeMq.UnitTests.Service;
 
 public sealed class EdgeMqTests
 {

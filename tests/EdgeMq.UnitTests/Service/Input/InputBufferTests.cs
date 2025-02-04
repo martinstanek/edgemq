@@ -6,7 +6,7 @@ using EdgeMq.Service.Input;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.UnitTests.Service.Input;
+namespace EdgeMq.UnitTests.Service.Input;
 
 public sealed class InputBufferTests
 {

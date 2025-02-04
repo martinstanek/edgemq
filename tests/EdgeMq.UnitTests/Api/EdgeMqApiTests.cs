@@ -12,7 +12,7 @@ using EdgeMq.Client.Exceptions;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMQ.UnitTests.Api;
+namespace EdgeMq.UnitTests.Api;
 
 public sealed class EdgeMqApiTests
 {
