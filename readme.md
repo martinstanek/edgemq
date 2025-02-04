@@ -8,6 +8,8 @@
 [![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.Client.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.Client) 
 ![Docker Image Version](https://img.shields.io/docker/v/awitec/edgemq)
 
+![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/ui.png?raw=true)
+
 ### Enqueue
 
 ```csharp
