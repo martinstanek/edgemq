@@ -1,9 +1,13 @@
 using EdgeMq.Model;
+using Microsoft.AspNetCore.Components;
 
 namespace EdgeMq.Dashboard.Components;
 
 public partial class QueuePressureChart
 {
+    [Parameter]
+    public string QueueName { get; set; } = string.Empty;
+
     private double _sizePressure = 0d;
     private double _sizeBufferPressure = 0;
     private double _countPressure = 0d;
@@ -18,6 +22,11 @@ public partial class QueuePressureChart
 
     private async void OnMetrics(object? sender, QueueMetrics queueMetrics)
     {
+        if (!queueMetrics.Name.Equals(QueueName))
+        {
+            return;
+        }
+
         var adjustedCountPressures = GetAdjustedPressures(
             queueMetrics.MaxMessageCount,
             queueMetrics.MaxBufferMessageCount,

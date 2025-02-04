@@ -38,10 +38,7 @@ public partial class QueueThroughputChart
         _inValues.Push(new ChartValue(dateTime, queueMetrics.MessagesInPerSecond));
         _outValues.Push(new ChartValue(dateTime, queueMetrics.MessagesOutPerSecond));
 
-        await InvokeAsync(() =>
-        {
-            StateHasChanged();
-        });
+        await InvokeAsync(StateHasChanged);
     }
 
     private List<ChartSeries> Series =>
