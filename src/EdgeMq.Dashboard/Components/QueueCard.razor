@@ -19,7 +19,7 @@
                 <ValueLabel Label="Buffer pressure (size):" Value="@BufferSizePressure" />
             </MudItem>
             <MudItem xs="6">
-                <QueueThroughputChart/>
+                <QueueThroughputChart QueueName="@Queue.Name"/>
             </MudItem>
         </MudGrid>
         <QueuePressureChart/>

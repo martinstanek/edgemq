@@ -1,11 +1,15 @@
 using EdgeMq.Infra.Metrics;
 using EdgeMq.Model;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace EdgeMq.Dashboard.Components;
 
 public partial class QueueThroughputChart
 {
+    [Parameter]
+    public string QueueName { get; set; } = string.Empty;
+
     private sealed record ChartValue(string Label, double Value);
 
     private const int EdgeChartMaxValues = 15;
@@ -24,6 +28,11 @@ public partial class QueueThroughputChart
 
     private async void AddValues(object? sender, QueueMetrics queueMetrics)
     {
+        if (!queueMetrics.Name.Equals(QueueName))
+        {
+            return;
+        }
+
         var dateTime = $"{DateTime.Now.Minute:00}:{DateTime.Now.Second:00}";
 
         _inValues.Push(new ChartValue(dateTime, queueMetrics.MessagesInPerSecond));
