@@ -5,12 +5,13 @@ namespace EdgeMq.Dashboard.Pages;
 public partial class MainView
 {
     private QueueServer _server = QueueServer.Empty;
+    private Timer? _timer;
     private bool _autoRefresh = true;
     private bool _rendered;
 
     protected override Task OnInitializedAsync()
     {
-        _ = new Timer(
+        _timer = new Timer(
             callback: async void (_) => await OnTimerAsync(),
             state: null,
             dueTime: TimeSpan.FromSeconds(1),
@@ -33,7 +34,7 @@ public partial class MainView
 
     private async Task OnTimerAsync()
     {
-        if (!_autoRefresh)
+        if (!_autoRefresh && _timer != null)
         {
             return;
         }
