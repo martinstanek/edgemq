@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Immutable;
 using EdgeMq.Service.Configuration;
 
 namespace EdgeMq.Api.Configuration;
@@ -24,7 +24,7 @@ public sealed record EdgeMqServerConfiguration
 
     public required string Path { get; init; } = Constants.DefaultRootPath;
 
-    public required IReadOnlyCollection<string> Queues { get; init; } = [ Constants.DefaultQueueName ];
+    public required ImmutableArray<string> Queues { get; init; } = [ Constants.DefaultQueueName ];
 
     public ulong MaxMessageCount { get; init; } = Constants.DefaultMaxMessageCount;
 
@@ -48,12 +48,17 @@ public sealed record EdgeMqServerConfiguration
                 ? varConstraintMode
                 : defaultConfig.ConstraintsMode;
 
+        var queues = EnvReader.GetEnvironmentValue(EdgeMqQueues, Constants.DefaultQueueName)
+            .Split(',')
+            .Select(s => s.Trim())
+            .ToImmutableArray();
+
        return new EdgeMqServerConfiguration
         {
+            Queues = queues,
             StoreMode = storeMode,
             ConstraintsMode = constraintsMode,
             Path = EnvReader.GetEnvironmentValue(EdgeMqPath, defaultConfig.Path),
-            Queues = EnvReader.GetEnvironmentValue(EdgeMqQueues, Constants.DefaultQueueName).Split(',').Select(s => s.Trim()).ToList(),
             DefaultBatchSize = EnvReader.GetEnvironmentValue(EdgeMqDefaultBatchSize, defaultConfig.DefaultBatchSize),
             MaxMessageCount = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageCount, defaultConfig.MaxMessageCount),
             MaxMessageSizeBytes = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageSizeBytes, defaultConfig.MaxMessageSizeBytes),
