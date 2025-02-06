@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Ardalis.GuardClauses;
@@ -77,7 +78,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         return Task.FromResult(result);
     }
 
-    public async Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)
+    public async Task<ImmutableArray<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
@@ -91,10 +92,10 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             Headers = s.Headers
         });
 
-        return result.ToArray();
+        return result.ToImmutableArray();
     }
 
-    public async Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize)
+    public async Task<ImmutableArray<QueueRawMessage>> PeekAsync(string queueName, int batchSize)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
@@ -108,7 +109,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             Headers = s.Headers
         });
 
-        return result.ToArray();
+        return result.ToImmutableArray();
     }
 
     public async Task<QueueServer> GetQueuesAsync()
@@ -127,7 +128,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
 
         return new QueueServer
         {
-            Queues = queues,
+            Queues = queues.ToImmutableArray(),
             UptimeSeconds = (ulong) Math.Round(DateTime.Now.Subtract(_started).TotalSeconds, 0),
             ConstraintsViolationMode = _configuration.ConstraintsMode.ToString(),
             Version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? string.Empty

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -61,9 +62,9 @@ public sealed class FileSystemMessageStore : IMessageStore
         }
     }
 
-    public async Task<bool> AddMessagesAsync(IReadOnlyCollection<StoreMessage> messages)
+    public async Task<bool> AddMessagesAsync(ImmutableArray<StoreMessage> messages)
     {
-        if (messages.Count == 0)
+        if (messages.Length == 0)
         {
             return false;
         }
@@ -100,16 +101,16 @@ public sealed class FileSystemMessageStore : IMessageStore
         return true;
     }
 
-    public Task<IReadOnlyCollection<Message>> ReadMessagesAsync()
+    public Task<ImmutableArray<Message>> ReadMessagesAsync()
     {
         return ReadMessagesAsync(_configuration.DefaultBatchSize);
     }
 
-    public async Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize)
+    public async Task<ImmutableArray<Message>> ReadMessagesAsync(uint batchSize)
     {
         if (batchSize == 0)
         {
-            return Array.Empty<Message>();
+            return ImmutableArray<Message>.Empty;
         }
 
         var result = new List<Message>();
@@ -134,7 +135,7 @@ public sealed class FileSystemMessageStore : IMessageStore
                 result.Add(message);
             }
 
-            return result;
+            return result.ToImmutableArray();
         }
         finally
         {
@@ -142,9 +143,9 @@ public sealed class FileSystemMessageStore : IMessageStore
         }
     }
 
-    public async Task DeleteMessagesAsync(IReadOnlyCollection<ulong> messageIds)
+    public async Task DeleteMessagesAsync(ImmutableArray<ulong> messageIds)
     {
-        if (messageIds.Count == 0)
+        if (messageIds.Length == 0)
         {
             return;
         }

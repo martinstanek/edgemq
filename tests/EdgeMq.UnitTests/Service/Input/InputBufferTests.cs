@@ -28,7 +28,7 @@ public sealed class InputBufferTests
 
         var messages = await buffer.ReadAllAsync(token);
 
-        messages.Count.ShouldBe(3);
+        messages.Length.ShouldBe(3);
         buffer.MessageMessageCount.ShouldBe((ulong) 0);
         buffer.MessageMessagesSize.ShouldBe((ulong) 0);
     }

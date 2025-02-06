@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using EdgeMq.Model;
 using Microsoft.AspNetCore.Http;
@@ -14,9 +14,9 @@ public interface IEdgeQueueHandler
 
     Task<QueueMetrics> GetMetricsAsync(string queueName);
 
-    Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize);
+    Task<ImmutableArray<QueueRawMessage>> DequeueAsync(string queueName, int batchSize);
 
-    Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize);
+    Task<ImmutableArray<QueueRawMessage>> PeekAsync(string queueName, int batchSize);
 
     Task<QueueServer> GetQueuesAsync();
 }

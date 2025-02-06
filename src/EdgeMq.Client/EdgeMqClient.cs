@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Net.Mime;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Net.Mime;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using EdgeMq.Model;
-using Ardalis.GuardClauses;
 using EdgeMq.Client.Exceptions;
+using Ardalis.GuardClauses;
 
 namespace EdgeMq.Client;
 
@@ -84,33 +85,33 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return _httpClient.PatchAsync($"/queue/{queueName}?batchId={batchId.ToString()}", content: null);
     }
 
-    public async Task<IReadOnlyCollection<QueueRawMessage>> PeekAsync(string queueName, int batchSize)
+    public async Task<ImmutableArray<QueueRawMessage>> PeekAsync(string queueName, int batchSize)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
 
         var result = await _httpClient
-            .GetFromJsonAsync<IReadOnlyCollection<QueueRawMessage>>($"/queue/{queueName}/peek?batchSize={batchSize}");
+            .GetFromJsonAsync<IEnumerable<QueueRawMessage>>($"/queue/{queueName}/peek?batchSize={batchSize}");
 
-        return result ?? throw new EdgeClientException("Invalid response");
+        return result?.ToImmutableArray() ?? throw new EdgeClientException("Invalid response");
     }
 
-    public async Task<IReadOnlyCollection<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)
+    public async Task<ImmutableArray<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
         Guard.Against.NegativeOrZero(batchSize);
 
         var result = await _httpClient
-            .GetFromJsonAsync<IReadOnlyCollection<QueueRawMessage>>($"/queue/{queueName}?batchSize={batchSize}");
+            .GetFromJsonAsync<IEnumerable<QueueRawMessage>>($"/queue/{queueName}?batchSize={batchSize}");
 
-        return result ?? throw new EdgeClientException("Invalid response");
+        return result?.ToImmutableArray() ?? throw new EdgeClientException("Invalid response");
     }
 
     public async Task DequeueAsync(
         string queueName,
         int batchSize,
         TimeSpan timeOut,
-        Func<IReadOnlyCollection<QueueRawMessage>, Task> process,
+        Func<ImmutableArray<QueueRawMessage>, Task> process,
         CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
@@ -129,7 +130,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
 
             await Task.Run(() => process(messages), linkedToken);
 
-            if (messages.Count == 0)
+            if (messages.Length == 0)
             {
                 return;
             }

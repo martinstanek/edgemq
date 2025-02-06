@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddQueue(this IServiceCollection services)
     {
         var serverConfig = EdgeMqServerConfiguration.ReadFromEnvironment();
-        var queueConfigs = serverConfig.Queues.Select(queue => FromConfig(queue, serverConfig)).ToList();
+        var queueConfigs = serverConfig.Queues.Select(queue => FromConfig(queue, serverConfig)).ToImmutableArray();
 
         return services
             .AddSingleton(serverConfig)

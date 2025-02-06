@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
@@ -52,7 +53,7 @@ public sealed class InputBuffer
         return true;
     }
 
-    public async Task<IReadOnlyCollection<BufferMessage>> ReadAllAsync(CancellationToken cancellationToken)
+    public async Task<ImmutableArray<BufferMessage>> ReadAllAsync(CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
 
@@ -73,7 +74,7 @@ public sealed class InputBuffer
             _semaphore.Release();
         }
 
-        return messages;
+        return messages.ToImmutableArray();
     }
 
     private bool CheckConstraints(string payload)

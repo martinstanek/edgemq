@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc.Testing;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
@@ -26,7 +27,7 @@ public sealed class EdgeMqApiTests
 
         var queues = await client.GetQueuesAsync();
 
-        queues.Queues.Count.ShouldBe(1);
+        queues.Queues.Length.ShouldBe(1);
         queues.Queues.Single().Name.ShouldBe(queueName);
     }
 
@@ -72,7 +73,7 @@ public sealed class EdgeMqApiTests
         var messages = await client.DequeueAsync(queueName, batchSize: 100);
         var stats = await client.GetMetricsAsync(queueName);
 
-        messages.Count.ShouldBe(1);
+        messages.Length.ShouldBe(1);
         messages.First().Payload.ShouldBe(payload);
         stats.Name.ShouldBe(queueName);
         stats.MessageCount.ShouldBe((uint) 0);
@@ -109,8 +110,8 @@ public sealed class EdgeMqApiTests
 
         stats1.MessageCount.ShouldBe((ulong) 2);
         stats2.MessageCount.ShouldBe((ulong) 2);
-        messages1.Count.ShouldBe(2);
-        messages2.Count.ShouldBe(2);
+        messages1.Length.ShouldBe(2);
+        messages2.Length.ShouldBe(2);
         statsPost1.MessageCount.ShouldBe((ulong) 0);
         statsPost2.MessageCount.ShouldBe((ulong) 0);
     }
@@ -165,7 +166,7 @@ public sealed class EdgeMqApiTests
 
         var messages = await client.DequeueAsync(queueName, batchSize: 100);
 
-        messages.Count.ShouldBe(3);
+        messages.Length.ShouldBe(3);
         messages.Any(a => a.Headers["key"].Equals("value1")).ShouldBeTrue();
         messages.Any(a => a.Headers["key"].Equals("value2")).ShouldBeTrue();
         messages.Any(a => a.Headers["key"].Equals("value3")).ShouldBeTrue();
@@ -190,7 +191,7 @@ public sealed class EdgeMqApiTests
 
         await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
         {
-            messages.Count.ShouldBe(3);
+            messages.Length.ShouldBe(3);
 
             return Task.CompletedTask;
 
@@ -202,7 +203,7 @@ public sealed class EdgeMqApiTests
 
         await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
         {
-            messages.Count.ShouldBe(0);
+            messages.Length.ShouldBe(0);
 
             return Task.CompletedTask;
 
@@ -228,7 +229,7 @@ public sealed class EdgeMqApiTests
 
         await client.DequeueAsync(queueName, batchSize: 2, timeOut, messages =>
         {
-            messages.Count.ShouldBe(2);
+            messages.Length.ShouldBe(2);
 
             return Task.CompletedTask;
 
@@ -240,7 +241,7 @@ public sealed class EdgeMqApiTests
 
         await client.DequeueAsync(queueName, batchSize: 1, timeOut, messages =>
         {
-            messages.Count.ShouldBe(1);
+            messages.Length.ShouldBe(1);
 
             return Task.CompletedTask;
 
@@ -415,7 +416,7 @@ public sealed class EdgeMqApiTests
             return new EdgeMqClient(httpClient);
         }
 
-        internal static async Task<IReadOnlyCollection<QueueRawMessage>> PeekUntilPeekedAsync(
+        internal static async Task<ImmutableArray<QueueRawMessage>> PeekUntilPeekedAsync(
             IEdgeMqClient queue,
             string queueName,
             int batchSize)
@@ -428,7 +429,7 @@ public sealed class EdgeMqApiTests
                 messages = (await queue.PeekAsync(queueName, batchSize)).ToList();
             }
 
-            return messages;
+            return messages.ToImmutableArray();
         }
 
         internal void DeclareVariables(

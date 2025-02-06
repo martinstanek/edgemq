@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using EdgeMq.Service.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddQueueManager(
         this IServiceCollection services,
-        IReadOnlyCollection<EdgeQueueConfiguration> queueConfigs,
+        ImmutableArray<EdgeQueueConfiguration> queueConfigs,
         bool isInMemory)
     {
         var manager = new QueueManager(isInMemory);

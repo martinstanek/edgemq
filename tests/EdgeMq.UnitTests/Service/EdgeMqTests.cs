@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ public sealed class EdgeMqTests
 
         var messages = await EdgeMqTestsContext.PeekUntilPeekedAsync(queue, 10, token);
 
-        messages.Count.ShouldBe(3);
+        messages.Length.ShouldBe(3);
         messages.All(a => a.BatchId == messages.First().BatchId).ShouldBeTrue();
         queue.Metrics.BufferMessageCount.ShouldBe((ulong) 0);
         queue.Metrics.BufferMessageSizeBytes.ShouldBe((ulong) 0);
@@ -84,7 +85,7 @@ public sealed class EdgeMqTests
 
         var messages = await queue.DequeueAsync(10, token);
 
-        messages.Count.ShouldBe(3);
+        messages.Length.ShouldBe(3);
         queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.Metrics.MessageCount.ShouldBe((ulong) 0);
     }
@@ -107,7 +108,7 @@ public sealed class EdgeMqTests
 
         await queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
-            m.Count.ShouldBe(3);
+            m.Length.ShouldBe(3);
             messages = m.ToArray();
 
             return Task.CompletedTask;
@@ -136,14 +137,14 @@ public sealed class EdgeMqTests
 
         await queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
-            m.Count.ShouldBe(3);
+            m.Length.ShouldBe(3);
             return Task.CompletedTask;
 
         }, token);
 
         await queue.DequeueAsync(batchSize: 10, TimeSpan.FromSeconds(1), m =>
         {
-            m.Count.ShouldBe(0);
+            m.Length.ShouldBe(0);
             return Task.CompletedTask;
 
         }, token);
@@ -229,7 +230,7 @@ public sealed class EdgeMqTests
             return queue;
         }
 
-        internal static async Task<IReadOnlyCollection<Message>> PeekUntilPeekedAsync(
+        internal static async Task<ImmutableArray<Message>> PeekUntilPeekedAsync(
             IEdgeMq queue,
             uint batchSize,
             CancellationToken token)
@@ -241,7 +242,7 @@ public sealed class EdgeMqTests
                 messages = (await queue.PeekAsync(batchSize, token)).ToList();
             }
 
-            return messages;
+            return messages.ToImmutableArray();
         }
     }
 }

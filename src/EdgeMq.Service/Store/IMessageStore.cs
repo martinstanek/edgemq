@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using EdgeMq.Service.Model;
 
@@ -8,13 +8,13 @@ public interface IMessageStore
 {
     Task InitAsync();
 
-    Task<bool> AddMessagesAsync(IReadOnlyCollection<StoreMessage> messages);
+    Task<bool> AddMessagesAsync(ImmutableArray<StoreMessage> messages);
 
-    Task<IReadOnlyCollection<Message>> ReadMessagesAsync();
+    Task<ImmutableArray<Message>> ReadMessagesAsync();
 
-    Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize);
+    Task<ImmutableArray<Message>> ReadMessagesAsync(uint batchSize);
 
-    Task DeleteMessagesAsync(IReadOnlyCollection<ulong> messageIds);
+    Task DeleteMessagesAsync(ImmutableArray<ulong> messageIds);
 
     public bool IsFull { get; }
 

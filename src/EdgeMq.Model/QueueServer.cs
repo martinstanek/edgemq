@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace EdgeMq.Model;
 
@@ -10,7 +10,7 @@ public sealed record QueueServer
 
     public required ulong UptimeSeconds { get; init; }
 
-    public required IReadOnlyCollection<Queue> Queues { get; init; } = [];
+    public required ImmutableArray<Queue> Queues { get; init; } = [];
 
     public static QueueServer Empty => new()
     {

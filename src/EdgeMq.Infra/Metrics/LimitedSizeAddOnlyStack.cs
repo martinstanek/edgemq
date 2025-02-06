@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
@@ -55,12 +56,12 @@ public class LimitedSizeAddOnlyStack<T>
         }
     }
 
-    public IReadOnlyCollection<T> Items {
+    public ImmutableArray<T> Items {
         get
         {
             lock (Lock)
             {
-                return Stack;
+                return Stack.ToImmutableArray();
             }
         }
     }

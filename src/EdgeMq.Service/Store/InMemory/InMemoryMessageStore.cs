@@ -1,9 +1,9 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Model;
 
@@ -35,9 +35,9 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Task.CompletedTask;
     }
 
-    public Task<bool> AddMessagesAsync(IReadOnlyCollection<StoreMessage> messages)
+    public Task<bool> AddMessagesAsync(ImmutableArray<StoreMessage> messages)
     {
-        if (messages.Count == 0)
+        if (messages.Length == 0)
         {
             return Task.FromResult(false);
         }
@@ -67,28 +67,28 @@ public sealed class InMemoryMessageStore : IMessageStore
         return Task.FromResult(true);
     }
 
-    public Task<IReadOnlyCollection<Message>> ReadMessagesAsync()
+    public Task<ImmutableArray<Message>> ReadMessagesAsync()
     {
         return ReadMessagesAsync(_configuration.DefaultBatchSize);
     }
 
-    public Task<IReadOnlyCollection<Message>> ReadMessagesAsync(uint batchSize)
+    public Task<ImmutableArray<Message>> ReadMessagesAsync(uint batchSize)
     {
         if (batchSize == 0)
         {
-            return Task.FromResult<IReadOnlyCollection<Message>>(Array.Empty<Message>());
+            return Task.FromResult(ImmutableArray<Message>.Empty);
         }
 
         var result = _messages
             .OrderBy(m => m.Key)
             .Select(s => s.Value)
             .Take((int) batchSize)
-            .ToList();
+            .ToImmutableArray();
 
-        return Task.FromResult<IReadOnlyCollection<Message>>(result);
+        return Task.FromResult(result);
     }
 
-    public Task DeleteMessagesAsync(IReadOnlyCollection<ulong> messageIds)
+    public Task DeleteMessagesAsync(ImmutableArray<ulong> messageIds)
     {
         lock (_lock)
         {

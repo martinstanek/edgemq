@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using EdgeMq.Infra.Metrics;
 using EdgeMq.Service.Input;
@@ -52,7 +53,7 @@ public sealed class EdgeMq : IEdgeMq
         return _inputBuffer.TryAddAsync(payload, headers, cancellationToken);
     }
 
-    public async Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<IReadOnlyCollection<Message>, Task> process, CancellationToken cancellationToken)
+    public async Task DequeueAsync(uint batchSize, TimeSpan timeOut, Func<ImmutableArray<Message>, Task> process, CancellationToken cancellationToken)
     {
         Guard.Against.NegativeOrZero(batchSize);
 
@@ -64,7 +65,7 @@ public sealed class EdgeMq : IEdgeMq
         try
         {
             await NonBlockingPeekAsync(batchSize);
-            await Task.Run(() => process(_peekedMessages), linkedSource.Token);
+            await Task.Run(() => process(_peekedMessages.ToImmutableArray()), linkedSource.Token);
 
             if (_peekedMessages.Count != 0)
             {
@@ -77,7 +78,7 @@ public sealed class EdgeMq : IEdgeMq
         }
     }
 
-    public async Task<IReadOnlyCollection<Message>> DequeueAsync(uint batchSize, CancellationToken cancellationToken)
+    public async Task<ImmutableArray<Message>> DequeueAsync(uint batchSize, CancellationToken cancellationToken)
     {
         Guard.Against.NegativeOrZero(batchSize);
 
@@ -88,7 +89,7 @@ public sealed class EdgeMq : IEdgeMq
             await NonBlockingPeekAsync(batchSize);
             await NonBlockingAcknowledgeAsync(_currentBatchId);
 
-            return _peekedMessages;
+            return _peekedMessages.ToImmutableArray();
         }
         finally
         {
@@ -96,7 +97,7 @@ public sealed class EdgeMq : IEdgeMq
         }
     }
 
-    public async Task<IReadOnlyCollection<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken)
+    public async Task<ImmutableArray<Message>> PeekAsync(uint batchSize, CancellationToken cancellationToken)
     {
         Guard.Against.NegativeOrZero(batchSize);
 
@@ -145,7 +146,7 @@ public sealed class EdgeMq : IEdgeMq
         Stop();
     }
 
-    private async Task<IReadOnlyCollection<Message>> NonBlockingPeekAsync(uint batchSize)
+    private async Task<ImmutableArray<Message>> NonBlockingPeekAsync(uint batchSize)
     {
         _peekedMessages.Clear();
         _currentBatchId = Guid.NewGuid();
@@ -157,7 +158,7 @@ public sealed class EdgeMq : IEdgeMq
             _peekedMessages.Add(message with { BatchId = _currentBatchId });
         }
 
-        return _peekedMessages;
+        return _peekedMessages.ToImmutableArray();
     }
 
     private async Task NonBlockingAcknowledgeAsync(Guid batchId)
@@ -172,12 +173,12 @@ public sealed class EdgeMq : IEdgeMq
             throw new EdgeQueueAcknowledgeException("The batch id is invalid");
         }
 
-        var idsToDelete = _peekedMessages.Select(s => s.Id).ToList();
+        var idsToDelete = _peekedMessages.Select(s => s.Id).ToImmutableArray();
 
         await _messageStore.DeleteMessagesAsync(idsToDelete);
 
-        _messagesOut.AddEvents((uint) idsToDelete.Count);
-        _processedMessages += (ulong) idsToDelete.Count;
+        _messagesOut.AddEvents((uint) idsToDelete.Length);
+        _processedMessages += (ulong) idsToDelete.Length;
     }
 
     private async Task ProcessBufferAsync(CancellationToken cancellationToken)
@@ -218,7 +219,7 @@ public sealed class EdgeMq : IEdgeMq
         await StoreIncomingMessagesAsync(messagesToStore);
     }
 
-    private async Task<IReadOnlyCollection<StoreMessage>> ExtractIncomingMessagesAsync(CancellationToken cancellationToken)
+    private async Task<ImmutableArray<StoreMessage>> ExtractIncomingMessagesAsync(CancellationToken cancellationToken)
     {
         var incomingMessages = await _inputBuffer.ReadAllAsync(cancellationToken);
 
@@ -228,10 +229,10 @@ public sealed class EdgeMq : IEdgeMq
                 Payload = incomingMessage.Payload,
                 Headers = incomingMessage.Headers
             })
-            .ToList();
+            .ToImmutableArray();
     }
 
-    private async Task StoreIncomingMessagesAsync(IReadOnlyCollection<StoreMessage> messagesToStore)
+    private async Task StoreIncomingMessagesAsync(ImmutableArray<StoreMessage> messagesToStore)
     {
         bool added;
 
@@ -251,7 +252,7 @@ public sealed class EdgeMq : IEdgeMq
 
         if (added)
         {
-            _messagesIn.AddEvents((uint) messagesToStore.Count);
+            _messagesIn.AddEvents((uint) messagesToStore.Length);
         }
     }
 

@@ -35,7 +35,7 @@ public sealed class InMemoryMessageStoreTests
 
         var messages = await store.ReadMessagesAsync();
 
-        messages.Count.ShouldBe(2);
+        messages.Length.ShouldBe(2);
 
         await store.DeleteMessagesAsync([messages.First().Id]);
 

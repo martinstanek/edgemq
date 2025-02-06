@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,7 +70,7 @@ public sealed class FileSystemMessageStoreTests
 
         var messages = await store.ReadMessagesAsync();
 
-        messages.Count.ShouldBe(3);
+        messages.Length.ShouldBe(3);
     }
 
     [Fact]
@@ -83,7 +84,7 @@ public sealed class FileSystemMessageStoreTests
         await store.AddMessagesAsync([message, message, message]);
 
         var messages = await store.ReadMessagesAsync();
-        var ids = messages.Select(s => s.Id).ToList();
+        var ids = messages.Select(s => s.Id).ToImmutableArray();
 
         await store.DeleteMessagesAsync(ids);
 
@@ -103,11 +104,11 @@ public sealed class FileSystemMessageStoreTests
         await store.AddMessagesAsync([message, message, message]);
 
         var messages = await store.ReadMessagesAsync(2);
-        var ids = messages.Select(s => s.Id).ToList();
+        var ids = messages.Select(s => s.Id).ToImmutableArray();
 
         await store.DeleteMessagesAsync(ids);
 
-        messages.Count.ShouldBe(2);
+        messages.Length.ShouldBe(2);
         store.MessageCount.ShouldBe((ulong) 1);
         store.CurrentId.ShouldBe((ulong) 3);
         store.MessageSizeBytes.ShouldBe((ulong) 4);

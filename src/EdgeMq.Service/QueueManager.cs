@@ -1,7 +1,6 @@
-using System.Linq;
 using System.Threading;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using EdgeMq.Service.Input;
 using EdgeMq.Service.Store;
 using EdgeMq.Service.Configuration;
@@ -73,7 +72,7 @@ public sealed class QueueManager
 
     public IEdgeMq this[string name] => GetQueue(name);
 
-    public IReadOnlyCollection<string> Queues => _queues.Keys.ToList();
+    public ImmutableArray<string> Queues => _queues.Keys.ToImmutableArray();
 
     public bool IsInMemory => _isInMemory;
 }
