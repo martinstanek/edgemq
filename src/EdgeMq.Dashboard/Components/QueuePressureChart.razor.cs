@@ -33,7 +33,6 @@ public partial class QueuePressureChart
             queueMetrics.MessageCountPressure,
             queueMetrics.BufferMessageCountPressure);
 
-
         var adjustedSizePressures = GetAdjustedPressures(
             queueMetrics.MessagesSizeBytes,
             queueMetrics.MaxBufferMessagesSizeBytes,
@@ -57,7 +56,7 @@ public partial class QueuePressureChart
         var percent = 100 / (double) (maxCount + maxBufferCount);
         var countRatio = maxCount * percent / 100;
         var adjustedPressure = pressure * countRatio * 100;
-        var adjustedBufferPressure = ((bufferPressure * (1 - countRatio)) + countRatio) * 100;
+        var adjustedBufferPressure = ((bufferPressure * (1 - countRatio) * 100) + adjustedPressure);
 
         return (adjustedPressure, adjustedBufferPressure);
     }
