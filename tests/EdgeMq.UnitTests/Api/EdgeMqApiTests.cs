@@ -401,6 +401,38 @@ public sealed class EdgeMqApiTests
         stats.MessageCount.ShouldBe((ulong) 2);
     }
 
+    [Fact]
+    public async Task GetMetrics_MessagesAdded_MessageDequeued_MetricsMatch()
+    {
+        const string queueName = "default";
+        const string payload = "hallo";
+
+        using var context = new EdgeMqApiTestsContext();
+        var client = context.GetClient();
+        var timeOut = TimeSpan.FromSeconds(5);
+        var token = CancellationToken.None;
+
+        await client.EnqueueAsync(queueName, payload);
+        await client.EnqueueAsync(queueName, payload);
+        await client.EnqueueAsync(queueName, payload);
+        await Task.Delay(TimeSpan.FromSeconds(1), token);
+
+        var statsQueue = await client.GetMetricsAsync(queueName);
+        
+        await client.DequeueAsync(queueName, batchSize: 100, timeOut, messages =>
+        {
+            messages.Length.ShouldBe(3);
+
+            return Task.CompletedTask;
+
+        }, token);
+
+        var statsDequeue = await client.GetMetricsAsync(queueName);
+
+        statsQueue.MessagesInPerSecond.ShouldBeGreaterThanOrEqualTo(3);
+        statsDequeue.MessagesOutPerSecond.ShouldBeGreaterThanOrEqualTo(3);
+    }
+    
     private sealed class EdgeMqApiTestsContext : IDisposable
     {
         private const EnvironmentVariableTarget EdgeTarget = EnvironmentVariableTarget.Process;
