@@ -12,7 +12,7 @@ public static class WebApplicationExtensions
 {
     public static WebApplication UseApiEndpoints(this WebApplication webApplication)
     {
-        var api = webApplication.MapGroup("/queue");
+        var api = webApplication.MapGroup("/queues");
 
         api.MapGet("/", async ([FromServices] IEdgeQueueHandler handler)
             => Results.Ok(await handler.GetQueuesAsync()));
