@@ -18,6 +18,7 @@ namespace EdgeMq.Client;
 public sealed class EdgeMqClient : IEdgeMqClient
 {
     private const string EdgeHeaderPrefix = "EDGQ_";
+    private const string EdgeRootRoute = "/v1/queues";
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly HttpClient _httpClient;
@@ -29,7 +30,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
 
     public async Task<QueueServer> GetQueuesAsync()
     {
-        var result = await _httpClient.GetFromJsonAsync<QueueServer>("/queue");
+        var result = await _httpClient.GetFromJsonAsync<QueueServer>(EdgeRootRoute);
 
         return result ?? throw new EdgeClientException("Invalid response content");
     }
@@ -38,7 +39,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
-        var result = await _httpClient.GetFromJsonAsync<QueueMetrics>($"/queue/{queueName}/stats");
+        var result = await _httpClient.GetFromJsonAsync<QueueMetrics>($"{EdgeRootRoute}{queueName}/stats");
 
         return result ?? throw new EdgeClientException("Invalid response content");
     }
@@ -66,7 +67,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         }
 
         using var content = new StringContent(payload, Encoding.UTF8, MediaTypeNames.Text.Plain);
-        using var response = await _httpClient.PostAsync($"/queue/{queueName}", content);
+        using var response = await _httpClient.PostAsync($"{EdgeRootRoute}/{queueName}", content);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -82,7 +83,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
-        return _httpClient.PatchAsync($"/queue/{queueName}?batchId={batchId.ToString()}", content: null);
+        return _httpClient.PatchAsync($"{EdgeRootRoute}{queueName}?batchId={batchId.ToString()}", content: null);
     }
 
     public async Task<ImmutableArray<QueueRawMessage>> PeekAsync(string queueName, int batchSize)
@@ -91,7 +92,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         Guard.Against.NegativeOrZero(batchSize);
 
         var result = await _httpClient
-            .GetFromJsonAsync<IEnumerable<QueueRawMessage>>($"/queue/{queueName}/peek?batchSize={batchSize}");
+            .GetFromJsonAsync<IEnumerable<QueueRawMessage>>($"{EdgeRootRoute}/{queueName}/peek?batchSize={batchSize}");
 
         return result?.ToImmutableArray() ?? throw new EdgeClientException("Invalid response");
     }
@@ -102,7 +103,7 @@ public sealed class EdgeMqClient : IEdgeMqClient
         Guard.Against.NegativeOrZero(batchSize);
 
         var result = await _httpClient
-            .GetFromJsonAsync<IEnumerable<QueueRawMessage>>($"/queue/{queueName}?batchSize={batchSize}");
+            .GetFromJsonAsync<IEnumerable<QueueRawMessage>>($"{EdgeRootRoute}/{queueName}?batchSize={batchSize}");
 
         return result?.ToImmutableArray() ?? throw new EdgeClientException("Invalid response");
     }
