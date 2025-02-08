@@ -1,6 +1,6 @@
+using EdgeMq.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using EdgeMq.Api.Extensions;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateSlimBuilder(args);
