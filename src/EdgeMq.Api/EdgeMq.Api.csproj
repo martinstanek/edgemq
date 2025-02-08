@@ -1,29 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <LangVersion>latest</LangVersion>
-        <InvariantGlobalization>true</InvariantGlobalization>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <ServerGarbageCollection>true</ServerGarbageCollection>
-        <PublishAot>true</PublishAot>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<PublishAot>true</PublishAot>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\EdgeMq.Model\EdgeMq.Model.csproj" />
-      <ProjectReference Include="..\EdgeMq.Service\EdgeMq.Service.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\EdgeMq.Model\EdgeMq.Model.csproj" />
+	  <ProjectReference Include="..\EdgeMq.Service\EdgeMq.Service.csproj" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
-    </ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
+	  <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+	  <PackageReference Include="Scalar.AspNetCore" Version="2.0.12" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <Content Update="wwwroot\index.html">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
+	<ItemGroup>
+	  <Content Update="wwwroot\index.html">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
 
 </Project>
