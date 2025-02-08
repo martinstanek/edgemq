@@ -3,7 +3,7 @@ using EdgeMq.Infra.Metrics;
 using Shouldly;
 using Xunit;
 
-namespace EdgeMq.UnitTests.Service;
+namespace EdgeMq.UnitTests.Infra.Metrics;
 
 public sealed class EventsPerIntervalTests
 {
