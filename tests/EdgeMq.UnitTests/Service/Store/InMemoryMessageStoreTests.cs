@@ -24,12 +24,29 @@ public sealed class InMemoryMessageStoreTests
         store.MessageSizeBytes.ShouldBe((ulong) 10);
     }
 
-    [Fact] public async Task AddMessages_EmptyList_ReturnsFalse()
+    [Fact]
+    public async Task AddMessages_EmptyList_ReturnsFalse()
     {
         var config = new MessageStoreConfiguration();
         var store = new InMemoryMessageStore(config);
 
         var added = await store.AddMessagesAsync([]);
+
+        added.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task AddMessages_IsFull_ReturnsFalse()
+    {
+        var config = new MessageStoreConfiguration
+        {
+            MaxMessageCount = 2
+        };
+        var store = new InMemoryMessageStore(config);
+        var message = new StoreMessage { Payload = "hello" };
+
+        await store.AddMessagesAsync([message, message, message]);
+        var added = await store.AddMessagesAsync([message]);
 
         added.ShouldBeFalse();
     }
