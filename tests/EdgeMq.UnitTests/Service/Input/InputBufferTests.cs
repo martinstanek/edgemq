@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using EdgeMq.Service.Configuration;
+using EdgeMq.Service.Exceptions;
 using EdgeMq.Service.Input;
 using Shouldly;
 using Xunit;
@@ -75,6 +76,44 @@ public sealed class InputBufferTests
 
         buffer.MessageMessageCount.ShouldBe((ulong) 2);
         buffer.MessageMessagesSize.ShouldBe((ulong) 10);
+    }
+
+    [Fact]
+    public async Task Add_PayloadTooBig_NotAdded_Throws()
+    {
+        var config = new InputBufferConfiguration
+        {
+            MaxMessageCount = 2,
+            MaxPayloadSizeBytes = 5,
+            Mode = ConstraintViolationMode.ThrowException
+        };
+
+        var buffer = new InputBuffer(config);
+        var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
+        var message = "hello-this-is-too-big";
+
+        await Should.ThrowAsync<EdgeQueueInputException>(() => buffer.TryAddAsync(message, headers, token));
+    }
+
+    [Fact]
+    public async Task Add_PayloadTooBig_NotAdded()
+    {
+        var config = new InputBufferConfiguration
+        {
+            MaxMessageCount = 2,
+            MaxPayloadSizeBytes = 5,
+            Mode = ConstraintViolationMode.Ignore
+        };
+
+        var buffer = new InputBuffer(config);
+        var token = CancellationToken.None;
+        var headers = ReadOnlyDictionary<string, string>.Empty;
+        var message = "hello-this-is-too-big";
+
+        var added = await buffer.TryAddAsync(message, headers, token);
+
+        added.ShouldBeFalse();
     }
 
     [Fact]

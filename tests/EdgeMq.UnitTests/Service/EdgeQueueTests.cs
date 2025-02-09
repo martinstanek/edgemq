@@ -15,7 +15,7 @@ using Xunit;
 
 namespace EdgeMq.UnitTests.Service;
 
-public sealed class QueueTests
+public sealed class EdgeQueueTests
 {
     [Fact]
     public async Task Peek_MessagesPeeked_QueueNotAltered()
@@ -66,6 +66,24 @@ public sealed class QueueTests
 
         queue.Metrics.MessageSizeBytes.ShouldBe((ulong) 0);
         queue.Metrics.MessageCount.ShouldBe((ulong) 0);
+    }
+
+    [Fact]
+    public async Task Acknowledge_WrongId_Throws()
+    {
+        const string payload = "test";
+
+        using var queue = new EdgeMqTestsContext().GetQueue();
+        var token = CancellationToken.None;
+
+        queue.Start(CancellationToken.None);
+
+        await queue.EnqueueAsync(payload, token);
+        await Task.Delay(1000, token);
+
+        await EdgeMqTestsContext.PeekUntilPeekedAsync(queue, 10, token);
+
+        await Should.ThrowAsync<EdgeQueueAcknowledgeException>(() => queue.AcknowledgeAsync(Guid.NewGuid(), token));
     }
 
     [Fact]
