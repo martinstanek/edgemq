@@ -12,7 +12,7 @@ public sealed class EdgeQueueTestContainerTests
     {
         await using var testContainer = new EdgeQueueTestContainer();
 
-        var client = await testContainer.GetClientAsync();
+        var client = await testContainer.GetClientAsync(hostNetwork: false);
         var queues = await client.GetQueuesAsync();
 
         queues.Queues.ShouldNotBeEmpty();

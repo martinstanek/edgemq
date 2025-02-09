@@ -6,15 +6,15 @@ namespace EdgeMq.TestContainer;
 
 public sealed class EdgeQueueTestContainer : IAsyncDisposable
 {
-    private const string EdgeQueueImageFullName = "awitec/edgemq:latest-amd64";
+    private const string EdgeQueueImageFullName = "awitec/edgemq:latest-arm64";
     private const string EdgeQueueTestQueueName = "testcontainer-queue";
-    private const string EdgeQueueUrl = "http://127.0.0.1:2323";
+    private const string EdgeQueueUrl = "http://localhost:2323";
 
     private readonly IDockerService _dockerService = new DockerService();
     private IEdgeMqClient? _client;
     private bool _isDisposed;
 
-    public async Task<IEdgeMqClient> GetClientAsync(string testContainerName = "edgemq-test")
+    public async Task<IEdgeMqClient> GetClientAsync(string testContainerName = "edgemq-test", bool hostNetwork = true)
     {
         Guard.Against.NullOrWhiteSpace(testContainerName);
 
@@ -34,6 +34,7 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
         await _dockerService.StartContainerAsync(
             fullImageName: EdgeQueueImageFullName,
             containerName: testContainerName,
+            hostNetwork: hostNetwork,
             ports: new Dictionary<ushort, ushort> { { 2323, 2323 } },
             volumes: new Dictionary<string, string> { { "edgemqdata", "/data" } },
             variables: new Dictionary<string, string> { { "EDGEMQ_QUEUES", EdgeQueueTestQueueName }, { "EDGEMQ_MODE", "InMemory" } },

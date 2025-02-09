@@ -5,6 +5,7 @@ public interface IDockerService
     Task StartContainerAsync(
         string fullImageName,
         string containerName,
+        bool hostNetwork,
         IReadOnlyDictionary<ushort, ushort> ports,
         IReadOnlyDictionary<string, string> volumes,
         IReadOnlyDictionary<string, string> variables,
