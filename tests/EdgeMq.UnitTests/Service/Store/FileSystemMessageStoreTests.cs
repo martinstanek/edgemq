@@ -86,6 +86,19 @@ public sealed class FileSystemMessageStoreTests
     }
 
     [Fact]
+    public async Task ReadMessages_BatchIsZero_EmptyArrayReturned()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var store = context.GetMessageStore();
+
+        await store.InitAsync();
+
+        var messages = await store.ReadMessagesAsync(batchSize: 0);
+
+        messages.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task DeleteMessages_InputIsValid_MessagesDeleted()
     {
         using var context = new FileSystemMessageStoreTestsContext();

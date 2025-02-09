@@ -136,4 +136,17 @@ public sealed class InMemoryMessageStoreTests
 
         store.IsFull.ShouldBeFalse();
     }
+
+    [Fact]
+    public async Task ReadMessages_BatchIsZero_EmptyArrayReturned()
+    {
+        var config = new MessageStoreConfiguration();
+        var store = new InMemoryMessageStore(config);
+
+        await store.InitAsync();
+
+        var messages = await store.ReadMessagesAsync(batchSize: 0);
+
+        messages.ShouldBeEmpty();
+    }
 }
