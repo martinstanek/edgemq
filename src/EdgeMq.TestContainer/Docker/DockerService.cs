@@ -17,7 +17,7 @@ public sealed class DockerService : IDockerService
         Guard.Against.NullOrWhiteSpace(fullImageName);
         Guard.Against.NullOrWhiteSpace(containerName);
 
-        var commandArguments = new StringBuilder($"run -d --name {containerName}");
+        var commandArguments = new StringBuilder($"run -d --name {containerName} --network=host");
 
         commandArguments.Append(string.Join(' ', ports.Select(p => $" -p {p.Key}:{p.Value}")));
         commandArguments.Append(string.Join(' ', volumes.Select(v => $" -v \"{v.Key}:{v.Value}\"")));
