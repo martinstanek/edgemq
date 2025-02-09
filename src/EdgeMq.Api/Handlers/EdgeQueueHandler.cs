@@ -12,6 +12,7 @@ using Ardalis.GuardClauses;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Service;
+using Queue = EdgeMq.Model.Queue;
 
 namespace EdgeMq.Api.Handlers;
 
@@ -137,9 +138,9 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         {
             queues.Add(new Queue
             {
-                Name = queue,
-                StoreMode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
-                Metrics = GetQueueMetrics(queue)
+                Name = queue.Name,
+                StoreMode = queue.Configuration.IsInMemory ? "InMemory" : "FileSystem",
+                Metrics = GetQueueMetrics(queue.Name)
             });
         }
 

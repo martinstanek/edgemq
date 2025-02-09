@@ -21,7 +21,7 @@ public sealed class QueueService : IHostedService
         _queueManager.Start(cancellationToken);
 
         Console.WriteLine(Assembly.GetEntryAssembly()?.GetName().Version?.ToString());
-        Console.WriteLine($"Started: {string.Join(',', _queueManager.Queues)}");
+        Console.WriteLine($"Started: {string.Join(',', _queueManager.QueueNames)}");
 
         return Task.CompletedTask;
     }

@@ -15,7 +15,7 @@ using Xunit;
 
 namespace EdgeMq.UnitTests.Service;
 
-public sealed class EdgeMqTests
+public sealed class QueueTests
 {
     [Fact]
     public async Task Peek_MessagesPeeked_QueueNotAltered()
@@ -212,26 +212,27 @@ public sealed class EdgeMqTests
 
     private sealed class EdgeMqTestsContext
     {
-        internal IEdgeMq GetQueue(string name = "test")
+        internal IEdgeQueue GetQueue(string name = "test")
         {
             var storeConfig = new MessageStoreConfiguration();
             var bufferConfig = new InputBufferConfiguration();
             var queueConfig = new EdgeQueueConfiguration
             {
                 Name = name,
+                IsInMemory = true,
                 BufferConfiguration = bufferConfig,
                 StoreConfiguration = storeConfig,
                 ConstraintViolationMode = ConstraintViolationMode.Ignore
             };
             var buffer = new InputBuffer(bufferConfig);
             var store = new InMemoryMessageStore(storeConfig);
-            var queue = new EdgeMq.Service.EdgeMq(buffer, store, queueConfig);
+            var queue = new EdgeQueue(buffer, store, queueConfig);
 
             return queue;
         }
 
         internal static async Task<ImmutableArray<Message>> PeekUntilPeekedAsync(
-            IEdgeMq queue,
+            IEdgeQueue queue,
             uint batchSize,
             CancellationToken token)
         {

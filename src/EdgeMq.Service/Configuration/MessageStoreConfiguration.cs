@@ -9,4 +9,6 @@ public sealed record MessageStoreConfiguration
     public uint DefaultBatchSize { get; init; } = Constants.DefaultBatchSize;
 
     public string Path { get; init; } = Constants.DefaultQueuePath;
+
+    public static MessageStoreConfiguration Default => new();
 }

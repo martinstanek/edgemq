@@ -9,4 +9,6 @@ public sealed record InputBufferConfiguration
     public ulong MaxMessageSizeBytes { get; init; } = Constants.DefaultBufferMaxMessageSizeBytes;
 
     public ConstraintViolationMode Mode { get; init; } = ConstraintViolationMode.Ignore;
+
+    public static InputBufferConfiguration Default => new();
 }

@@ -14,13 +14,7 @@ namespace EdgeMq.Service;
 
 public sealed class QueueManager
 {
-    private readonly ConcurrentDictionary<string, IEdgeMq> _queues = [];
-    private readonly bool _isInMemory;
-
-    public QueueManager(bool isInMemory)
-    {
-        _isInMemory = isInMemory;
-    }
+    private readonly ConcurrentDictionary<string, IEdgeQueue> _queues = [];
 
     public void Start(CancellationToken cancellationToken)
     {
@@ -38,41 +32,41 @@ public sealed class QueueManager
         }
     }
 
-    public QueueManager AddQueue(string name, EdgeQueueConfiguration queueConfiguration)
+    public QueueManager AddQueue(EdgeQueueConfiguration queueConfiguration)
     {
-        Guard.Against.NullOrWhiteSpace(name);
+        Guard.Against.NullOrWhiteSpace(queueConfiguration.Name);
 
-        if (!Validations.IsQueueNameValid(name))
+        if (!Validations.IsQueueNameValid(queueConfiguration.Name))
         {
-            throw new EdgeQueueException($"The provided name {name} for the queue is invalid.");
+            throw new EdgeQueueException($"The provided name {queueConfiguration.Name} for the queue is invalid.");
         }
 
-        if (_queues.ContainsKey(name))
+        if (_queues.ContainsKey(queueConfiguration.Name))
         {
             return this;
         }
 
-        var store = _isInMemory
+        var store = queueConfiguration.IsInMemory
             ? (IMessageStore) new InMemoryMessageStore(queueConfiguration.StoreConfiguration)
             : new FileSystemMessageStore(queueConfiguration.StoreConfiguration);
         var buffer = new InputBuffer(queueConfiguration.BufferConfiguration);
-        var queue = new EdgeMq(buffer, store, queueConfiguration);
+        var queue = new EdgeQueue(buffer, store, queueConfiguration);
 
-        _queues[name] = queue;
+        _queues[queueConfiguration.Name] = queue;
 
         return this;
     }
 
-    private IEdgeMq GetQueue(string name)
+    private IEdgeQueue GetQueue(string name)
     {
         Guard.Against.NullOrWhiteSpace(name);
 
         return _queues[name];
     }
 
-    public IEdgeMq this[string name] => GetQueue(name);
+    public IEdgeQueue this[string name] => GetQueue(name);
 
-    public ImmutableArray<string> Queues => _queues.Keys.ToImmutableArray();
+    public ImmutableArray<string> QueueNames => _queues.Keys.ToImmutableArray();
 
-    public bool IsInMemory => _isInMemory;
+    public ImmutableArray<IEdgeQueue> Queues => _queues.Values.ToImmutableArray();
 }

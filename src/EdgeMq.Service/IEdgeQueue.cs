@@ -3,11 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using EdgeMq.Service.Configuration;
 using EdgeMq.Service.Model;
 
 namespace EdgeMq.Service;
 
-public interface IEdgeMq : IDisposable
+public interface IEdgeQueue : IDisposable
 {
     Task<bool> EnqueueAsync(string payload, CancellationToken cancellationToken);
 
@@ -28,4 +29,6 @@ public interface IEdgeMq : IDisposable
     public string Name { get; }
 
     public Metrics Metrics { get; }
+
+    public EdgeQueueConfiguration Configuration { get; }
 }

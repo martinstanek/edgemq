@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
 
         return services
             .AddSingleton(serverConfig)
-            .AddQueueManager(queueConfigs, serverConfig.StoreMode == QueueStoreMode.InMemory)
+            .AddQueueManager(queueConfigs)
             .AddSingleton<IEdgeQueueHandler, EdgeQueueHandler>()
             .AddHostedService<QueueService>();
     }
@@ -38,6 +38,7 @@ public static class ServiceCollectionExtensions
         return new EdgeQueueConfiguration
         {
             Name = queue,
+            IsInMemory = serverConfig.StoreMode == QueueStoreMode.InMemory,
             BufferConfiguration = new InputBufferConfiguration
             {
                 MaxMessageCount = serverConfig.MaxBufferMessageCount,

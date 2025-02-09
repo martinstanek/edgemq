@@ -16,7 +16,7 @@ using Ardalis.GuardClauses;
 
 namespace EdgeMq.Service;
 
-public sealed class EdgeMq : IEdgeMq
+public sealed class EdgeQueue : IEdgeQueue
 {
     private readonly List<Message> _peekedMessages = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -29,7 +29,7 @@ public sealed class EdgeMq : IEdgeMq
     private ulong _processedMessages;
     private bool _isStopped;
 
-    public EdgeMq(InputBuffer inputBuffer, IMessageStore messageStore, EdgeQueueConfiguration configuration)
+    public EdgeQueue(InputBuffer inputBuffer, IMessageStore messageStore, EdgeQueueConfiguration configuration)
     {
         if (!Validations.IsConfigurationValid(configuration))
         {
@@ -278,4 +278,6 @@ public sealed class EdgeMq : IEdgeMq
         MessagesInPerSecond = _messagesIn.CurrentEventsPerSecond(),
         MessagesOutPerSecond = _messagesOut.CurrentEventsPerSecond()
     };
+
+    public EdgeQueueConfiguration Configuration => _configuration;
 }
