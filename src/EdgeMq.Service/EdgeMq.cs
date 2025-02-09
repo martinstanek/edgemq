@@ -163,6 +163,11 @@ public sealed class EdgeMq : IEdgeMq
 
     private async Task NonBlockingAcknowledgeAsync(Guid batchId)
     {
+        if (_peekedMessages.Count == 0)
+        {
+            return;
+        }
+
         if (!batchId.Equals(_currentBatchId))
         {
             throw new EdgeQueueAcknowledgeException("The batch id is obsolete");

@@ -83,11 +83,16 @@ public sealed class EdgeMqClient : IEdgeMqClient
         return result ?? throw new EdgeClientException("Invalid response content");
     }
 
-    public Task AcknowledgeAsync(string queueName, Guid batchId)
+    public async Task AcknowledgeAsync(string queueName, Guid batchId)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
-        return _httpClient.PatchAsync($"{EdgeQueueUrlRoot}/{queueName}?batchId={batchId.ToString()}", content: null);
+        var response = await _httpClient.PatchAsync($"{EdgeQueueUrlRoot}/{queueName}?batchId={batchId.ToString()}", content: null);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new EdgeClientException("Invalid response", response.StatusCode);
+        }
     }
 
     public async Task<ImmutableArray<QueueRawMessage>> PeekAsync(string queueName, int batchSize)

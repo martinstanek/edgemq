@@ -6,15 +6,15 @@ namespace EdgeMq.Api.Handlers;
 
 public interface IEdgeQueueHandler
 {
-    Task<IResult> AcknowledgeAsync(string queueName, Guid batchId);
+    Task<IResult> AcknowledgeAsync(string queueName, string apiKey, Guid batchId);
 
-    Task<IResult> EnqueueAsync(HttpRequest request, string queueName);
+    Task<IResult> EnqueueAsync(HttpRequest request, string queueName, string apiKey);
 
-    Task<IResult> GetMetricsAsync(string queueName);
+    Task<IResult> GetMetricsAsync(string queueName, string apiKey);
 
-    Task<IResult> DequeueAsync(string queueName, int batchSize);
+    Task<IResult> DequeueAsync(string queueName, string apiKey, int batchSize);
 
-    Task<IResult> PeekAsync(string queueName, int batchSize);
+    Task<IResult> PeekAsync(string queueName, string apiKey, int batchSize);
 
-    Task<IResult> GetQueuesAsync();
+    Task<IResult> GetQueuesAsync(string apiKey);
 }

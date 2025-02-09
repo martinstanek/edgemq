@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
@@ -31,6 +32,50 @@ public sealed class EdgeMqApiTests
         queues.Queues.Single().Name.ShouldBe(queueName);
     }
 
+    [Fact]
+    public async Task GetQueues_KeyNotProvided_NotAuthorized_Throws()
+    {
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.GetQueuesAsync());
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetQueues_KeyIsInvalid_NotAuthorized_Throws()
+    {
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key-1" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.GetQueuesAsync());
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetQueues_KeyIsValid_Authorized()
+    {
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        await client.GetQueuesAsync();
+    }
+
     [Theory]
     [InlineData(QueueStoreMode.InMemory)]
     [InlineData(QueueStoreMode.FileSystem)]
@@ -50,6 +95,56 @@ public sealed class EdgeMqApiTests
         messages.ShouldBeEmpty();
         stats.Name.ShouldBe(queueName);
         stats.MessageCount.ShouldBe((uint)0);
+    }
+
+    [Fact]
+    public async Task Peek_KeyNotProvided_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.PeekAsync(queueName, 10));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Peek_KeyIsInvalid_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key-1" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.PeekAsync(queueName, 10));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Peek_KeyIsValid_Authorized()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        await client.PeekAsync(queueName, 10);
     }
 
     [Theory]
@@ -253,6 +348,56 @@ public sealed class EdgeMqApiTests
     }
 
     [Fact]
+    public async Task Dequeue_KeyNotProvided_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.DequeueAsync(queueName, 10));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Dequeue_KeyIsInvalid_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key-1" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.DequeueAsync(queueName, 10));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Dequeue_KeyIsValid_Authorized()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        await client.DequeueAsync(queueName, 10);
+    }
+
+    [Fact]
     public async Task Acknowledge_MessagesAdded_QueueIsEmpty()
     {
         const string queueName = "default";
@@ -272,6 +417,59 @@ public sealed class EdgeMqApiTests
 
         stats.Name.ShouldBe(queueName);
         stats.MessageCount.ShouldBe((uint)0);
+    }
+
+    [Fact]
+    public async Task Acknowledge_KeyNotProvided_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.AcknowledgeAsync(queueName, Guid.NewGuid()));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Acknowledge_KeyIsInvalid_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key-1" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.AcknowledgeAsync(queueName, Guid.NewGuid()));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Acknowledge_KeyIsValid_Authorized()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        await client.EnqueueAsync(queueName, "test");
+        await Task.Delay(1000);
+        var message = await client.PeekAsync(queueName, 10);
+        await client.AcknowledgeAsync(queueName, message.First().BatchId);
     }
 
     [Theory]
@@ -402,6 +600,56 @@ public sealed class EdgeMqApiTests
     }
 
     [Fact]
+    public async Task Enqueue_KeyNotProvided_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.EnqueueAsync(queueName, "test"));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Enqueue_KeyIsInvalid_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key-1" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        var exception = await Should.ThrowAsync<EdgeClientException>(() => client.EnqueueAsync(queueName, "test"));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Enqueue_KeyIsValid_Authorized()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        await client.EnqueueAsync(queueName, "test");
+    }
+
+    [Fact]
     public async Task GetMetrics_MessagesAdded_MessageDequeued_MetricsMatch()
     {
         const string queueName = "default";
@@ -432,6 +680,56 @@ public sealed class EdgeMqApiTests
         statsQueue.MessagesInPerSecond.ShouldBeGreaterThanOrEqualTo(3);
         statsDequeue.MessagesOutPerSecond.ShouldBeGreaterThanOrEqualTo(3);
     }
+
+    [Fact]
+    public async Task GetMetrics_KeyNotProvided_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient();
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.GetMetricsAsync(queueName));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetMetrics_KeyIsInvalid_NotAuthorized_Throws()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key-1" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        var exception = await Should.ThrowAsync<HttpRequestException>(() => client.GetMetricsAsync(queueName));
+
+        exception.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetMetrics_KeyIsValid_Authorized()
+    {
+        const string queueName = "default";
+
+        using var context = new EdgeMqApiTestsContext();
+
+        var clientConfig = new EdgeMqClientConfiguration { ApiKey = "test-key" };
+
+        context.DeclareVariables(apiKey: "test-key");
+
+        var client = context.GetClient(clientConfig);
+
+        await client.GetMetricsAsync(queueName);
+    }
     
     private sealed class EdgeMqApiTestsContext : IDisposable
     {
@@ -439,13 +737,18 @@ public sealed class EdgeMqApiTests
 
         internal IEdgeMqClient GetClient()
         {
+            return GetClient(EdgeMqClientConfiguration.Empty);
+        }
+
+        internal IEdgeMqClient GetClient(EdgeMqClientConfiguration configuration)
+        {
             var application = new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder => { builder.ConfigureServices(_ => { }); });
 
             var httpClient = application.CreateClient();
 
 
-            return new EdgeMqClient(httpClient);
+            return new EdgeMqClient(httpClient, configuration);
         }
 
         internal static async Task<ImmutableArray<QueueRawMessage>> PeekUntilPeekedAsync(
@@ -466,6 +769,7 @@ public sealed class EdgeMqApiTests
 
         internal void DeclareVariables(
             string queues = "default",
+            string apiKey = "",
             byte maxMessageCount = 10,
             byte maxMessagesStoreSizeBytes = 200,
             byte maxBufferMessageCount = 5,
@@ -479,6 +783,7 @@ public sealed class EdgeMqApiTests
                 : QueueApiConstraintsMode.Fail;
 
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqQueues, queues, EdgeTarget);
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqApiKey, apiKey, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageCount, maxMessageCount.ToString(), EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageSizeBytes, maxMessagesStoreSizeBytes.ToString(), EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxBufferMessageSizeBytes, maxMessagesBufferSizeBytes.ToString(), EdgeTarget);
@@ -490,6 +795,7 @@ public sealed class EdgeMqApiTests
 
         private static void RemoveVariables()
         {
+            Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqApiKey, string.Empty, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqQueues, string.Empty, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageCount, string.Empty, EdgeTarget);
             Environment.SetEnvironmentVariable(EdgeMqServerConfiguration.EdgeMqMaxMessageSizeBytes, string.Empty, EdgeTarget);

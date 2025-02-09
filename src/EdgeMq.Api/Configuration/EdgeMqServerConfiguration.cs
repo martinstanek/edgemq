@@ -9,6 +9,7 @@ public sealed record EdgeMqServerConfiguration
 {
     public const string EdgeMqPath = "EDGEMQ_PATH";
     public const string EdgeMqQueues = "EDGEMQ_QUEUES";
+    public const string EdgeMqApiKey = "EDGEMQ_APIKEY";
     public const string EdgeMqStoreMode = "EDGEMQ_STOREMODE";
     public const string EdgeMqConstraintsMode = "EDGEMQ_CONSTRAINTSMODE";
     public const string EdgeMqDefaultBatchSize = "EDGEMQ_BATCHSIZE";
@@ -21,6 +22,8 @@ public sealed record EdgeMqServerConfiguration
     public required QueueStoreMode StoreMode { get; init; } = QueueStoreMode.InMemory;
 
     public required QueueApiConstraintsMode ConstraintsMode { get; init; } = QueueApiConstraintsMode.Ignore;
+
+    public required string ApiKey { get; init; } = string.Empty;
 
     public required string Path { get; init; } = Constants.DefaultRootPath;
 
@@ -59,6 +62,7 @@ public sealed record EdgeMqServerConfiguration
             StoreMode = storeMode,
             ConstraintsMode = constraintsMode,
             Path = EnvReader.GetEnvironmentValue(EdgeMqPath, defaultConfig.Path),
+            ApiKey = EnvReader.GetEnvironmentValue(EdgeMqApiKey, defaultConfig.ApiKey),
             DefaultBatchSize = EnvReader.GetEnvironmentValue(EdgeMqDefaultBatchSize, defaultConfig.DefaultBatchSize),
             MaxMessageCount = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageCount, defaultConfig.MaxMessageCount),
             MaxMessageSizeBytes = EnvReader.GetEnvironmentValue(EdgeMqMaxMessageSizeBytes, defaultConfig.MaxMessageSizeBytes),
@@ -73,6 +77,7 @@ public sealed record EdgeMqServerConfiguration
         StoreMode = QueueStoreMode.InMemory,
         ConstraintsMode = QueueApiConstraintsMode.Ignore,
         Path = string.Empty,
+        ApiKey = string.Empty,
         Queues = []
     };
 }
