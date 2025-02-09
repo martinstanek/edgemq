@@ -23,6 +23,7 @@
       <ProjectReference Include="..\..\src\EdgeMq.Api\EdgeMq.Api.csproj" />
       <ProjectReference Include="..\..\src\EdgeMq.Client\EdgeMq.Client.csproj" />
       <ProjectReference Include="..\..\src\EdgeMq.Service\EdgeMq.Service.csproj" />
+      <ProjectReference Include="..\..\src\EdgeMq.TestContainer\EdgeMq.TestContainer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
