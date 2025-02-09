@@ -1,4 +1,4 @@
-FROM debian:12.9
+FROM ubuntu:22.04
 EXPOSE 2323
 ENV ASPNETCORE_URLS=http://*:2323
 
