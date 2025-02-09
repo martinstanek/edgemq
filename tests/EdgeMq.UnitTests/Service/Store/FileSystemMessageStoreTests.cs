@@ -59,6 +59,18 @@ public sealed class FileSystemMessageStoreTests
     }
 
     [Fact]
+    public async Task AddMessages_EmptyList_ReturnsFalse()
+    {
+        using var context = new FileSystemMessageStoreTestsContext();
+        var store = context.GetMessageStore();
+
+        await store.InitAsync();
+        var added = await store.AddMessagesAsync([]);
+
+        added.ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task ReadMessages_InputIsValid_MessagesReturned()
     {
         using var context = new FileSystemMessageStoreTestsContext();

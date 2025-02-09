@@ -24,6 +24,16 @@ public sealed class InMemoryMessageStoreTests
         store.MessageSizeBytes.ShouldBe((ulong) 10);
     }
 
+    [Fact] public async Task AddMessages_EmptyList_ReturnsFalse()
+    {
+        var config = new MessageStoreConfiguration();
+        var store = new InMemoryMessageStore(config);
+
+        var added = await store.AddMessagesAsync([]);
+
+        added.ShouldBeFalse();
+    }
+
     [Fact]
     public async Task DeleteMessages_MessagesDeleted()
     {
