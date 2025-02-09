@@ -14,6 +14,9 @@ public sealed class DockerService : IDockerService
         IReadOnlyDictionary<string, string> variables,
         CancellationToken cancellationToken)
     {
+        Guard.Against.NullOrWhiteSpace(fullImageName);
+        Guard.Against.NullOrWhiteSpace(containerName);
+
         var commandArguments = new StringBuilder($"run -d --name {containerName}");
 
         commandArguments.Append(string.Join(' ', ports.Select(p => $" -p {p.Key}:{p.Value}")));
