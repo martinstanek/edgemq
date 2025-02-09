@@ -29,14 +29,16 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         _configuration = configuration;
     }
 
-    public async Task AcknowledgeAsync(string queueName, Guid batchId)
+    public async Task<IResult> AcknowledgeAsync(string queueName, Guid batchId)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
         await _queueManager[queueName].AcknowledgeAsync(batchId, CancellationToken.None);
+
+        return Results.NoContent();
     }
 
-    public async Task<bool> EnqueueAsync(HttpRequest request, string queueName)
+    public async Task<IResult> EnqueueAsync(HttpRequest request, string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
@@ -47,15 +49,87 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             .Where(p => p.Key.StartsWith(EdgeHeaderPrefix))
             .ToDictionary(k => k.Key.Replace(EdgeHeaderPrefix, string.Empty), v => v.Value);
 
-        return await _queueManager[queueName].EnqueueAsync(rawContent, headers, CancellationToken.None);
+        var added = await _queueManager[queueName].EnqueueAsync(rawContent, headers, CancellationToken.None);
+
+        return !added && _configuration.ConstraintsMode == QueueApiConstraintsMode.Fail
+            ? Results.UnprocessableEntity()
+            : Results.Ok(new QueueEnqueueResult(added));
     }
 
-    public Task<QueueMetrics> GetMetricsAsync(string queueName)
+    public async Task<IResult> DequeueAsync(string queueName, int batchSize)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+        Guard.Against.NegativeOrZero(batchSize);
+
+        var messages = await _queueManager[queueName].DequeueAsync(batchSize: (uint) batchSize, CancellationToken.None);
+        var result = messages.Select(s => new QueueRawMessage
+        {
+            Id = s.Id,
+            BatchId = s.BatchId,
+            Payload = s.Payload,
+            Headers = s.Headers
+        }).ToImmutableArray();
+
+        return Results.Ok(result);
+    }
+
+    public async Task<IResult> PeekAsync(string queueName, int batchSize)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+        Guard.Against.NegativeOrZero(batchSize);
+
+        var messages = await _queueManager[queueName].PeekAsync(batchSize: (uint) batchSize, CancellationToken.None);
+        var result = messages.Select(s => new QueueRawMessage
+        {
+            Id = s.Id,
+            BatchId = s.BatchId,
+            Payload = s.Payload,
+            Headers = s.Headers
+        }).ToImmutableArray();
+
+        return Results.Ok(result);
+    }
+
+    public Task<IResult> GetMetricsAsync(string queueName)
+    {
+        Guard.Against.NullOrWhiteSpace(queueName);
+
+        var result = GetQueueMetrics(queueName);
+
+        return Task.FromResult(Results.Ok(result));
+    }
+
+    public Task<IResult> GetQueuesAsync()
+    {
+        var queues = new List<Queue>();
+
+        foreach (var queue in _queueManager.Queues)
+        {
+            queues.Add(new Queue
+            {
+                Name = queue,
+                StoreMode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
+                Metrics = GetQueueMetrics(queue)
+            });
+        }
+
+        var result = new QueueServer
+        {
+            Queues = queues.ToImmutableArray(),
+            UptimeSeconds = (ulong) Math.Round(DateTime.Now.Subtract(_started).TotalSeconds, 0),
+            ConstraintsViolationMode = _configuration.ConstraintsMode.ToString(),
+            Version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? string.Empty
+        };
+
+        return Task.FromResult(Results.Ok(result));
+    }
+
+    private QueueMetrics GetQueueMetrics(string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
 
         var queue = _queueManager[queueName];
-        var result = new QueueMetrics
+        return new QueueMetrics
         {
             Name = queue.Name,
             MessageCount = queue.Metrics.MessageCount,
@@ -73,65 +147,6 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
             BufferMessagesSizePressure = SafeDivide(queue.Metrics.BufferMessageSizeBytes, queue.Metrics.MaxBufferMessageSizeBytes),
             MessagesInPerSecond = queue.Metrics.MessagesInPerSecond,
             MessagesOutPerSecond = queue.Metrics.MessagesOutPerSecond,
-        };
-
-        return Task.FromResult(result);
-    }
-
-    public async Task<ImmutableArray<QueueRawMessage>> DequeueAsync(string queueName, int batchSize)
-    {
-        Guard.Against.NullOrWhiteSpace(queueName);
-        Guard.Against.NegativeOrZero(batchSize);
-
-        var messages = await _queueManager[queueName].DequeueAsync(batchSize: (uint) batchSize, CancellationToken.None);
-        var result = messages.Select(s => new QueueRawMessage
-        {
-            Id = s.Id,
-            BatchId = s.BatchId,
-            Payload = s.Payload,
-            Headers = s.Headers
-        });
-
-        return result.ToImmutableArray();
-    }
-
-    public async Task<ImmutableArray<QueueRawMessage>> PeekAsync(string queueName, int batchSize)
-    {
-        Guard.Against.NullOrWhiteSpace(queueName);
-        Guard.Against.NegativeOrZero(batchSize);
-
-        var messages = await _queueManager[queueName].PeekAsync(batchSize: (uint) batchSize, CancellationToken.None);
-        var result = messages.Select(s => new QueueRawMessage
-        {
-            Id = s.Id,
-            BatchId = s.BatchId,
-            Payload = s.Payload,
-            Headers = s.Headers
-        });
-
-        return result.ToImmutableArray();
-    }
-
-    public async Task<QueueServer> GetQueuesAsync()
-    {
-        var queues = new List<Queue>();
-
-        foreach (var queue in _queueManager.Queues)
-        {
-            queues.Add(new Queue
-            {
-                Name = queue,
-                StoreMode = _queueManager.IsInMemory ? "InMemory" : "FileSystem",
-                Metrics = await GetMetricsAsync(queue)
-            });
-        }
-
-        return new QueueServer
-        {
-            Queues = queues.ToImmutableArray(),
-            UptimeSeconds = (ulong) Math.Round(DateTime.Now.Subtract(_started).TotalSeconds, 0),
-            ConstraintsViolationMode = _configuration.ConstraintsMode.ToString(),
-            Version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? string.Empty
         };
     }
 

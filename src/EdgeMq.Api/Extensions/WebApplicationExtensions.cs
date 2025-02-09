@@ -2,45 +2,56 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
-using EdgeMq.Api.Configuration;
 using EdgeMq.Api.Handlers;
-using EdgeMq.Model;
 
 namespace EdgeMq.Api.Extensions;
 
 public static class WebApplicationExtensions
 {
+    private const string EdgeApiKeyHeader = "X-Api-Key";
+
     public static WebApplication UseApiEndpoints(this WebApplication webApplication)
     {
         var api = webApplication.MapGroup("/v1/queues");
 
-        api.MapGet("/", async ([FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.GetQueuesAsync()));
+        api.MapGet("/", async (
+                [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
+                [FromServices] IEdgeQueueHandler handler)
+            => await handler.GetQueuesAsync());
 
-        api.MapGet("/{name}", async (string name, [FromQuery] int batchSize, [FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.DequeueAsync(name, batchSize)));
+        api.MapGet("/{name}", async (
+                [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
+                [FromRoute] string name,
+                [FromQuery] int batchSize,
+                [FromServices] IEdgeQueueHandler handler)
+            => await handler.DequeueAsync(name, batchSize));
 
-        api.MapGet("/{name}/stats", async (string name, [FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.GetMetricsAsync(name)));
+        api.MapGet("/{name}/stats", async (
+                [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
+                [FromRoute] string name,
+                [FromServices] IEdgeQueueHandler handler)
+            => await handler.GetMetricsAsync(name));
 
-        api.MapGet("/{name}/peek", async (string name, [FromQuery] int batchSize, [FromServices] IEdgeQueueHandler handler)
-            => Results.Ok(await handler.PeekAsync(name, batchSize)));
+        api.MapGet("/{name}/peek", async (
+                [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
+                [FromRoute] string name,
+                [FromQuery] int batchSize,
+                [FromServices] IEdgeQueueHandler handler)
+            => await handler.PeekAsync(name, batchSize));
 
-        api.MapPatch("/{name}", async (string name, [FromQuery] Guid batchId, [FromServices] IEdgeQueueHandler handler) =>
-        {
-            await handler.AcknowledgeAsync(name, batchId);
+        api.MapPatch("/{name}", async (
+                [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
+                [FromRoute] string name,
+                [FromQuery] Guid batchId,
+                [FromServices] IEdgeQueueHandler handler)
+            => await handler.AcknowledgeAsync(name, batchId));
 
-            return Results.NoContent();
-        });
-
-        api.MapPost("/{name}", async (string name, HttpRequest request, [FromServices] IEdgeQueueHandler handler, [FromServices] EdgeMqServerConfiguration config) =>
-        {
-            var added = await handler.EnqueueAsync(request, name);
-
-            return !added && config.ConstraintsMode == QueueApiConstraintsMode.Fail
-                ? Results.UnprocessableEntity()
-                : Results.Ok(new QueueEnqueueResult(added));
-        });
+        api.MapPost("/{name}", async (
+                [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
+                [FromRoute] string name,
+                [FromServices] IEdgeQueueHandler handler,
+                HttpRequest request)
+            => await handler.EnqueueAsync(request, name));
 
         return webApplication;
     }

@@ -19,13 +19,17 @@ public sealed class EdgeMqClient : IEdgeMqClient
 {
     private const string EdgeHeaderPrefix = "EDGQ_";
     private const string EdgeQueueUrlRoot = "/v1/queues";
+    private const string EdgeApiKeyHeader = "X-Api-Key";
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly HttpClient _httpClient;
 
-    public EdgeMqClient(HttpClient httpClient)
+    public EdgeMqClient(HttpClient httpClient) : this(httpClient, EdgeMqClientConfiguration.Empty) { }
+
+    public EdgeMqClient(HttpClient httpClient, EdgeMqClientConfiguration configuration)
     {
         _httpClient = httpClient;
+        _httpClient.DefaultRequestHeaders.Add(EdgeApiKeyHeader, configuration.ApiKey);
     }
 
     public async Task<QueueServer> GetQueuesAsync()
