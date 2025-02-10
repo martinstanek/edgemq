@@ -15,6 +15,7 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
 
     private readonly IDockerService _dockerService = new DockerService();
     private IEdgeMqClient? _client;
+    private string _archSpecificImageName = string.Empty;
     private bool _isDisposed;
 
     public enum ImageArchitecture
@@ -42,12 +43,13 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
             throw new InvalidOperationException("The Docker daemon seems not to be running");
         }
 
+        _archSpecificImageName = EdgeQueueImageFullName.Replace("arm64", architecture.ToString().ToLowerInvariant());
+
         var hostNetwork = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-        var imageName = EdgeQueueImageFullName.Replace("arm64", architecture.ToString().ToLowerInvariant());
 
         await _dockerService.PullImageAsync(EdgeQueueImageFullName, cancellationToken);
         await _dockerService.StartContainerAsync(
-            fullImageName: imageName,
+            fullImageName: _archSpecificImageName,
             containerName: testContainerName,
             hostNetwork: hostNetwork,
             ports: new Dictionary<ushort, ushort> { { 2323, 2323 } },
@@ -79,8 +81,8 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
 
         _isDisposed = true;
 
-        await _dockerService.StopContainerAsync(EdgeQueueImageFullName, CancellationToken.None);
-        await _dockerService.RemoveContainerAsync(EdgeQueueImageFullName, CancellationToken.None);
-        await _dockerService.RemoveImageAsync(EdgeQueueImageFullName, CancellationToken.None);
+        await _dockerService.StopContainerAsync(_archSpecificImageName, CancellationToken.None);
+        await _dockerService.RemoveContainerAsync(_archSpecificImageName, CancellationToken.None);
+        await _dockerService.RemoveImageAsync(_archSpecificImageName, CancellationToken.None);
     }
 }
