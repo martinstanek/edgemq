@@ -13,10 +13,6 @@ public interface IDockerService
 
     Task<bool> IsDockerRunningAsync(CancellationToken cancellationToken);
 
-    Task<string> GetVersionAsync(CancellationToken cancellationToken);
-
-    Task<string> GetDockerProcessesAsync(CancellationToken cancellationToken);
-
     Task<string> PullImageAsync(string fullImageName, CancellationToken cancellationToken);
 
     Task RemoveContainerAsync(string fullImageName, CancellationToken cancellationToken);

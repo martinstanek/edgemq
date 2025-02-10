@@ -52,16 +52,6 @@ public sealed class DockerService : IDockerService
         }
     }
 
-    public Task<string> GetVersionAsync(CancellationToken cancellationToken)
-    {
-        return RunDockerProcessAsync("--version", cancellationToken);
-    }
-
-    public Task<string> GetDockerProcessesAsync(CancellationToken cancellationToken)
-    {
-        return RunDockerProcessAsync("ps", cancellationToken);
-    }
-
     public Task<string> PullImageAsync(string fullImageName, CancellationToken cancellationToken)
     {
         Guard.Against.NullOrWhiteSpace(fullImageName);
@@ -102,6 +92,11 @@ public sealed class DockerService : IDockerService
         Guard.Against.NullOrWhiteSpace(fullImageName);
 
         return RunDockerProcessAsync($"image rm {fullImageName}", cancellationToken);
+    }
+
+    private static Task<string> GetDockerProcessesAsync(CancellationToken cancellationToken)
+    {
+        return RunDockerProcessAsync("ps", cancellationToken);
     }
 
     private static Task<string> RunDockerProcessAsync(string arguments, CancellationToken cancellationToken)
