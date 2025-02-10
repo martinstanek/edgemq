@@ -10,11 +10,11 @@ public interface IEdgeQueueHandler
 
     Task<IResult> EnqueueAsync(HttpRequest request, string queueName, string apiKey);
 
-    Task<IResult> GetMetricsAsync(string queueName, string apiKey);
-
     Task<IResult> DequeueAsync(string queueName, string apiKey, int batchSize);
 
     Task<IResult> PeekAsync(string queueName, string apiKey, int batchSize);
 
-    Task<IResult> GetQueuesAsync(string apiKey);
+    Task<IResult> GetMetricsAsync(string queueName);
+
+    Task<IResult> GetQueuesAsync();
 }

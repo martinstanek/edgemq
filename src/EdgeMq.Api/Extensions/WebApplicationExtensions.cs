@@ -17,9 +17,8 @@ public static class WebApplicationExtensions
         var api = webApplication.MapGroup("/v1/queues");
 
         api.MapGet("/", async (
-                    [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
                     [FromServices] IEdgeQueueHandler handler)
-                => await handler.GetQueuesAsync(apiKey ?? string.Empty))
+                => await handler.GetQueuesAsync())
             .Produces<ImmutableArray<Queue>>();
 
         api.MapGet("/{name}", async (
@@ -31,10 +30,9 @@ public static class WebApplicationExtensions
             .Produces<ImmutableArray<QueueRawMessage>>();
 
         api.MapGet("/{name}/stats", async (
-                    [FromHeader(Name = EdgeApiKeyHeader)] string? apiKey,
                     [FromRoute] string name,
                     [FromServices] IEdgeQueueHandler handler)
-                => await handler.GetMetricsAsync(name, apiKey ?? string.Empty))
+                => await handler.GetMetricsAsync(name))
             .Produces<QueueMetrics>();
 
         api.MapGet("/{name}/peek", async (

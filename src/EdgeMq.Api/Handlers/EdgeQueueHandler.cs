@@ -111,27 +111,17 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         return Results.Ok(result);
     }
 
-    public Task<IResult> GetMetricsAsync(string queueName, string apiKey)
+    public Task<IResult> GetMetricsAsync(string queueName)
     {
         Guard.Against.NullOrWhiteSpace(queueName);
-
-        if (IsNotAuthorized(apiKey, out var authResult))
-        {
-            return Task.FromResult(authResult);
-        }
 
         var result = GetQueueMetrics(queueName);
 
         return Task.FromResult(Results.Ok(result));
     }
 
-    public Task<IResult> GetQueuesAsync(string apiKey)
+    public Task<IResult> GetQueuesAsync()
     {
-        if (IsNotAuthorized(apiKey, out var authResult))
-        {
-            return Task.FromResult(authResult);
-        }
-
         var queues = new List<Queue>();
 
         foreach (var queue in _queueManager.Queues)
