@@ -14,4 +14,10 @@
       <ProjectReference Include="..\EdgeMq.Client\EdgeMq.Client.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="nuget.readme.md">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>

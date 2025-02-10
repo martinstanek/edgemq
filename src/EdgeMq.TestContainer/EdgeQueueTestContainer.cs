@@ -17,8 +17,15 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
     private IEdgeMqClient? _client;
     private bool _isDisposed;
 
+    public enum ImageArchitecture
+    {
+        Arm64,
+        Amd64
+    }
+
     public async Task<IEdgeMqClient> GetClientAsync(
         string testContainerName =  EdgeQueueContainerName,
+        ImageArchitecture architecture = ImageArchitecture.Arm64,
         CancellationToken cancellationToken = default)
     {
         Guard.Against.NullOrWhiteSpace(testContainerName);
@@ -36,10 +43,11 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
         }
 
         var hostNetwork = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        var imageName = EdgeQueueImageFullName.Replace("arm64", architecture.ToString().ToLowerInvariant());
 
         await _dockerService.PullImageAsync(EdgeQueueImageFullName, cancellationToken);
         await _dockerService.StartContainerAsync(
-            fullImageName: EdgeQueueImageFullName,
+            fullImageName: imageName,
             containerName: testContainerName,
             hostNetwork: hostNetwork,
             ports: new Dictionary<ushort, ushort> { { 2323, 2323 } },
