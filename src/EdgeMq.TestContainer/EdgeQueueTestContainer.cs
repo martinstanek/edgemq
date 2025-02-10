@@ -40,6 +40,8 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
             variables: new Dictionary<string, string> { { "EDGEMQ_QUEUES", EdgeQueueTestQueueName }, { "EDGEMQ_MODE", "InMemory" } },
             cancellationToken: CancellationToken.None);
 
+        await Task.Delay(TimeSpan.FromSeconds(5));
+
         var containerUrl = new Uri(EdgeQueueUrl);
         var httpClient = new HttpClient { BaseAddress = containerUrl };
 
