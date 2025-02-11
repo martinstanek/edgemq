@@ -12,7 +12,6 @@ using Ardalis.GuardClauses;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Model;
 using EdgeMq.Service;
-using Queue = EdgeMq.Model.Queue;
 
 namespace EdgeMq.Api.Handlers;
 
@@ -150,6 +149,7 @@ public sealed class EdgeQueueHandler : IEdgeQueueHandler
         Guard.Against.NullOrWhiteSpace(queueName);
 
         var queue = _queueManager[queueName];
+
         return new QueueMetrics
         {
             Name = queue.Name,

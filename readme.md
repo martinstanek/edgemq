@@ -28,7 +28,7 @@ var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:2323")
 var config = new EdgeMqClientConfiguration { ApiKey = "123" };
 var edgeMqClient = new EdgeMqClient(httpClient, config);
 
-await edgeMqClient.DequeueAsync("test-queue", batch, TimeSpan.FromSeconds(1), messages =>
+await edgeMqClient.DequeueAsync("test-queue", batch, timeOut: TimeSpan.FromSeconds(1), messages =>
 {
     foreach (var message in messages)
     {

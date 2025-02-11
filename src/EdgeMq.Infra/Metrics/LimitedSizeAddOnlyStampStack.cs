@@ -9,7 +9,7 @@ public sealed class LimitedSizeAddOnlyStampStack : LimitedSizeAddOnlyStack<Stamp
 
     public void Push(uint value, DateTime time)
     {
-        base.Push(new Stamp(value, time));
+        Push(new Stamp(value, time));
     }
 
     public new Stamp MostRecent()

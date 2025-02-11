@@ -1,6 +1,6 @@
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using EdgeMq.Api.Configuration;
 using EdgeMq.Api.Handlers;
