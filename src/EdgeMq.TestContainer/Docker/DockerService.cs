@@ -113,7 +113,7 @@ public sealed class DockerService : IDockerService
             RedirectStandardOutput = true
         };
 
-        var process = Process.Start(info);
+        using var process = Process.Start(info);
 
         if (process is null)
         {
