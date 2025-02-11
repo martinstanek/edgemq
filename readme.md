@@ -101,7 +101,7 @@ public async Task GetClient_ContainerIsCreated_ClientReturned()
         return;
     }
 
-     var client = await testContainer.GetClientAsync(
+    var client = await testContainer.GetClientAsync(
             testContainerName: "my-test-container", 
             testQueueName: "my-test-queue", 
             EdgeQueueTestContainer.ImageArchitecture.Amd64);
