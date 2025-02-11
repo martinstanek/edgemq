@@ -17,11 +17,7 @@ public sealed class EdgeQueueTestContainerTests
             return;
         }
 
-        var client = await testContainer.GetClientAsync(
-            testContainerName: "my-test-container",
-            testQueueName: "my-test-queue",
-            EdgeQueueTestContainer.ImageArchitecture.Amd64);
-
+        var client = await testContainer.GetClientAsync();
         var queues = await client.GetQueuesAsync();
 
         queues.Queues.ShouldNotBeEmpty();
