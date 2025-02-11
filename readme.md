@@ -5,24 +5,29 @@
 ![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/logo.svg?raw=true)
 
 [![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52)
-[![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.Client.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.Client) 
+[![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.Client.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.Client)
+[![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.TestContainer.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.TestContainer)
 ![Docker Image Version](https://img.shields.io/docker/v/awitec/edgemq)
 
 ![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/ui.png?raw=true)
 
-### Enqueue
+### Producer
 
 ```csharp
 var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:2323") };
-var edgeMqClient = new EdgeMqClient(httpClient);
+var config = new EdgeMqClientConfiguration { ApiKey = "123" };
+var edgeMqClient = new EdgeMqClient(httpClient, config);
+
 await edgeMqClient.EnqueueAsync("test-queue", "hello world!");
 ```
 
-### Dequeue
+### Consumer
 
 ```csharp
 var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:2323") };
-var edgeMqClient = new EdgeMqClient(httpClient);
+var config = new EdgeMqClientConfiguration { ApiKey = "123" };
+var edgeMqClient = new EdgeMqClient(httpClient, config);
+
 await edgeMqClient.DequeueAsync("test-queue", batch, TimeSpan.FromSeconds(1), messages =>
 {
     foreach (var message in messages)
@@ -34,6 +39,16 @@ await edgeMqClient.DequeueAsync("test-queue", batch, TimeSpan.FromSeconds(1), me
 
 }, CancellationToken.None);
 ```
+
+### Server
+
+```
+UI -> http://localhost:2323/
+OpenApi -> http://localhost:2323/openapi/v1.json
+Scalar -> http://localhost:2323/scalar/
+API -> http://localhost:2323/v1/queues
+```
+### Docker
 
 Available Docker Tags: https://hub.docker.com/repository/docker/awitec/edgemq/tags
 
@@ -49,6 +64,7 @@ services:
     ports:
       - 2323:2323
     environment:
+      - EDGEMQ_APIKEY=123
       - EDGEMQ_PATH=/data/queues
       - EDGEMQ_QUEUES=test-queue
       - EDGEMQ_STOREMODE=FileSystem
@@ -67,6 +83,35 @@ services:
 volumes:
   edgemqdata:
 ```
+
+When no env. vars provided, the server will default to InMemory mode without any API key.
+
+### Testing
+
+The test container NuGet can be used for the derived integration tests, (the default architecture is arm64) ie.:
+
+```csharp
+[Fact]
+public async Task GetClient_ContainerIsCreated_ClientReturned()
+{
+    await using var testContainer = new EdgeQueueTestContainer();
+
+    if (!await testContainer.IsTestable())
+    {
+        return;
+    }
+
+     var client = await testContainer.GetClientAsync(
+            testContainerName: "my-test-container", 
+            testQueueName: "my-test-queue", 
+            EdgeQueueTestContainer.ImageArchitecture.Amd64);
+     
+    var queues = await client.GetQueuesAsync();
+
+    queues.Queues.ShouldNotBeEmpty();
+}
+```
+
 
 Happy Queueing,\
 Martin

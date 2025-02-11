@@ -1,6 +1,8 @@
-## The EdgeMQ Client
+## The EdgeMq.TestContainer
 
-*... simple native .NET docker wrapper for the EdgeMQ queue docker imager*
+*The docker test container wrapper used for the integration tests.*
+
+The test container NuGet can be used for the derived integration tests, (the default architecture is arm64) ie.:
 
 ```csharp
 [Fact]
@@ -13,7 +15,11 @@ public async Task GetClient_ContainerIsCreated_ClientReturned()
         return;
     }
 
-    var client = await testContainer.GetClientAsync();
+    var client = await testContainer.GetClientAsync(
+          testContainerName: "my-test-container", 
+          testQueueName: "my-test-queue", 
+          EdgeQueueTestContainer.ImageArchitecture.Amd64);
+     
     var queues = await client.GetQueuesAsync();
 
     queues.Queues.ShouldNotBeEmpty();

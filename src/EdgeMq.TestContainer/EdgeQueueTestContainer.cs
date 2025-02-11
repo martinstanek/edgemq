@@ -26,6 +26,7 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
 
     public async Task<IEdgeMqClient> GetClientAsync(
         string testContainerName =  EdgeQueueContainerName,
+        string testQueueName = EdgeQueueTestQueueName,
         ImageArchitecture architecture = ImageArchitecture.Arm64,
         CancellationToken cancellationToken = default)
     {
@@ -54,7 +55,7 @@ public sealed class EdgeQueueTestContainer : IAsyncDisposable
             hostNetwork: hostNetwork,
             ports: new Dictionary<ushort, ushort> { { 2323, 2323 } },
             volumes: new Dictionary<string, string> { { "edgemqdata", "/data" } },
-            variables: new Dictionary<string, string> { { "EDGEMQ_QUEUES", EdgeQueueTestQueueName }, { "EDGEMQ_MODE", "InMemory" } },
+            variables: new Dictionary<string, string> { { "EDGEMQ_QUEUES", testQueueName }, { "EDGEMQ_MODE", "InMemory" } },
             cancellationToken: cancellationToken);
 
         await Task.Delay(TimeSpan.FromSeconds(EdgeQueueContainerStartUpDelaySeconds), cancellationToken);
