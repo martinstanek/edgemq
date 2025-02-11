@@ -68,7 +68,7 @@ services:
     environment:
       - EDGEMQ_APIKEY=123
       - EDGEMQ_PATH=/data/queues
-      - EDGEMQ_QUEUES=test-queue
+      - EDGEMQ_QUEUES=queue1, queue2
       - EDGEMQ_STOREMODE=FileSystem
       - EDGEMQ_CONSTRAINTSMODE=Ignore
       - EDGEMQ_MAXCOUNT=100000
