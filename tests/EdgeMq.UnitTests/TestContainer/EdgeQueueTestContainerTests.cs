@@ -17,7 +17,7 @@ public sealed class EdgeQueueTestContainerTests
             return;
         }
 
-        var client = await testContainer.GetClientAsync();
+        var client = await testContainer.GetClientAsync(testContainerName: "edge-mq-test");
         var queues = await client.GetQueuesAsync();
 
         queues.Queues.ShouldNotBeEmpty();
