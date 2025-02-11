@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="Moq" Version="4.20.72" />
+        <PackageReference Include="Shouldly" Version="4.3.0" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1" PrivateAssets="all" />
+        <PackageReference Include="coverlet.msbuild" Version="6.0.4" PrivateAssets="all" />
+        <PackageReference Include="coverlet.collector" Version="6.0.4" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\EdgeMq.Api\EdgeMq.Api.csproj" />
+      <ProjectReference Include="..\..\src\EdgeMq.Client\EdgeMq.Client.csproj" />
+      <ProjectReference Include="..\..\src\EdgeMq.Service\EdgeMq.Service.csproj" />
+      <ProjectReference Include="..\..\src\EdgeMq.TestContainer\EdgeMq.TestContainer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Infra\" />
+      <Folder Include="Infra\Metrics\" />
+    </ItemGroup>
+
+</Project>

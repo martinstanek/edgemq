@@ -1,0 +1,5 @@
+@using EdgeMq.Dashboard.Eventing
+@inject IQueueMetricsEventingService EventingService;
+
+<MudProgressLinear Color="Color.Primary" Buffer="true" Value="@_sizePressure" BufferValue="@_sizeBufferPressure" Class="my-7"/>
+<MudProgressLinear Color="Color.Secondary" Buffer="true" Value="@_countPressure" BufferValue="@_countBufferPressure" Class="my-7"/>

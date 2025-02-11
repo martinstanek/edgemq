@@ -1,0 +1,27 @@
+<MudCard Style="margin-bottom: 10px">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Queue.Name</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid Justify="Justify.FlexEnd">
+            <MudItem xs="6">
+                <ValueLabel Label="Store mode:" Value="@Queue.StoreMode"/>
+                <ValueLabel Label="Count:" Value="@Queue.Metrics.MessageCount.ToString()" />
+                <ValueLabel Label="Size:" Value="@CurrentSize" />
+                <ValueLabel Label="Processed messages:" Value="@Queue.Metrics.ProcessedMessages.ToString()" />
+                <ValueLabel Label="Messages in:" Value="@MessagesInPerSecond" />
+                <ValueLabel Label="Messages out:" Value="@MessagesOutPerSecond" />
+                <ValueLabel Label="Pressure (count):" Value="@CountPressure" />
+                <ValueLabel Label="Pressure (size):" Value="@SizePressure" />
+                <ValueLabel Label="Buffer pressure (count):" Value="@BufferCountPressure" />
+                <ValueLabel Label="Buffer pressure (size):" Value="@BufferSizePressure" />
+            </MudItem>
+            <MudItem xs="6">
+                <QueueThroughputChart QueueName="@Queue.Name"/>
+            </MudItem>
+        </MudGrid>
+        <QueuePressureChart QueueName="@Queue.Name"/>
+    </MudCardContent>
+</MudCard>

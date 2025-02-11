@@ -1,0 +1,11 @@
+@using EdgeMq.Dashboard.Eventing
+@inject IQueueMetricsEventingService EventingService;
+
+<MudChart
+    ChartType="ChartType.Line"
+    ChartSeries="@Series"
+    @bind-SelectedIndex="_chartIndex"
+    XAxisLabels="@XAxisLabels"
+    Width="100%"
+    Height="270px"
+    ChartOptions="@_options"/>

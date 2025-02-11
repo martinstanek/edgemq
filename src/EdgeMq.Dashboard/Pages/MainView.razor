@@ -1,0 +1,29 @@
+﻿@page "/"
+@using EdgeMq.Client
+@using EdgeMq.Dashboard.Components
+@using EdgeMq.Dashboard.Eventing
+@inject IEdgeMqClient EdgeMqClient;
+@inject IQueueMetricsEventingService EventingService;
+
+<PageTitle>EdgeMQ Dashboard</PageTitle>
+
+<MudGrid>
+    <MudItem xs="6">
+        <div style="margin-top: 10px;">
+            <MudTooltip Text="@_server.Version">
+                <MudImage Width="200" Height="50" Src="logo.svg" Alt="EdgeMQ"/>
+            </MudTooltip>
+        </div>
+    </MudItem>
+    <MudItem xs="6">
+        <div style="margin-bottom: 10px; margin-top: 10px; display: flex; justify-content: right" >
+            <MudSwitch @bind-Value="_autoRefresh" Label="auto refresh" Color="Color.Tertiary" />
+        </div>
+    </MudItem>
+</MudGrid>
+
+
+@foreach (var queue in _server.Queues)
+{
+    <QueueCard Queue="@queue" />
+}
