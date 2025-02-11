@@ -1,6 +1,8 @@
-## The EdgeMQ
+## The EdgeMq
 
- *... a simple (like really simple) queue designed to have minimal memory footprint and feature set*
+ *... a simple (like seriously and naively simple), lightweight queue designed to have a minimal memory footprint*
+
+Multi producer, single consumer & plenty of space for improvements.
 
 ![logo](https://github.com/martinstanek/edgemq/blob/develop/misc/logo.svg?raw=true)
 
