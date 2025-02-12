@@ -6,7 +6,7 @@ Multi producer, single consumer & plenty of space for improvements.
 
 ![logo](https://github.com/martinstanek/edgemq/blob/main/misc/logo.svg?raw=true)
 
-[![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52)
+[![Build status](https://awitec.visualstudio.com/Awitec/_apis/build/status/awitec.edgemq)](https://awitec.visualstudio.com/Awitec/_build/latest?definitionId=52)
 [![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.Client.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.Client)
 [![NuGet](https://img.shields.io/nuget/v/Awitec.EdgeMq.TestContainer.svg)](https://www.nuget.org/packages/Awitec.EdgeMq.TestContainer)
 ![Docker Image Version](https://img.shields.io/docker/v/awitec/edgemq)
